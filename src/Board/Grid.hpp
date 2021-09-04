@@ -4,10 +4,10 @@
 #include "ElementsContainer.hpp"
 #include "Line.hpp"
 #include "Subgrid.hpp"
-#include <string>
-#include <iterator>
 #include "GlobalDefinitions.hpp"
 
+#include <string>
+#include <array>
 
 // class Solver;
 
@@ -15,9 +15,9 @@ class Grid
 {
 private:
     GridTiles m_gridTiles;
-    Line m_verticalLines[9];
-    Line m_horizontalLines[9];
-    Subgrid m_subgrids[9];
+    std::array<Line, 9> m_verticalLines;
+    std::array<Line, 9> m_horizontalLines;
+    std::array<Subgrid, 9> m_subgrids;
 
     friend class Solver;
     friend int main();
