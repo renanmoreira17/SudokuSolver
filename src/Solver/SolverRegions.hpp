@@ -5,7 +5,6 @@
 #include "Board/ElementsContainer.hpp"
 #include "Board/Grid.hpp"
 #include <set>
-#include <utility>
 #include <map>
 
 class Solver;

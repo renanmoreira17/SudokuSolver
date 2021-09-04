@@ -4,11 +4,7 @@
 #include "Board/Grid.hpp"
 #include "Board/ElementsContainer.hpp"
 #include "SolverRegions.hpp"
-#include <set>
-#include <tuple>
-#include <array>
 #include <vector>
-#include <utility>
 #include <memory>
 #include "Techniques/Singles.hpp"
 
