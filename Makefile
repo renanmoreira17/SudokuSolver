@@ -7,7 +7,7 @@ SRC     := ./src
 SRCS    := $(shell find $(SRC) -name '*.cpp')
 OBJS    := $(patsubst $(SRC)/%.cpp,$(OBJ)/%.o,$(SRCS))
 EXE     := $(TARGET)/SudokuSolver
-CXXFLAGS  := -I$(SRC) -std=c++20 -stdlib=libc++ -g -Wall -Wextra -Wpedantic
+CXXFLAGS  := -I$(SRC) -std=c++20 -stdlib=libc++ -g -Wall -Wextra -Wpedantic -MD -MP
 LDLIBS  := -lm
 LDFLAGS :=
 
@@ -38,3 +38,19 @@ clean:
 printstuff:
 	@echo "sources: $(SRCS)"
 	@echo "objects: $(OBJS)"
+
+
+# Add .d to Make's recognized suffixes.
+SUFFIXES += .d
+
+#We don't need to clean up when we're making these targets
+NODEPS:=clean
+#These are the dependency files, which make will clean up after it creates them
+DEPFILES:=$(patsubst $(SRC)/%.cpp,$(OBJ)/%.d,$(SRCS))
+
+#Don't create dependencies when we're cleaning, for instance
+ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
+    #Chances are, these files don't exist.  GMake will create them and
+    #clean up automatically afterwards
+    -include $(DEPFILES)
+endif

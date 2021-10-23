@@ -4,9 +4,11 @@
 #include "Board/Grid.hpp"
 #include "Board/ElementsContainer.hpp"
 #include "SolverRegions.hpp"
+#include "Techniques/Singles.hpp"
+
 #include <vector>
 #include <memory>
-#include "Techniques/Singles.hpp"
+#include <array>
 
 class Solver
 {
@@ -14,9 +16,9 @@ private:
     Grid *m_grid;
     GridElements<std::pair<Tile*, Suggestions>> m_suggestions;
 
-    SolverLine m_horizontalLines[9];
-    SolverLine m_verticalLines[9];
-    SolverSubgrid m_subgrids[9];
+    std::array<SolverLine, 9> m_horizontalLines;
+    std::array<SolverLine, 9> m_verticalLines;
+    std::array<SolverSubgrid, 9> m_subgrids;
     std::array<SolverRegion*, 27> m_allRegions;
 
     std::vector<std::unique_ptr<Technique>> m_techniques{};

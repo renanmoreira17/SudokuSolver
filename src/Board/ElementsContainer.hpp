@@ -2,13 +2,14 @@
 #define __GRIDELEMENTS_H__
 
 #include <iterator>
+#include <array>
 #include "Tile.hpp"
 
 template<typename T, TileValueType R, TileValueType C>
 class ElementsContainer
 {
 private:
-    T m_elements[R][C];
+    std::array<std::array<T, C>, R> m_elements;
 
 public:
     struct const_iterator

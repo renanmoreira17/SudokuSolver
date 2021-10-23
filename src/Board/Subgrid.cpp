@@ -19,7 +19,7 @@ Subgrid::Subgrid(Subgrid&& other)
     m_grid = other.m_grid;
     m_index = other.m_index;
 
-    auto head = m_elementList->getHead();
+    auto* head = m_elementList->getHead();
     do
     {
         head->getElement().setSubgrid(this);

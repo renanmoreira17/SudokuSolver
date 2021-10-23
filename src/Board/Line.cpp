@@ -26,13 +26,12 @@ Line::Line(Grid* grid, Orientation orientation, const TileValueType index)
 }
 
 Line::Line(Line&& other)
-: Region(other)
+: Region(other), m_grid(other.m_grid)
 {
-    m_grid = other.m_grid;
     m_index = other.m_index;
     m_orientation = other.m_orientation;
 
-    auto head = m_elementList->getHead();
+    auto* head = m_elementList->getHead();
     do
     {
         auto& tile = head->getElement();
@@ -60,7 +59,7 @@ Line& Line::operator=(Line&& other)
     m_index = other.m_index;
     m_orientation = other.m_orientation;
 
-    auto head = m_elementList->getHead();
+    auto* head = m_elementList->getHead();
     do
     {
         auto& tile = head->getElement();

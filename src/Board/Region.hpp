@@ -2,11 +2,13 @@
 #define __REGION_H__
 
 #include "ElementList.hpp"
-#include <algorithm>
 #include "ElementsContainer.hpp"
+
+#include <algorithm>
 #include <functional>
 #include <optional>
 #include <set>
+#include <memory>
 
 enum Orientation {vertical, horizontal};
 
@@ -14,7 +16,7 @@ template<typename T>
 class Region
 {
 protected:
-    ElementList<T>* m_elementList{nullptr};
+    std::shared_ptr<ElementList<T>> m_elementList;
     TileValueType m_index;
 public:
     Region() = default;
@@ -23,13 +25,9 @@ public:
     Region(Region<T>&& other) = default;
     Region<T>& operator=(const Region& other) = default;
     Region<T>& operator=(Region&& other) = default;
-    virtual ~Region()
-    {
-        delete m_elementList;
-    }
+    virtual ~Region() = default;
 
-    ElementList<T>* const & getElementList() { return m_elementList; };
-    const ElementList<T>* getElementList() const { return m_elementList; };
+    std::shared_ptr<ElementList<T>> getElementList() const { return m_elementList; };
 
     TileValueType getIndex() const { return m_index; }
 
@@ -83,7 +81,7 @@ public:
     }
 
 
-    static ElementList<T>* const make_line(const Orientation& orientation, TileValueType index, GridElements<T>& gridElements, const std::optional<const std::function<void(T&)>>& applyElement)  {
+    static std::shared_ptr<ElementList<T>> make_line(const Orientation& orientation, TileValueType index, GridElements<T>& gridElements, const std::optional<const std::function<void(T&)>>& applyElement)  {
         LineElementWrapper<T>* lastElementWrapper = nullptr;
         for (TileValueType i = 0; i < 9; i++)
         {
@@ -95,10 +93,10 @@ public:
             auto elementWrapper = new LineElementWrapper<T>(&element, lastElementWrapper);
             lastElementWrapper = elementWrapper;
         }
-        return new ElementList<T>(lastElementWrapper);
+        return std::make_shared<ElementList<T>>(lastElementWrapper);
     }
 
-    static ElementList<T>* const make_subgrid(TileValueType index, GridElements<T>& gridElements, const std::optional<const std::function<void(T&)>>& applyElement)  {
+    static std::shared_ptr<ElementList<T>> make_subgrid(TileValueType index, GridElements<T>& gridElements, const std::optional<const std::function<void(T&)>>& applyElement)  {
         SubgridElementWrapper<T>* lastElementWrapper = nullptr;
         const TileValueType offsetCol = index % 3;
         const TileValueType offsetRow = index / 3;
@@ -112,7 +110,7 @@ public:
             auto tileWrapper = new SubgridElementWrapper<T>(&element, lastElementWrapper);
             lastElementWrapper = tileWrapper;
         }
-        return new ElementList<T>(lastElementWrapper);
+        return std::make_shared<ElementList<T>>(lastElementWrapper);
     }
 };
 
