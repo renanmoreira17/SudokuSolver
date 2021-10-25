@@ -1,88 +1,70 @@
 #ifndef __SOLVERREGIONS_H__
 #define __SOLVERREGIONS_H__
 
-#include "Board/Region.hpp"
 #include "Board/ElementsContainer.hpp"
 #include "Board/Grid.hpp"
-#include <set>
+#include "Board/Region.hpp"
 #include <map>
+#include <set>
 
 class Solver;
 class Line;
 class Subgrid;
 
 using SuggestionsQuan = std::map<TileValueType, TileValueType>;
-using Suggestions = std::set<TileValueType>;
 
-
-class SolverRegion : public Region<std::pair<Tile*, Suggestions>>
+class SolverRegion : virtual public Region
 {
-private:
-    Solver* m_solver;
+  private:
+    Grid* m_grid;
     // Suggestions m_missing{1, 2, 3, 4, 5, 6, 7, 8, 9};
     SuggestionsQuan m_suggestionsQuan;
-    Region<Tile>* m_originalRegion;
-public:
-    SolverRegion(Solver* const& solver, const unsigned index, Region<Tile>* const& originalRegion);
-    SolverRegion() = default;
-    SolverRegion(const SolverRegion& other)             = default;
-    SolverRegion(SolverRegion&& other);
-    SolverRegion& operator=(const SolverRegion& other)  = default;
-    SolverRegion& operator=(SolverRegion&& other);
-    ~SolverRegion() {}
 
-    Solver* const& getSolver() { return m_solver; }
-    const Solver* const& getSolver() const { return m_solver; }
+  public:
+    SolverRegion(Grid* grid, const unsigned index);
+    SolverRegion(const SolverRegion& other) = default;
+    SolverRegion(SolverRegion&& other);
+    SolverRegion& operator=(const SolverRegion& other) = default;
+    SolverRegion& operator=(SolverRegion&& other);
+    virtual ~SolverRegion() = default;
+
+    Solver* getSolver() const;
+
     SuggestionsQuan& getSuggestionsQuan() { return m_suggestionsQuan; }
     const SuggestionsQuan& getSuggestionsQuan() const { return m_suggestionsQuan; }
+
     void suggestionAdded(const unsigned value);
     void suggestionRemoved(const unsigned value);
-    TileValueType getSuggestionsQuanFor(TileValueType value) const;
 
-    Region<Tile>& getOriginalRegion() { return *m_originalRegion; }
-    const Region<Tile>& getOriginalRegion() const { return *m_originalRegion; }
+    TileValueType getSuggestionsQuanFor(TileValueType value) const;
 };
 
-
-class SolverLine : public SolverRegion
+class SolverLine
+    : public SolverRegion
+    , public Line
 {
-private:
-    Orientation m_orientation;
-    static Region<Tile>& getLineRegionFrom(Grid& grid, const Orientation& orientation, const TileValueType index)
-    {
-        if (orientation == horizontal)
-        {
-            return grid.getHorizontalLine(index);
-        }
-        else
-        {
-            return grid.getVerticalLine(index);
-        }
-    }
-public:
-    SolverLine(Line& line, Solver* const& solver);
-    SolverLine(Solver* const& solver, Orientation orientation, const TileValueType index);
-    SolverLine()                                    = default;
-    SolverLine(const SolverLine& other)             = default;
-    SolverLine(SolverLine&& other)                  = default;
-    SolverLine& operator=(const SolverLine& other)  = default;
-    SolverLine& operator=(SolverLine&& other)       = default;
+  private:
+  public:
+    SolverLine(Grid* grid, LineOrientation orientation, const short index);
+    SolverLine(const SolverLine& other) = default;
+    SolverLine(SolverLine&& other) = default;
+    SolverLine& operator=(const SolverLine& other) = default;
+    SolverLine& operator=(SolverLine&& other) = default;
     ~SolverLine() {}
 };
 
-class SolverSubgrid : public SolverRegion
+class SolverSubgrid
+    : public SolverRegion
+    , public Subgrid
 {
-private:
-public:
-    SolverSubgrid(Subgrid& subgrid, Solver* const& solver);
-    SolverSubgrid(Solver* const& solver, const TileValueType index);
-    SolverSubgrid()                                       = default;
-    SolverSubgrid(const SolverSubgrid& other)             = default;
-    SolverSubgrid(SolverSubgrid&& other)                  = default;
-    SolverSubgrid& operator=(const SolverSubgrid& other)  = default;
-    SolverSubgrid& operator=(SolverSubgrid&& other)       = default;
+  private:
+  public:
+    SolverSubgrid(Grid* grid, const short index);
+    SolverSubgrid(const SolverSubgrid& other) = default;
+    SolverSubgrid(SolverSubgrid&& other) = default;
+    SolverSubgrid& operator=(const SolverSubgrid& other) = default;
+    SolverSubgrid& operator=(SolverSubgrid&& other) = default;
     ~SolverSubgrid() {}
 };
-
 
 #endif // __SOLVERREGIONS_H__

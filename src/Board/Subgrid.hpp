@@ -6,16 +6,16 @@
 class Grid;
 class Tile;
 
-class Subgrid: public Region<Tile>
+class Subgrid : virtual public Region
 {
-private:
+  private:
     Grid* m_grid;
-public:
+
+  public:
     Subgrid(Grid* grid, const short index);
-    Subgrid()                                  = default;
-    Subgrid(const Subgrid& other)              = default;
+    Subgrid(const Subgrid& other) = default;
     Subgrid(Subgrid&& other);
-    Subgrid& operator=(const Subgrid& other)   = default;
+    Subgrid& operator=(const Subgrid& other) = default;
     Subgrid& operator=(Subgrid&& other);
     ~Subgrid() {}
 };

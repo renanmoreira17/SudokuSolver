@@ -19,6 +19,7 @@ $(EXE): $(OBJS) | $(TARGET)
 	@echo ""
 	@echo "Linking $(@F)..."
 	$(CXX) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+	@echo "\nBuild Successful!"
 
 $(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ)
 	@echo "Compiling $<"

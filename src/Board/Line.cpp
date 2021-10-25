@@ -1,48 +1,34 @@
 #include "Line.hpp"
-#include "ElementWrapper.hpp"
 #include "ElementList.hpp"
+#include "ElementWrapper.hpp"
 #include "Grid.hpp"
 #include "Tile.hpp"
 #include <utility>
 
-Line::Line(Grid* grid, Orientation orientation, const TileValueType index)
+Line::Line(Grid* grid, LineOrientation orientation, const short index)
     : Region(index)
     , m_orientation(orientation)
     , m_grid(grid)
 {
 
-    const auto lamb = [&](Tile& tile) {
-            if (orientation == vertical)
-            {
-                tile.setVerticalLine(this);
-            }
-            else
-            {
-                tile.setHorizontalLine(this);
-            }
+    const auto lamb = [&](const std::shared_ptr<Tile>& tile) {
+        tile->setLine(orientation, this);
     };
 
-    m_elementList = Region<Tile>::make_line(orientation, index, grid->getGridTiles(), std::make_optional(lamb));
+    m_elementList = Region::make_line(orientation, index, grid->getGridTiles(), lamb);
 }
 
 Line::Line(Line&& other)
-: Region(other), m_grid(other.m_grid)
+    : Region(other)
+    , m_grid(other.m_grid)
 {
     m_index = other.m_index;
     m_orientation = other.m_orientation;
 
     auto* head = m_elementList->getHead();
-    do
-    {
+    do {
         auto& tile = head->getElement();
-        if (m_orientation == vertical)
-        {
-            tile.setVerticalLine(this);
-        }
-        else
-        {
-            tile.setHorizontalLine(this);
-        }
+        tile->setLine(m_orientation, this);
     } while ((head = head->next()));
 
     other.m_grid = nullptr;
@@ -51,7 +37,8 @@ Line::Line(Line&& other)
 
 Line& Line::operator=(Line&& other)
 {
-    if (&other == this) return *this;
+    if (&other == this)
+        return *this;
 
     Region::operator=(std::move(other));
 
@@ -60,17 +47,9 @@ Line& Line::operator=(Line&& other)
     m_orientation = other.m_orientation;
 
     auto* head = m_elementList->getHead();
-    do
-    {
+    do {
         auto& tile = head->getElement();
-        if (m_orientation == vertical)
-        {
-            tile.setVerticalLine(this);
-        }
-        else
-        {
-            tile.setHorizontalLine(this);
-        }
+        tile->setLine(m_orientation, this);
     } while ((head = head->next()));
 
     other.m_grid = nullptr;

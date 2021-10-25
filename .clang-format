@@ -1,0 +1,47 @@
+﻿---
+BasedOnStyle: LLVM
+AlignConsecutiveMacros: 'true'
+AlignConsecutiveAssignments: 'false'
+AlignConsecutiveDeclarations: 'false'
+AlignTrailingComments: 'true'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortCaseLabelsOnASingleLine: 'true'
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortLambdasOnASingleLine: Inline
+AllowShortLoopsOnASingleLine: 'true'
+AlwaysBreakTemplateDeclarations: 'Yes'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
+BraceWrapping:
+    AfterCaseLabel: 'true'
+    AfterClass: 'true'
+    AfterControlStatement: 'true'
+    AfterEnum: 'true'
+    AfterFunction: 'true'
+    AfterNamespace: 'true'
+    AfterObjCDeclaration: 'true'
+    AfterStruct: 'true'
+    AfterUnion: 'true'
+    AfterExternBlock: 'true'
+    BeforeCatch: 'true'
+    BeforeElse: 'true'
+    IndentBraces: 'false'
+    SplitEmptyFunction: 'false'
+    SplitEmptyRecord: 'true'
+    SplitEmptyNamespace: 'true'
+BreakBeforeBraces: Custom
+BreakBeforeTernaryOperators: 'true'
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+BreakStringLiterals: 'true'
+ColumnLimit: '100'
+ConstructorInitializerAllOnOneLineOrOnePerLine: 'false'
+IndentWidth: '4'
+IndentWrappedFunctionNames: 'false'
+PointerAlignment: Left
+SortIncludes: 'true'
+SortUsingDeclarations: 'true'
+SpaceAfterTemplateKeyword: 'false'
+AllowAllConstructorInitializersOnNextLine: 'true'
+
+...

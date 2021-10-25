@@ -260,6 +260,6 @@ public:
 template<typename T>
 using GridElements = ElementsContainer<T, 9, 9>;
 
-using GridTiles = GridElements<Tile>;
+using GridTiles = GridElements<std::shared_ptr<Tile>>;
 
 #endif // __GRIDELEMENTS_H__

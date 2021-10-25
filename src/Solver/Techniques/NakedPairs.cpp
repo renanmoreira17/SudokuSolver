@@ -1,16 +1,24 @@
 #include "NakedPairs.hpp"
+
 #include "Solver/Solver.hpp"
-#include <type_traits>
+#include "Solver/SolverTile.hpp"
+
 #include <list>
+#include <memory>
+#include <type_traits>
+#include <utility>
 
 bool NakedPairs::analyze()
 {
-    for (auto &&region : m_solver->getAllRegions())
+    for (auto&& region : m_solver->getAllRegions())
     {
         short suggestionQuan = 0;
-        for (auto &&suggestion : *region)
+        for (auto&& tile : *region)
         {
-            if (suggestion.second.size() == 2)
+            // cast tile to std::shared_ptr<SolverTile>, check if the number of suggestions is
+            // greater than 2, if so, increments suggestionQuan, and if suggestionQuan is greater
+            // than 2, then return true
+            if (std::dynamic_pointer_cast<SolverTile>(tile)->getSuggestions().size() >= 2)
             {
                 ++suggestionQuan;
                 if (suggestionQuan == 2)
@@ -26,23 +34,26 @@ bool NakedPairs::analyze()
 bool NakedPairs::perform()
 {
     bool performed = false;
-    for (auto &&region : m_solver->getAllRegions())
+    for (auto&& region : m_solver->getAllRegions())
     {
         if (region->isCompleted())
             continue;
 
-        using VecType = std::decay<decltype(region->getElementList()->getHead()->getElement())>::type;
-        std::list<VecType*> filteredSuggestions;
+        std::list<std::shared_ptr<SolverTile>*> filteredSuggestions;
 
         // filtra todos tiles que tem a quantidade de sugestões = 2
-        for (auto &&suggestion : *region)
+        for (auto&& tile : *region)
         {
-            if (suggestion.second.size() == 2)
-                filteredSuggestions.push_back(&suggestion);
+            auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
+            if (solverTile->getSuggestions().size() == 2)
+            {
+                filteredSuggestions.push_back(&solverTile);
+            }
         }
 
         if (filteredSuggestions.size() <= 2)
             continue;
+
         auto it = filteredSuggestions.begin();
         // so pode ser feito uma vez por region, por mais que haja outros hidden pairs na region.
         // isso porque a remoçao de sugestoes de uma region pode interfereir a filteredSuggestions
@@ -50,22 +61,24 @@ bool NakedPairs::perform()
         while (it != filteredSuggestions.end())
         {
             auto& current = *it;
-            auto found = std::find_if(filteredSuggestions.begin(), filteredSuggestions.end(),
-                [&](decltype(current) s) -> bool
-                {
-                    return s != current && s->second == current->second;
-                }
-            );
+            auto found = std::find_if(filteredSuggestions.begin(),
+                                      filteredSuggestions.end(),
+                                      [&](decltype(current) s) -> bool {
+                                          return s != current && (*s)->getSuggestions() ==
+                                                                     (*current)->getSuggestions();
+                                      });
             if (found != filteredSuggestions.end())
             {
                 // e remove as sugestões desses hiddens pairs dos outros tiles da region
-                for (auto &&suggestion : *region)
+                for (auto&& tile : *region)
                 {
-                    if (&suggestion == current || &suggestion == *found || suggestion.second.empty())
+                    auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
+                    if (solverTile == *current || solverTile == **found ||
+                        solverTile->getSuggestions().empty())
                         continue;
-                    for (auto &&currentSugg : current->second)
+                    for (auto&& currentSugg : (*current)->getSuggestions())
                     {
-                        bool erased = suggestion.second.erase(currentSugg);
+                        bool erased = solverTile->getSuggestions().erase(currentSugg);
                         performed |= erased;
                     }
                 }

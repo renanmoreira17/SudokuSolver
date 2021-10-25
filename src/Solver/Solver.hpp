@@ -1,74 +1,57 @@
 #ifndef __SOLVER_H__
 #define __SOLVER_H__
 
-#include "Board/Grid.hpp"
 #include "Board/ElementsContainer.hpp"
+#include "Board/Grid.hpp"
 #include "SolverRegions.hpp"
 #include "Techniques/Singles.hpp"
 
-#include <vector>
-#include <memory>
 #include <array>
+#include <memory>
+#include <vector>
 
-class Solver
+class SolverComponentsContructor : public ComponentsConstructor
 {
-private:
-    Grid *m_grid;
-    GridElements<std::pair<Tile*, Suggestions>> m_suggestions;
+  public:
+    std::shared_ptr<Tile> createTile(Grid* grid, TileValueType row, TileValueType col) override;
+    std::shared_ptr<Line> createLine(Grid* grid, LineOrientation row, short index) override;
+    std::shared_ptr<Subgrid> createSubgrid(Grid* grid, short index) override;
+};
 
-    std::array<SolverLine, 9> m_horizontalLines;
-    std::array<SolverLine, 9> m_verticalLines;
-    std::array<SolverSubgrid, 9> m_subgrids;
-    std::array<SolverRegion*, 27> m_allRegions;
+class Solver : public Grid
+{
+  private:
+    std::array<std::shared_ptr<SolverRegion>, 27> m_allRegions;
 
     std::vector<std::unique_ptr<Technique>> m_techniques{};
 
-    void initializeTechniques();
-public:
-    Grid* const& getGrid() { return m_grid; }
-    const Grid* const& getGrid() const { return m_grid; }
+    void initialize();
 
-    std::set<TileValueType> &getSuggestions(TileValueType row, TileValueType col);
-    std::set<TileValueType> &getSuggestions(const Tile &tile);
-    const std::set<TileValueType> &getSuggestions(TileValueType row, TileValueType col) const;
-    const std::set<TileValueType> &getSuggestions(const Tile &tile) const;
-
-    SolverLine& getSolverHorizontalLine(const Tile& tile);
-    const SolverLine& getSolverHorizontalLine(const Tile& tile) const;
-    SolverLine& getSolverVerticalLine(const Tile& tile);
-    const SolverLine& getSolverVerticalLine(const Tile& tile) const;
-    SolverSubgrid& getSolverSubgrid(const Tile& tile);
-    const SolverSubgrid& getSolverSubgrid(const Tile& tile) const;
-    const std::tuple<SolverLine&, SolverLine&, SolverSubgrid&> getSolverRegionsTuple(const Tile& tile);
-    const std::tuple<const SolverLine&, const SolverLine&, const SolverSubgrid&> getSolverRegionsTuple(const Tile& tile) const;
+  public:
     const std::array<SolverRegion* const, 3> getSolverRegions(const Tile& tile);
     const std::array<const SolverRegion* const, 3> getSolverRegions(const Tile& tile) const;
 
-    std::array<SolverRegion*, 27>& getAllRegions() { return m_allRegions; }
-    const std::array<SolverRegion*, 27>& getAllRegions() const { return m_allRegions; }
+    std::array<std::shared_ptr<SolverRegion>, 27>& getAllRegions() { return m_allRegions; }
+    const std::array<std::shared_ptr<SolverRegion>, 27>& getAllRegions() const
+    {
+        return m_allRegions;
+    }
 
     void computeAllSuggestions(const bool clear = false);
     void computeTileSuggestions(const Tile& tile, const bool clear = false);
 
-    bool canPlaceValueInTile(const Tile& tile, const TileValueType value, const bool forceCheck = false) const;
-
-    void placeValueInTile(Tile& tile, const TileValueType value);
-    void placeValueInTile(const Tile& tile, const TileValueType value);
-    void placeValueInTile(Tile* const& tile, const TileValueType value);
-    void placeValueInTile(const Tile* const& tile, const TileValueType value);
+    bool canPlaceValueInTile(const Tile& tile,
+                             const TileValueType value,
+                             const bool forceCheck = false) const;
 
     friend int main();
 
-public:
-    Solver() = default;
-    Solver(Grid *const &grid);
-    Solver(Grid& grid) : Solver(&grid) {}
+  public:
+    Solver();
+    Solver(const std::string& fromBoard);
     ~Solver() = default;
 
     void solve();
-
-    GridElements<std::pair<Tile*, Suggestions>>& getSuggestions() { return m_suggestions; }
-    const GridElements<std::pair<Tile*, Suggestions>>& getSuggestions() const { return m_suggestions; }
 };
 
 #endif // __SOLVER_H__

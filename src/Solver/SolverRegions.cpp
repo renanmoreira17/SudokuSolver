@@ -1,65 +1,52 @@
 #include "SolverRegions.hpp"
-#include <optional>
 #include "Board/Line.hpp"
 #include "Board/Subgrid.hpp"
 #include "Solver.hpp"
-#include <exception>
+
 #include <algorithm>
+#include <exception>
+#include <optional>
 #include <utility>
 
-
-template<>
-bool Region<std::pair<Tile*, Suggestions>>::hasValue(const TileValueType value) const {
-    for (auto &&element : *m_elementList)
-    {
-        if (element.second.find(value) != element.second.cend())
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-template<>
-const Tile& Region<std::pair<Tile*, Suggestions>>::getTileFromT(const std::pair<Tile*, Suggestions>& element) const
+SolverRegion::SolverRegion(Grid* grid, const unsigned index)
+    : Region(index)
+    , m_grid(grid)
 {
-    return *element.first;
-}
-
-
-SolverRegion::SolverRegion(Solver* const& solver, const unsigned index, Region<Tile>* const& originalRegion)
-    : Region(index), m_solver(solver), m_originalRegion(originalRegion)
-{
-    for (TileValueType i = 1; i <= 9; i++)
-    {
-        m_suggestionsQuan[i] = 0;
-    }
+    for (TileValueType i = 1; i <= 9; i++) { m_suggestionsQuan[i] = 0; }
 }
 
 SolverRegion::SolverRegion(SolverRegion&& other)
-: Region(other)
+    : Region(other)
 {
-    m_solver = other.m_solver;
-    m_originalRegion = other.m_originalRegion;
+    m_grid = other.m_grid;
     m_suggestionsQuan = std::move(other.m_suggestionsQuan);
 
-    other.m_solver = nullptr;
-    other.m_originalRegion = nullptr;
+    other.m_grid = nullptr;
     other.m_elementList = nullptr;
+}
+
+Solver* SolverRegion::getSolver() const
+{
+    // try casting m_grid to Solver*, and return it if it is valid, otherwise throw an exception
+    Solver* solver = dynamic_cast<Solver*>(m_grid);
+    if (solver == nullptr)
+    {
+        throw std::runtime_error("SolverRegion::getSolver() - m_grid is not a Solver*");
+    }
+    return solver;
 }
 
 SolverRegion& SolverRegion::operator=(SolverRegion&& other)
 {
-    if (&other == this) return *this;
+    if (&other == this)
+        return *this;
 
     Region::operator=(std::move(other));
 
-    m_solver = other.m_solver;
-    m_originalRegion = other.m_originalRegion;
+    m_grid = other.m_grid;
     m_suggestionsQuan = std::move(other.m_suggestionsQuan);
 
-    other.m_solver = nullptr;
-    other.m_originalRegion = nullptr;
+    other.m_grid = nullptr;
     other.m_elementList = nullptr;
 
     return *this;
@@ -71,7 +58,6 @@ void SolverRegion::suggestionAdded(const unsigned value)
     if (number == 9)
         throw std::out_of_range("Trying to increase suggestions number, but it's already at 9!");
     ++number;
-
 }
 
 void SolverRegion::suggestionRemoved(const unsigned value)
@@ -89,29 +75,14 @@ TileValueType SolverRegion::getSuggestionsQuanFor(TileValueType value) const
     return m_suggestionsQuan.at(value);
 }
 
+SolverLine::SolverLine(Grid* grid, LineOrientation orientation, const short index)
+    : Region(index)
+    , SolverRegion(grid, index)
+    , Line(grid, orientation, index)
+{}
 
-
-SolverLine::SolverLine(Line &line, Solver*  const& solver)
-    : SolverRegion(solver, line.getIndex(), &line), m_orientation(line.getOrientation())
-{
-    m_elementList = Region<std::pair<Tile*, Suggestions>>::make_line(m_orientation, m_index, solver->getSuggestions(), std::nullopt);
-}
-
-SolverLine::SolverLine(Solver*  const& solver, Orientation orientation, const TileValueType index)
-    : SolverRegion(solver, index, &SolverLine::getLineRegionFrom(*solver->getGrid(), orientation, index)), m_orientation(orientation)
-{
-    m_elementList = Region<std::pair<Tile*, Suggestions>>::make_line(orientation, index, solver->getSuggestions(), std::nullopt);
-}
-
-SolverSubgrid::SolverSubgrid(Subgrid &subgrid, Solver*  const& solver)
-    : SolverRegion(solver, subgrid.getIndex(), &subgrid)
-{
-    m_elementList = Region<std::pair<Tile*, Suggestions>>::make_subgrid(m_index, solver->getSuggestions(), std::nullopt);
-}
-
-SolverSubgrid::SolverSubgrid(Solver*  const& solver, const TileValueType index)
-    : SolverRegion(solver, index, &solver->getGrid()->getSubgrid(index))
-{
-    m_elementList = Region<std::pair<Tile*, Suggestions>>::make_subgrid(index, solver->getSuggestions(), std::nullopt);
-}
-
+SolverSubgrid::SolverSubgrid(Grid* grid, const short index)
+    : Region(index)
+    , SolverRegion(grid, index)
+    , Subgrid(grid, index)
+{}

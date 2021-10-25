@@ -6,22 +6,21 @@
 class Grid;
 class Tile;
 
-class Line: public Region<Tile>
+class Line : virtual public Region
 {
-private:
-    Orientation m_orientation;
+  private:
+    LineOrientation m_orientation;
     Grid* m_grid;
 
-public:
-    Line(Grid* grid, Orientation orientation, const TileValueType index);
-    Line()                              = default;
-    Line(const Line& other)             = default;
+  public:
+    Line(Grid* grid, LineOrientation orientation, const short index);
+    Line(const Line& other) = default;
     Line(Line&& other);
     Line& operator=(const Line& other) = default;
     Line& operator=(Line&& other);
-    ~Line() {}
+    virtual ~Line() = default;
 
-    const Orientation& getOrientation() const { return m_orientation; }
+    const LineOrientation& getLineOrientation() const { return m_orientation; }
 };
 
 #endif // __LINE_H__

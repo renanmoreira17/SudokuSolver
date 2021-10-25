@@ -5,23 +5,21 @@ class Solver;
 
 class Technique
 {
-protected:
+  protected:
     Solver* m_solver;
 
     virtual bool analyze() = 0;
     virtual bool perform() = 0;
-public:
+
+  public:
     Technique(Solver* solver)
-    : m_solver(solver) {}
+        : m_solver(solver)
+    {}
     Technique() = default;
     virtual ~Technique() = default;
 
     // TODO: improve return type
-    bool run()
-    {
-        return analyze() ? perform() : false;
-    }
-
+    bool run() { return analyze() ? perform() : false; }
 };
 
 #endif // __TECHNIQUE_H__

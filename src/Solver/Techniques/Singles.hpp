@@ -5,12 +5,15 @@
 
 class Singles : public Technique
 {
-protected:
+  protected:
     /* data */
     bool analyze() override;
     bool perform() override;
-public:
-    Singles(Solver* solver): Technique(solver) {}
+
+  public:
+    Singles(Solver* solver)
+        : Technique(solver)
+    {}
     Singles() = default;
     ~Singles() = default;
 };

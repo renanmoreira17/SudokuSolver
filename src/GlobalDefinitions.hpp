@@ -3,4 +3,10 @@
 
 using TileValueType = unsigned short;
 
+enum LineOrientation
+{
+    VERTICAL,
+    HORIZONTAL
+};
+
 #endif // __GLOBALDEFINITIONS_H__
