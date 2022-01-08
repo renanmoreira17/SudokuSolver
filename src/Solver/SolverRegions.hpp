@@ -21,7 +21,7 @@ class SolverRegion : virtual public Region
     SuggestionsQuan m_suggestionsQuan;
 
   public:
-    SolverRegion(Grid* grid, const unsigned index);
+    SolverRegion(Grid* grid, const unsigned index, RegionType type);
     SolverRegion(const SolverRegion& other) = default;
     SolverRegion(SolverRegion&& other);
     SolverRegion& operator=(const SolverRegion& other) = default;

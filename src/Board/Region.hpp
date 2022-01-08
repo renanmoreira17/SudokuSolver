@@ -13,13 +13,22 @@
 
 class Region
 {
+  public:
+    enum class RegionType
+    {
+        LINE,
+        SUBGRID
+    };
+
   protected:
     std::shared_ptr<ElementList<std::shared_ptr<Tile>>> m_elementList;
     short m_index;
+    RegionType m_type;
 
   public:
-    Region(const short index)
+    Region(const short index, const RegionType regionType)
         : m_index(index)
+        , m_type(regionType)
     {}
     Region(const Region& other) = default;
     Region(Region&& other) = default;
@@ -33,6 +42,7 @@ class Region
     };
 
     short getIndex() const { return m_index; }
+    RegionType getType() const { return m_type; }
 
     bool hasValue(const TileValueType value) const
     {

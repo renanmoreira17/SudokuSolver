@@ -1,21 +1,25 @@
-MKDIR   := mkdir -p
-RMDIR   := rm -rf
-CXX     := clang++
-TARGET  := ./target
-OBJ     := ./bin
-SRC     := ./src
-SRCS    := $(shell find $(SRC) -name '*.cpp')
-OBJS    := $(patsubst $(SRC)/%.cpp,$(OBJ)/%.o,$(SRCS))
-EXE     := $(TARGET)/SudokuSolver
-CXXFLAGS  := -I$(SRC) -std=c++20 -stdlib=libc++ -g -Wall -Wextra -Wpedantic -MD -MP
-LDLIBS  := -lm
-LDFLAGS :=
+MKDIR    := mkdir -p
+RMDIR    := rm -rf
+CXX      := clang++
+TARGET   := ./target
+OBJ      := ./bin
+LIBOBJ   := ./bin/lib
+SRC      := ./src
+LIB      := ./libs
+SRCS     := $(shell find $(SRC) -name '*.cpp')
+LIBS     := $(shell find $(LIB) \( -name '*.cpp' -o -name '*.cc' \))
+OBJS     := $(patsubst $(SRC)/%.cpp,$(OBJ)/%.o,$(SRCS))
+LIBOBJS  := $(filter %.o, $(LIBS:$(LIB)/%.cpp=$(LIBOBJ)/%.o) $(LIBS:$(LIB)/%.cc=$(LIBOBJ)/%.o))
+EXE      := $(TARGET)/SudokuSolver
+CXXFLAGS := -I$(SRC) -I$(LIB) -std=c++20 -stdlib=libc++ -g -Wall -Wextra -Wpedantic -MD -MP
+LDLIBS   := -lm
+LDFLAGS  :=
 
 .PHONY: all run clean printstuff
 
 all: $(EXE)
 
-$(EXE): $(OBJS) | $(TARGET)
+$(EXE): $(OBJS) $(LIBOBJS) | $(TARGET)
 	@echo ""
 	@echo "Linking $(@F)..."
 	$(CXX) $(LDFLAGS) $^ -o $@ $(LDLIBS)
@@ -23,6 +27,11 @@ $(EXE): $(OBJS) | $(TARGET)
 
 $(OBJ)/%.o: $(SRC)/%.cpp | $(OBJ)
 	@echo "Compiling $<"
+	@$(MKDIR) -p $(@D)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(LIBOBJ)/%.o: $(LIB)/%.cc | $(OBJ)
+	@echo "Compiling lib $<"
 	@$(MKDIR) -p $(@D)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
@@ -39,6 +48,8 @@ clean:
 printstuff:
 	@echo "sources: $(SRCS)"
 	@echo "objects: $(OBJS)"
+	@echo "libs: $(LIBS)"
+	@echo "LIBobjects: $(LIBOBJS)"
 
 
 # Add .d to Make's recognized suffixes.

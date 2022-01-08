@@ -3,6 +3,7 @@
 
 #include "Board/ElementsContainer.hpp"
 #include "Board/Grid.hpp"
+#include "Reporter.hpp"
 #include "SolverRegions.hpp"
 #include "Techniques/Singles.hpp"
 
@@ -27,6 +28,8 @@ class Solver : public Grid
 
     void initialize();
 
+    const Reporter* m_reporter{nullptr};
+
   public:
     const std::array<SolverRegion* const, 3> getSolverRegions(const Tile& tile);
     const std::array<const SolverRegion* const, 3> getSolverRegions(const Tile& tile) const;
@@ -45,6 +48,9 @@ class Solver : public Grid
                              const bool forceCheck = false) const;
 
     friend int main();
+
+    void setReporter(const Reporter& reporter) { m_reporter = &reporter; }
+    const Reporter* getReporter() const { return m_reporter; }
 
   public:
     Solver();

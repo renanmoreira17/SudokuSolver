@@ -26,16 +26,25 @@ bool Singles::perform()
                                   [](const auto& in) -> bool { return in.second == 1; });
         if (found != suggestionNum.cend())
         {
-            auto value = std::distance(suggestionNum.cbegin(), found) + 1;
+            // a key desse iterator será o valor que tem apenas 1 sugestão
+            const TileValueType value = found->first;
             // sempre vai achar
             auto foundTile = std::find_if(region->cbegin(), region->cend(), [&](auto& in) -> bool {
                 const auto& suggestions =
                     std::dynamic_pointer_cast<SolverTile>(in)->getSuggestions();
                 return suggestions.find(value) != suggestions.cend();
             });
+            assert(foundTile != region->cend());
             auto solverTile = std::dynamic_pointer_cast<SolverTile>(*foundTile);
             solverTile->setValue(value);
             performed = true;
+
+            m_solver->getReporter()->report(
+                "Naked Pairs:\nA região \"{}\" apresenta somente 1 sugestão do valor {}, no Tile "
+                "{}. Dessa forma, esse Tile foi definido com esse valor.",
+                dynamic_cast<const Region&>(*region),
+                value,
+                **foundTile);
         }
     }
     return performed;

@@ -7,7 +7,7 @@
 #include <utility>
 
 Subgrid::Subgrid(Grid* grid, const short index)
-    : Region(index)
+    : Region(index, RegionType::SUBGRID)
     , m_grid(grid)
 {
     const auto lambda = [&](const std::shared_ptr<Tile>& tile) {

@@ -8,8 +8,8 @@
 #include <optional>
 #include <utility>
 
-SolverRegion::SolverRegion(Grid* grid, const unsigned index)
-    : Region(index)
+SolverRegion::SolverRegion(Grid* grid, const unsigned index, const RegionType type)
+    : Region(index, type)
     , m_grid(grid)
 {
     for (TileValueType i = 1; i <= 9; i++) { m_suggestionsQuan[i] = 0; }
@@ -76,13 +76,13 @@ TileValueType SolverRegion::getSuggestionsQuanFor(TileValueType value) const
 }
 
 SolverLine::SolverLine(Grid* grid, LineOrientation orientation, const short index)
-    : Region(index)
-    , SolverRegion(grid, index)
+    : Region(index, RegionType::LINE)
+    , SolverRegion(grid, index, RegionType::LINE)
     , Line(grid, orientation, index)
 {}
 
 SolverSubgrid::SolverSubgrid(Grid* grid, const short index)
-    : Region(index)
-    , SolverRegion(grid, index)
+    : Region(index, RegionType::SUBGRID)
+    , SolverRegion(grid, index, RegionType::SUBGRID)
     , Subgrid(grid, index)
 {}

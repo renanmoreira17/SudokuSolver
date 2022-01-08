@@ -6,7 +6,7 @@
 #include <utility>
 
 Line::Line(Grid* grid, LineOrientation orientation, const short index)
-    : Region(index)
+    : Region(index, RegionType::LINE)
     , m_orientation(orientation)
     , m_grid(grid)
 {
