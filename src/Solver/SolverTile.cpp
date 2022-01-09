@@ -97,3 +97,8 @@ bool SolverTile::canPlaceValueInTile(const TileValueType value, const bool force
         return m_suggestions.find(value) == m_suggestions.cend();
     }
 }
+
+bool SolverTile::hasSuggestion(TileValueType value) const
+{
+    return m_suggestions.find(value) != m_suggestions.cend();
+}

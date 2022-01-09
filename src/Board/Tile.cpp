@@ -80,6 +80,11 @@ void Tile::setValue(const TileValueType value)
     m_value = value;
 }
 
+TileValueType Tile::getValue() const
+{
+    return m_value;
+}
+
 bool Tile::hasValue() const
 {
     return m_value != 0;

@@ -86,7 +86,7 @@ bool NakedPairs::perform()
                 }
                 if (performed)
                 {
-                    m_solver->getReporter()->report(
+                    m_solver->report(
                         "Naked Pairs:\nA região \"{}\" possui dois tiles com sugestões iguais, no "
                         "Tile {} e {}. Essas sugestões são: {}. Dessa forma, as sugestões dos "
                         "outros tiles da região foram removidas.",

@@ -39,10 +39,10 @@ bool Singles::perform()
             solverTile->setValue(value);
             performed = true;
 
-            m_solver->getReporter()->report(
+            m_solver->report(
                 "Singles:\nA região \"{}\" apresenta somente 1 sugestão do valor {}, no Tile "
                 "{}. Dessa forma, esse Tile foi definido com esse valor.",
-                dynamic_cast<const Region&>(*region),
+                *region,
                 value,
                 **foundTile);
         }

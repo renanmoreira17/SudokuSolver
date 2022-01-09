@@ -51,3 +51,15 @@ Subgrid& Subgrid::operator=(Subgrid&& other)
 
     return *this;
 }
+
+const std::shared_ptr<Tile> Subgrid::getTile(const TileValueType row, const TileValueType col) const
+{
+    const auto first = m_elementList->cbegin();
+    return *std::next(first, row * 3 + col);
+}
+
+const std::shared_ptr<Tile> Subgrid::operator()(const TileValueType row,
+                                                const TileValueType col) const
+{
+    return getTile(row, col);
+}

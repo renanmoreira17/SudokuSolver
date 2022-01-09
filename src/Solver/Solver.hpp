@@ -3,6 +3,7 @@
 
 #include "Board/ElementsContainer.hpp"
 #include "Board/Grid.hpp"
+#include "Board/GridPrinter.hpp"
 #include "Reporter.hpp"
 #include "SolverRegions.hpp"
 #include "Techniques/Singles.hpp"
@@ -28,7 +29,12 @@ class Solver : public Grid
 
     void initialize();
 
-    const Reporter* m_reporter{nullptr};
+    std::shared_ptr<Reporter> m_reporter;
+
+  protected:
+    std::vector<std::string>
+    requestTileDisplayStringForCoordinate(const TileValueType row,
+                                          const TileValueType col) const override;
 
   public:
     const std::array<SolverRegion* const, 3> getSolverRegions(const Tile& tile);
@@ -49,8 +55,17 @@ class Solver : public Grid
 
     friend int main();
 
-    void setReporter(const Reporter& reporter) { m_reporter = &reporter; }
-    const Reporter* getReporter() const { return m_reporter; }
+    void setReporter(const std::shared_ptr<Reporter>& reporter) { m_reporter = reporter; }
+
+    template<typename FormatString, typename... Args>
+    void report(FormatString formatString, Args&&... args) const
+    {
+        m_gridPrinter->print();
+        if (m_reporter)
+        {
+            m_reporter->report(formatString, std::forward<Args>(args)...);
+        }
+    }
 
   public:
     Solver();

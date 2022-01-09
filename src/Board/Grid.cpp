@@ -1,6 +1,12 @@
 #include "Grid.hpp"
+#include "GridPrinter.hpp"
 #include "Line.hpp"
 #include "Tile.hpp"
+
+#include <fmt/format.h>
+#include <iostream>
+#include <string>
+#include <vector>
 
 std::shared_ptr<Tile>
 ComponentsConstructor::createTile(Grid* grid, TileValueType row, TileValueType col)
@@ -27,10 +33,13 @@ Grid::Grid(std::unique_ptr<ComponentsConstructor>&& constructor)
 
     for (TileValueType i = 0; i < 9; i++)
     {
-        m_verticalLines[i] = constructor->createLine(this, LineOrientation::VERTICAL, i);
-        m_horizontalLines[i] = constructor->createLine(this, LineOrientation::HORIZONTAL, i);
-        m_subgrids[i] = constructor->createSubgrid(this, i);
+        m_verticalLines.emplace_back(constructor->createLine(this, LineOrientation::VERTICAL, i));
+        m_horizontalLines.emplace_back(
+            constructor->createLine(this, LineOrientation::HORIZONTAL, i));
+        m_subgrids.emplace_back(constructor->createSubgrid(this, i));
     }
+
+    m_gridPrinter = std::make_unique<GridPrinter>(*this);
 }
 
 Grid::Grid(const std::string& boardStr, std::unique_ptr<ComponentsConstructor>&& constructor)
@@ -48,6 +57,44 @@ Grid::Grid(const std::string& boardStr, std::unique_ptr<ComponentsConstructor>&&
     }
 }
 
+Grid::Grid(const Grid& other)
+{
+    m_gridTiles = other.m_gridTiles;
+    m_verticalLines = other.m_verticalLines;
+    m_horizontalLines = other.m_horizontalLines;
+    m_subgrids = other.m_subgrids;
+    m_gridPrinter = std::make_unique<GridPrinter>(*this);
+}
+
+Grid::Grid(Grid&& other)
+{
+    m_gridTiles = std::move(other.m_gridTiles);
+    m_verticalLines = std::move(other.m_verticalLines);
+    m_horizontalLines = std::move(other.m_horizontalLines);
+    m_subgrids = std::move(other.m_subgrids);
+    m_gridPrinter = std::make_unique<GridPrinter>(*this);
+}
+
+Grid& Grid::operator=(const Grid& other)
+{
+    m_gridTiles = other.m_gridTiles;
+    m_verticalLines = other.m_verticalLines;
+    m_horizontalLines = other.m_horizontalLines;
+    m_subgrids = other.m_subgrids;
+    m_gridPrinter = std::make_unique<GridPrinter>(*this);
+    return *this;
+}
+
+Grid& Grid::operator=(Grid&& other)
+{
+    m_gridTiles = std::move(other.m_gridTiles);
+    m_verticalLines = std::move(other.m_verticalLines);
+    m_horizontalLines = std::move(other.m_horizontalLines);
+    m_subgrids = std::move(other.m_subgrids);
+    m_gridPrinter = std::make_unique<GridPrinter>(*this);
+    return *this;
+}
+
 std::shared_ptr<Tile> Grid::operator()(TileValueType row, TileValueType col)
 {
     return m_gridTiles(row, col);
@@ -56,4 +103,29 @@ std::shared_ptr<Tile> Grid::operator()(TileValueType row, TileValueType col)
 const std::shared_ptr<Tile> Grid::operator()(TileValueType row, TileValueType col) const
 {
     return m_gridTiles(row, col);
+}
+
+void Grid::print() const
+{
+    for (TileValueType row = 0; row < 9; ++row)
+    {
+        for (TileValueType col = 0; col < 9; ++col)
+        {
+
+            std::cout << m_gridTiles(row, col)->getValue() << " ";
+        }
+    }
+}
+
+std::vector<std::string> Grid::requestTileDisplayStringForCoordinate(const TileValueType row,
+                                                                     const TileValueType col) const
+{
+    const auto& tile = m_gridTiles(row, col);
+    std::vector<std::string> result;
+    result.emplace_back("\\   /");
+    result.emplace_back(
+        fmt::format("  {}  ", tile->hasValue() ? std::to_string(tile->getValue()) : " "));
+    result.emplace_back("/   \\");
+
+    return result;
 }

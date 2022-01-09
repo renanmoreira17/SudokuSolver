@@ -6,11 +6,11 @@
 #include "Line.hpp"
 #include "Subgrid.hpp"
 
-#include <array>
 #include <memory>
 #include <string>
+#include <vector>
 
-// class Solver;
+class GridPrinter;
 
 class ComponentsConstructor
 {
@@ -26,12 +26,22 @@ class Grid
 {
   private:
     GridTiles m_gridTiles;
-    std::array<std::shared_ptr<Line>, 9> m_verticalLines;
-    std::array<std::shared_ptr<Line>, 9> m_horizontalLines;
-    std::array<std::shared_ptr<Subgrid>, 9> m_subgrids;
+    std::vector<std::shared_ptr<Line>> m_verticalLines;
+    std::vector<std::shared_ptr<Line>> m_horizontalLines;
+    std::vector<std::shared_ptr<Subgrid>> m_subgrids;
 
     friend class Solver;
+    friend class GridPrinter;
     friend int main();
+
+  public:
+    void print() const;
+
+  protected:
+    virtual std::vector<std::string>
+    requestTileDisplayStringForCoordinate(const TileValueType row, const TileValueType col) const;
+
+    std::unique_ptr<GridPrinter> m_gridPrinter;
 
   public:
     Grid(std::unique_ptr<ComponentsConstructor>&& constructor =
@@ -41,6 +51,11 @@ class Grid
          std::unique_ptr<ComponentsConstructor>&& constructor =
              std::make_unique<ComponentsConstructor>());
 
+    Grid(const Grid& other);
+    Grid(Grid&& other);
+    Grid& operator=(const Grid& other);
+    Grid& operator=(Grid&& other);
+
     virtual ~Grid() = default;
 
     std::shared_ptr<Tile> operator()(TileValueType row, TileValueType col);
@@ -48,10 +63,17 @@ class Grid
 
     GridTiles& getGridTiles() { return m_gridTiles; }
     const GridTiles& getGridTiles() const { return m_gridTiles; }
+
+    const std::vector<std::shared_ptr<Line>>& getVerticalLines() const { return m_verticalLines; }
     std::shared_ptr<Line> getVerticalLine(TileValueType index) { return m_verticalLines[index]; }
     const std::shared_ptr<Line> getVerticalLine(TileValueType index) const
     {
         return m_verticalLines[index];
+    }
+
+    const std::vector<std::shared_ptr<Line>>& getHorizontalLines() const
+    {
+        return m_horizontalLines;
     }
     std::shared_ptr<Line> getHorizontalLine(TileValueType index)
     {
@@ -61,6 +83,8 @@ class Grid
     {
         return m_horizontalLines[index];
     }
+
+    const std::vector<std::shared_ptr<Subgrid>>& getSubgrids() const { return m_subgrids; }
     std::shared_ptr<Subgrid> getSubgrid(TileValueType index) { return m_subgrids[index]; }
     const std::shared_ptr<Subgrid> getSubgrid(TileValueType index) const
     {
