@@ -7,6 +7,9 @@
 #include "Board/Tile.hpp"
 #include "Util/UtilFunctions.hpp"
 
+#include "SolverRegions.hpp"
+#include "SolverTile.hpp"
+
 #include <fmt/compile.h>
 #include <fmt/format.h>
 #include <string>
@@ -63,6 +66,16 @@ struct fmt::formatter<Tile> : formatter<std::string_view>
 };
 
 template<>
+struct fmt::formatter<SolverTile> : formatter<std::string_view>
+{
+    template<typename FormatContext>
+    auto format(const SolverTile& solverTile, FormatContext& ctx)
+    {
+        return format_to(ctx.out(), "{}", static_cast<const Tile&>(solverTile));
+    }
+};
+
+template<>
 struct fmt::formatter<Line> : formatter<std::string_view>
 {
     template<typename FormatContext>
@@ -80,6 +93,16 @@ struct fmt::formatter<Line> : formatter<std::string_view>
 };
 
 template<>
+struct fmt::formatter<SolverLine> : formatter<std::string_view>
+{
+    template<typename FormatContext>
+    auto format(const SolverLine& solverLine, FormatContext& ctx)
+    {
+        return format_to(ctx.out(), "{}", static_cast<const Line&>(solverLine));
+    }
+};
+
+template<>
 struct fmt::formatter<Subgrid> : formatter<std::string_view>
 {
     template<typename FormatContext>
@@ -89,6 +112,16 @@ struct fmt::formatter<Subgrid> : formatter<std::string_view>
         const short subgridRow = subgridIndex / 3;
         const short subgridCol = subgridIndex % 3;
         return format_to(ctx.out(), "{}{}", convertRowToLetter(subgridRow), subgridCol + 1);
+    }
+};
+
+template<>
+struct fmt::formatter<SolverSubgrid> : formatter<std::string_view>
+{
+    template<typename FormatContext>
+    auto format(const SolverSubgrid& solverSubgrid, FormatContext& ctx)
+    {
+        return format_to(ctx.out(), "{}", static_cast<const Subgrid&>(solverSubgrid));
     }
 };
 
@@ -107,5 +140,16 @@ struct fmt::formatter<Region> : formatter<std::string_view>
         }
     }
 };
+
+template<>
+struct fmt::formatter<SolverRegion> : formatter<std::string_view>
+{
+    template<typename FormatContext>
+    auto format(const SolverRegion& solverRegion, FormatContext& ctx)
+    {
+        return format_to(ctx.out(), "{}", static_cast<const Region&>(solverRegion));
+    }
+};
+
 
 #endif // __REPORTER_H__

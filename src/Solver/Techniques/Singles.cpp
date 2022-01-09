@@ -40,7 +40,7 @@ bool Singles::perform()
             performed = true;
 
             m_solver->getReporter()->report(
-                "Naked Pairs:\nA região \"{}\" apresenta somente 1 sugestão do valor {}, no Tile "
+                "Singles:\nA região \"{}\" apresenta somente 1 sugestão do valor {}, no Tile "
                 "{}. Dessa forma, esse Tile foi definido com esse valor.",
                 dynamic_cast<const Region&>(*region),
                 value,

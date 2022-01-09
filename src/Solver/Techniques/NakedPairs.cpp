@@ -34,24 +34,24 @@ bool NakedPairs::analyze()
 bool NakedPairs::perform()
 {
     bool performed = false;
-    for (auto&& region : m_solver->getAllRegions())
+    for (const auto& region : m_solver->getAllRegions())
     {
         if (region->isCompleted())
             continue;
 
-        std::list<std::shared_ptr<SolverTile>*> filteredSuggestions;
+        std::list<const std::shared_ptr<SolverTile>> filteredSuggestions;
 
-        // filtra todos tiles que tem a quantidade de sugestões = 2
-        for (auto&& tile : *region)
+        // filtra todos tiles que tem a quantidade de sugestões == 2
+        for (const auto& tile : *region)
         {
-            auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
+            const auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
             if (solverTile->getSuggestions().size() == 2)
             {
-                filteredSuggestions.push_back(&solverTile);
+                filteredSuggestions.push_back(solverTile);
             }
         }
 
-        if (filteredSuggestions.size() <= 2)
+        if (filteredSuggestions.size() < 2)
             continue;
 
         auto it = filteredSuggestions.begin();
@@ -60,37 +60,46 @@ bool NakedPairs::perform()
         // se houver remoçao de uma das sugestoes dos possiveis hidden pairs
         while (it != filteredSuggestions.end())
         {
-            auto& current = *it;
-            auto found = std::find_if(filteredSuggestions.begin(),
-                                      filteredSuggestions.end(),
-                                      [&](decltype(current) s) -> bool {
-                                          return s != current && (*s)->getSuggestions() ==
-                                                                     (*current)->getSuggestions();
-                                      });
-            if (found != filteredSuggestions.end())
+            const auto& current = *it;
+            // procura, no restante da lista, se há algum tile que possui a mesma sugestão
+            const auto found = std::find_if(
+                filteredSuggestions.begin(),
+                filteredSuggestions.end(),
+                [&](decltype(current) s) -> bool {
+                    return s != current && s->getSuggestions() == current->getSuggestions();
+                });
+
+            if (found != filteredSuggestions.cend())
             {
                 // e remove as sugestões desses hiddens pairs dos outros tiles da region
-                for (auto&& tile : *region)
+                for (const std::shared_ptr<Tile>& tile : *region)
                 {
-                    auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
-                    if (solverTile == *current || solverTile == **found ||
+                    const auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
+                    if (solverTile == current || solverTile == *found ||
                         solverTile->getSuggestions().empty())
                         continue;
-                    for (auto&& currentSugg : (*current)->getSuggestions())
+                    for (const TileValueType& currentSuggestion : current->getSuggestions())
                     {
-                        bool erased = solverTile->getSuggestions().erase(currentSugg);
+                        const bool erased = solverTile->getSuggestions().erase(currentSuggestion);
                         performed |= erased;
                     }
                 }
-                // remove tanto o elemento encontrado
-                filteredSuggestions.erase(found);
-                // quanto o atual
-                it = filteredSuggestions.erase(it);
+                if (performed)
+                {
+                    m_solver->getReporter()->report(
+                        "Naked Pairs:\nA região \"{}\" possui dois tiles com sugestões iguais, no "
+                        "Tile {} e {}. Essas sugestões são: {}. Dessa forma, as sugestões dos "
+                        "outros tiles da região foram removidas.",
+                        *region,
+                        *current,
+                        **found,
+                        joinContainer(current->getSuggestions()));
+
+                    break;
+                }
             }
-            else
-            {
-                ++it;
-            }
+
+            ++it;
         }
     }
 
