@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iostream>
 #include <sstream>
 #include <utility>
 
@@ -52,13 +53,17 @@ void Solver::computeAllSuggestions(const bool clear)
 void Solver::solve()
 {
     computeAllSuggestions();
+    printGrid();
     // checar enquanto o board não tiver solucionado
     while (true)
     {
         for (auto&& technique : m_techniques)
         {
-            if (technique->run())
+            const bool techniqueRun = technique->run();
+            if (techniqueRun)
+            {
                 break;
+            }
             // checar se solucionou
         }
     }

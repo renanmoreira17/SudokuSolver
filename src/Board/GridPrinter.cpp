@@ -10,25 +10,6 @@
 
 namespace
 {
-std::string createSubgridDisplayStringFromTileDisplayStrings(
-    const std::vector<std::vector<std::string>>& tileDisplayStrings)
-{
-    const static std::string edgeString = "+";
-    const static std::string verticalLineString = "|";
-    const static std::string horizontalBorderString = edgeString + std::string(5, '-') +
-                                                      edgeString + std::string(5, '-') +
-                                                      edgeString + std::string(5, '-') + edgeString;
-
-    std::string subgridDisplayString;
-    for (const auto& row : tileDisplayStrings)
-    {
-        subgridDisplayString += horizontalBorderString + "\n";
-        for (const auto& tileDisplayString : row) { subgridDisplayString += tileDisplayString; }
-        subgridDisplayString += "\n";
-    }
-    return subgridDisplayString;
-}
-
 class MultilineElement
 {
   public:
@@ -42,12 +23,29 @@ class MultilineElement
 
     void addLine(const std::string& line) { m_lines.emplace_back(line); }
     void addLine(std::string&& line) { m_lines.emplace_back(std::move(line)); }
+    void addLineToBeginning(const std::string& line) { m_lines.insert(m_lines.begin(), line); }
+    void addFromMultilineElement(const MultilineElement& multilineElement)
+    {
+        m_lines.insert(
+            m_lines.end(), multilineElement.getLines().begin(), multilineElement.getLines().end());
+    }
 
     std::string build() const
     {
         std::stringstream multilineString;
         for (const auto& line : m_lines) { multilineString << line + "\n"; }
         return multilineString.str();
+    }
+
+    MultilineElement operator+(const MultilineElement& other) const
+    {
+        MultilineElement result;
+        assert(m_lines.size() == other.m_lines.size());
+        for (size_t i = 0; i < m_lines.size(); ++i)
+        {
+            result.addLine(m_lines[i] + other.m_lines[i]);
+        }
+        return result;
     }
 
   private:
@@ -140,31 +138,13 @@ class DisplayMultilineElementBuilder
 
     std::vector<MultilineElement> m_elements;
 };
-
-class DisplayGridBuilder
-{
-  public:
-    DisplayGridBuilder() = default;
-    DisplayGridBuilder(const Grid& grid)
-        : m_grid(grid)
-    {}
-
-    void build();
-
-    const MultilineElement& getDisplayGrid() const { return m_displayGrid; }
-
-  private:
-    const Grid& m_grid;
-    MultilineElement m_displayGrid;
-};
-
 } // namespace
 
 GridPrinter::GridPrinter(const Grid& grid)
     : m_grid(grid)
 {}
 
-void GridPrinter::print() const
+std::string GridPrinter::createBoardString() const
 {
     std::vector<MultilineElement> subgridDisplayElements;
     for (const auto& subgrid : m_grid.getSubgrids())
@@ -192,6 +172,59 @@ void GridPrinter::print() const
     boardElementsBuilder.setShouldAddCustomLineBreak(false);
     boardElementsBuilder.setShouldAddCustomColumnDelimitator(false);
 
-    const MultilineElement boardDisplayElements = boardElementsBuilder.build();
-    std::cout << boardDisplayElements.build() << std::endl;
+    const static std::string columnsLabelString =
+        "   1     2     3      4     5     6      7     8     9   ";
+    //  "+-----+-----+-----++-----+-----+-----++-----+-----+-----+"
+    MultilineElement boardWithColumns({columnsLabelString});
+
+    boardWithColumns.addFromMultilineElement(boardElementsBuilder.build());
+
+    // clang-format off
+    const static MultilineElement linesLabelString({
+        "  ",  /*    1   */
+        "  ",  /* +---   */
+        "  ",  /* |\     */
+        "A ",  /* |  5   */
+        "  ",  /* |/     */
+        "  ",  /* +---   */
+        "  ",  /* |\     */
+        "B ",  /* |  8   */
+        "  ",  /* |/     */
+        "  ",  /* +---   */
+        "  ",  /* |\     */
+        "C ",  /* |  1   */
+        "  ",  /* |/     */
+        "  ",  /* +---   */
+        "  ",  /* +---   */
+        "  ",  /* |\     */
+        "D ",  /* |  4   */
+        "  ",  /* |/     */
+        "  ",  /* +---   */
+        "  ",  /* |\     */
+        "E ",  /* |  7   */
+        "  ",  /* |/     */
+        "  ",  /* +---   */
+        "  ",  /* |\     */
+        "F ",  /* |  9   */
+        "  ",  /* |/     */
+        "  ",  /* +---   */
+        "  ",  /* +---   */
+        "  ",  /* |\     */
+        "G ",  /* |  2   */
+        "  ",  /* |/     */
+        "  ",  /* +---   */
+        "  ",  /* |\     */
+        "H ",  /* |  6   */
+        "  ",  /* |/     */
+        "  ",  /* +---   */
+        "  ",  /* |\     */
+        "I ",  /* |  3   */
+        "  ",  /* |/     */
+        "  "   /* +---   */
+    });
+    // clang-format on
+
+    const MultilineElement finalBoardDisplay = linesLabelString + boardWithColumns;
+
+    return finalBoardDisplay.build();
 }

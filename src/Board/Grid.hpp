@@ -43,6 +43,8 @@ class Grid
 
     std::unique_ptr<GridPrinter> m_gridPrinter;
 
+    void printGrid() const;
+
   public:
     Grid(std::unique_ptr<ComponentsConstructor>&& constructor =
              std::make_unique<ComponentsConstructor>());

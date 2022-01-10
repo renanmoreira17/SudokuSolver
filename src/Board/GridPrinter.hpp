@@ -1,6 +1,8 @@
 #ifndef __GRIDPRINTER_H__
 #define __GRIDPRINTER_H__
 
+#include  <string>
+
 class Grid;
 
 class GridPrinter
@@ -9,7 +11,7 @@ class GridPrinter
     GridPrinter(const Grid& grid);
     virtual ~GridPrinter() = default;
 
-    void print() const;
+    std::string createBoardString() const;
 
   private:
     const Grid& m_grid;

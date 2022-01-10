@@ -129,3 +129,9 @@ std::vector<std::string> Grid::requestTileDisplayStringForCoordinate(const TileV
 
     return result;
 }
+
+
+void Grid::printGrid() const
+{
+    std::cout << m_gridPrinter->createBoardString() << std::endl;
+}

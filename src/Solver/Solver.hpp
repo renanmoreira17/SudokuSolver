@@ -60,10 +60,10 @@ class Solver : public Grid
     template<typename FormatString, typename... Args>
     void report(FormatString formatString, Args&&... args) const
     {
-        m_gridPrinter->print();
         if (m_reporter)
         {
             m_reporter->report(formatString, std::forward<Args>(args)...);
+            printGrid();
         }
     }
 
