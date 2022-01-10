@@ -10,7 +10,7 @@ class NakedPairs : public Technique
     bool perform() override;
 
   public:
-    NakedPairs(Solver* solver)
+    NakedPairs(Solver& solver)
         : Technique(solver)
     {}
     ~NakedPairs() {}

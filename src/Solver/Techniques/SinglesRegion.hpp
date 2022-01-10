@@ -10,10 +10,9 @@ class SinglesRegion : public Technique
     bool perform() override;
 
   public:
-    SinglesRegion(Solver* solver)
+    SinglesRegion(Solver& solver)
         : Technique(solver)
     {}
-    SinglesRegion() = default;
     ~SinglesRegion() = default;
 };
 

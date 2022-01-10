@@ -81,8 +81,8 @@ void Solver::initialize()
     }
 
     // initialize techniques
-    m_techniques.emplace_back(std::make_unique<NakedPairs>(this));
-    m_techniques.emplace_back(std::make_unique<SinglesRegion>(this));
+    m_techniques.emplace_back(std::make_unique<NakedPairs>(*this));
+    m_techniques.emplace_back(std::make_unique<SinglesRegion>(*this));
 }
 
 std::vector<std::string>

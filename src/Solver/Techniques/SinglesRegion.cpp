@@ -14,7 +14,7 @@ bool SinglesRegion::analyze()
 bool SinglesRegion::perform()
 {
     bool performed = false;
-    for (auto&& region : m_solver->getAllRegions())
+    for (auto&& region : m_solver.getAllRegions())
     {
         auto& suggestionNum = region->getSuggestionsQuan();
         // procura na region, entre os numero de sugestões para cada valor,
@@ -37,7 +37,7 @@ bool SinglesRegion::perform()
             solverTile->setValue(value);
             performed = true;
 
-            m_solver->report(
+            m_solver.report(
                 "Singles-Region:\nA região \"{}\" apresenta somente 1 sugestão do "
                 "valor {}, no Tile {}. Dessa forma, esse Tile foi definido com esse valor.",
                 *region,

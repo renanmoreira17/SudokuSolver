@@ -6,16 +6,15 @@ class Solver;
 class Technique
 {
   protected:
-    Solver* m_solver;
+    Solver& m_solver;
 
     virtual bool analyze() = 0;
     virtual bool perform() = 0;
 
   public:
-    Technique(Solver* solver)
+    Technique(Solver& solver)
         : m_solver(solver)
     {}
-    Technique() = default;
     virtual ~Technique() = default;
 
     // TODO: improve return type

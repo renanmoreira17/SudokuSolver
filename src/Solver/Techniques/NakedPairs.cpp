@@ -10,7 +10,7 @@
 
 bool NakedPairs::analyze()
 {
-    for (auto&& region : m_solver->getAllRegions())
+    for (auto&& region : m_solver.getAllRegions())
     {
         short suggestionQuan = 0;
         for (auto&& tile : *region)
@@ -34,7 +34,7 @@ bool NakedPairs::analyze()
 bool NakedPairs::perform()
 {
     bool performed = false;
-    for (const auto& region : m_solver->getAllRegions())
+    for (const auto& region : m_solver.getAllRegions())
     {
         if (region->isCompleted())
             continue;
@@ -86,7 +86,7 @@ bool NakedPairs::perform()
                 }
                 if (performed)
                 {
-                    m_solver->report(
+                    m_solver.report(
                         "Naked Pairs:\nA região \"{}\" possui dois tiles com sugestões iguais, no "
                         "Tile {} e {}. Essas sugestões são: {}. Dessa forma, as sugestões dos "
                         "outros tiles da região foram removidas.",
