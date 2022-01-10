@@ -31,7 +31,7 @@ bool SinglesTile::perform()
             performed = true;
 
             m_solver.report(
-                "Singles:\nO Tile \"{}\" apresenta somente 1 sugestão, no valor {}. Dessa "
+                "Singles-Tile:\nO Tile \"{}\" apresenta somente 1 sugestão, no valor {}. Dessa "
                 "forma, esse Tile foi definido com esse valor.",
                 *solverTile,
                 value);
