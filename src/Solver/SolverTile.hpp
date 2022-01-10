@@ -26,6 +26,7 @@ class SolverTile : public Tile
     const Suggestions& getSuggestions() const { return m_suggestions; };
     Suggestions& getSuggestions() { return m_suggestions; };
     bool hasSuggestion(TileValueType value) const;
+    bool removeSuggestion(TileValueType value);
 
     bool canPlaceValueInTile(TileValueType value, bool forceCheck = false) const;
 };

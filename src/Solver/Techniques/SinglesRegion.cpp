@@ -16,9 +16,10 @@ bool SinglesRegion::perform()
     bool performed = false;
     for (auto&& region : m_solver.getAllRegions())
     {
-        auto& suggestionNum = region->getSuggestionsQuan();
+        SuggestionsQuan& suggestionNum = region->getSuggestionsQuan();
         // procura na region, entre os numero de sugestões para cada valor,
         // se há algum com apenas 1 (single)
+        // SuggestionsQuan -> 1st: value (suggestion), 2nd: quantity
         auto found = std::find_if(suggestionNum.cbegin(),
                                   suggestionNum.cend(),
                                   [](const auto& in) -> bool { return in.second == 1; });
@@ -28,9 +29,7 @@ bool SinglesRegion::perform()
             const TileValueType value = found->first;
             // sempre vai achar
             auto foundTile = std::find_if(region->cbegin(), region->cend(), [&](auto& in) -> bool {
-                const auto& suggestions =
-                    std::dynamic_pointer_cast<SolverTile>(in)->getSuggestions();
-                return suggestions.find(value) != suggestions.cend();
+                return std::dynamic_pointer_cast<SolverTile>(in)->hasSuggestion(value);
             });
             assert(foundTile != region->cend());
             auto solverTile = std::dynamic_pointer_cast<SolverTile>(*foundTile);

@@ -32,6 +32,7 @@ class SolverRegion : virtual public Region
 
     Solver* getSolver() const;
 
+    // Returns a map telling how many times each value is missing in this region
     SuggestionsQuan& getSuggestionsQuan() { return m_suggestionsQuan; }
     const SuggestionsQuan& getSuggestionsQuan() const { return m_suggestionsQuan; }
 

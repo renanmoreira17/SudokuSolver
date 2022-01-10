@@ -80,7 +80,7 @@ bool NakedPairs::perform()
                         continue;
                     for (const TileValueType& currentSuggestion : current->getSuggestions())
                     {
-                        const bool erased = solverTile->getSuggestions().erase(currentSuggestion);
+                        const bool erased = solverTile->removeSuggestion(currentSuggestion);
                         performed |= erased;
                     }
                 }

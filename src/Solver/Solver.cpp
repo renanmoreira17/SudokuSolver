@@ -3,6 +3,7 @@
 #include "SolverTile.hpp"
 #include "Techniques/NakedPairs.hpp"
 #include "Techniques/SinglesRegion.hpp"
+#include "Techniques/SinglesTile.hpp"
 
 #include <algorithm>
 #include <array>
@@ -83,6 +84,7 @@ void Solver::initialize()
     // initialize techniques
     m_techniques.emplace_back(std::make_unique<NakedPairs>(*this));
     m_techniques.emplace_back(std::make_unique<SinglesRegion>(*this));
+    m_techniques.emplace_back(std::make_unique<SinglesTile>(*this));
 }
 
 std::vector<std::string>

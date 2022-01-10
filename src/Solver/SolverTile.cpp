@@ -38,20 +38,8 @@ void SolverTile::setValue(TileValueType value)
             auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
             if (solverTile->hasValue())
                 continue;
-            const auto erased = solverTile->m_suggestions.erase(value);
-            // se tiver apagado (o tile tinha suggestion desse value), diminui o numero de
-            // suggestions das SolverRegions desse valor
-            if (erased)
-            {
-                const auto& tileSolverRegions = solverTile->getRegions();
-                // iterate over all regions, cast each region to a SolverRegion, and remove the
-                // suggestion
-                for (const auto& tileSolverRegion : tileSolverRegions)
-                {
-                    auto* solverRegion = dynamic_cast<SolverRegion*>(tileSolverRegion);
-                    solverRegion->suggestionRemoved(value);
-                }
-            }
+
+            solverTile->removeSuggestion(value);
         }
     }
 }
@@ -101,4 +89,21 @@ bool SolverTile::canPlaceValueInTile(const TileValueType value, const bool force
 bool SolverTile::hasSuggestion(TileValueType value) const
 {
     return m_suggestions.find(value) != m_suggestions.cend();
+}
+
+bool SolverTile::removeSuggestion(TileValueType value)
+{
+    const auto erased = m_suggestions.erase(value);
+    // se tiver apagado (o tile tinha suggestion desse value), diminui o numero de
+    // suggestions das SolverRegions desse valor
+    if (erased)
+    {
+        const auto& regions = getRegions();
+        for (auto& region : regions)
+        {
+            auto* solverRegion = dynamic_cast<SolverRegion*>(region);
+            solverRegion->suggestionRemoved(value);
+        }
+    }
+    return erased;
 }
