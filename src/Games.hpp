@@ -1,0 +1,17 @@
+#ifndef __GAMES_H__
+#define __GAMES_H__
+
+#include <string>
+
+enum class Difficulty
+{
+    Any = 0,
+    Simple = 1,
+    Easy = 2,
+    Intermediate = 3,
+    Expert = 4
+};
+
+std::string getGameOfDifficulty(Difficulty difficulty);
+
+#endif // __GAMES_H__
