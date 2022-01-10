@@ -29,16 +29,16 @@ const static std::vector<std::string> expertGames = {
     ".........51..2..733....69.2.7.16.....5...3..7.369........235........4..67...1..3.",
     "..9.....43..6..2......53.........81.16.4.5..223..8...9...21....94..36.........6.."};
 
-std::string getGameOfDifficulty(Difficulty difficulty)
+std::string getGameOfDifficulty(GameDifficulty difficulty)
 {
     switch (difficulty)
     {
-    case Difficulty::Simple: return simpleGames[rand() % simpleGames.size()];
-    case Difficulty::Easy: return easyGames[rand() % easyGames.size()];
-    case Difficulty::Intermediate: return intermediateGames[rand() % intermediateGames.size()];
-    case Difficulty::Expert: return expertGames[rand() % expertGames.size()];
-    case Difficulty::Any:
-        const auto randomDifficulty = static_cast<Difficulty>(rand() % 5);
+    case GameDifficulty::Simple: return simpleGames[rand() % simpleGames.size()];
+    case GameDifficulty::Easy: return easyGames[rand() % easyGames.size()];
+    case GameDifficulty::Intermediate: return intermediateGames[rand() % intermediateGames.size()];
+    case GameDifficulty::Expert: return expertGames[rand() % expertGames.size()];
+    case GameDifficulty::Any:
+        const auto randomDifficulty = static_cast<GameDifficulty>(rand() % 5);
         return getGameOfDifficulty(randomDifficulty);
     }
 }

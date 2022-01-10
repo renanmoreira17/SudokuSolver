@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum class Difficulty
+enum class GameDifficulty
 {
     Any = 0,
     Simple = 1,
@@ -12,6 +12,6 @@ enum class Difficulty
     Expert = 4
 };
 
-std::string getGameOfDifficulty(Difficulty difficulty);
+std::string getGameOfDifficulty(GameDifficulty difficulty);
 
 #endif // __GAMES_H__
