@@ -1,4 +1,4 @@
-#include "Singles.hpp"
+#include "SinglesRegion.hpp"
 
 #include "Solver/Solver.hpp"
 #include "Solver/SolverTile.hpp"
@@ -6,18 +6,16 @@
 #include <algorithm>
 #include <iterator>
 
-bool Singles::analyze()
+bool SinglesRegion::analyze()
 {
     return true;
 }
 
-bool Singles::perform()
+bool SinglesRegion::perform()
 {
     bool performed = false;
     for (auto&& region : m_solver->getAllRegions())
     {
-        // iterate over SolverRegion
-
         auto& suggestionNum = region->getSuggestionsQuan();
         // procura na region, entre os numero de sugestões para cada valor,
         // se há algum com apenas 1 (single)
@@ -40,8 +38,8 @@ bool Singles::perform()
             performed = true;
 
             m_solver->report(
-                "Singles:\nA região \"{}\" apresenta somente 1 sugestão do valor {}, no Tile "
-                "{}. Dessa forma, esse Tile foi definido com esse valor.",
+                "Singles-Region:\nA região \"{}\" apresenta somente 1 sugestão do "
+                "valor {}, no Tile {}. Dessa forma, esse Tile foi definido com esse valor.",
                 *region,
                 value,
                 **foundTile);

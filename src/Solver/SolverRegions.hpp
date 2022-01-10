@@ -3,9 +3,11 @@
 
 #include "Board/ElementsContainer.hpp"
 #include "Board/Grid.hpp"
+#include "Board/Line.hpp"
 #include "Board/Region.hpp"
+#include "Board/Subgrid.hpp"
+
 #include <map>
-#include <set>
 
 class Solver;
 class Line;

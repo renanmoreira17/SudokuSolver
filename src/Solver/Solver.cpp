@@ -2,7 +2,7 @@
 #include "Board/Tile.hpp"
 #include "SolverTile.hpp"
 #include "Techniques/NakedPairs.hpp"
-#include "Techniques/Singles.hpp"
+#include "Techniques/SinglesRegion.hpp"
 
 #include <algorithm>
 #include <array>
@@ -38,6 +38,8 @@ Solver::Solver(const std::string& fromBoard)
 {
     initialize();
 }
+
+Solver::~Solver() {}
 
 void Solver::computeAllSuggestions(const bool clear)
 {
@@ -80,7 +82,7 @@ void Solver::initialize()
 
     // initialize techniques
     m_techniques.emplace_back(std::make_unique<NakedPairs>(this));
-    m_techniques.emplace_back(std::make_unique<Singles>(this));
+    m_techniques.emplace_back(std::make_unique<SinglesRegion>(this));
 }
 
 std::vector<std::string>

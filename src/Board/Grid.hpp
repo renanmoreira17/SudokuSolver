@@ -3,13 +3,13 @@
 
 #include "ElementsContainer.hpp"
 #include "GlobalDefinitions.hpp"
-#include "Line.hpp"
-#include "Subgrid.hpp"
 
 #include <memory>
 #include <string>
 #include <vector>
 
+class Line;
+class Subgrid;
 class GridPrinter;
 
 class ComponentsConstructor
@@ -58,7 +58,7 @@ class Grid
     Grid& operator=(const Grid& other);
     Grid& operator=(Grid&& other);
 
-    virtual ~Grid() = default;
+    virtual ~Grid();
 
     std::shared_ptr<Tile> operator()(TileValueType row, TileValueType col);
     const std::shared_ptr<Tile> operator()(TileValueType row, TileValueType col) const;

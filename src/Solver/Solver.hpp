@@ -1,16 +1,14 @@
 #ifndef __SOLVER_H__
 #define __SOLVER_H__
 
-#include "Board/ElementsContainer.hpp"
 #include "Board/Grid.hpp"
-#include "Board/GridPrinter.hpp"
 #include "Reporter.hpp"
-#include "SolverRegions.hpp"
-#include "Techniques/Singles.hpp"
 
 #include <array>
 #include <memory>
 #include <vector>
+
+class Technique;
 
 class SolverComponentsContructor : public ComponentsConstructor
 {
@@ -25,7 +23,7 @@ class Solver : public Grid
   private:
     std::array<std::shared_ptr<SolverRegion>, 27> m_allRegions;
 
-    std::vector<std::unique_ptr<Technique>> m_techniques{};
+    std::vector<std::unique_ptr<Technique>> m_techniques;
 
     void initialize();
 
@@ -70,7 +68,7 @@ class Solver : public Grid
   public:
     Solver();
     Solver(const std::string& fromBoard);
-    ~Solver() = default;
+    ~Solver();
 
     void solve();
 };

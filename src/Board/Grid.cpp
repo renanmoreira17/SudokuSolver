@@ -1,6 +1,7 @@
 #include "Grid.hpp"
 #include "GridPrinter.hpp"
 #include "Line.hpp"
+#include "Subgrid.hpp"
 #include "Tile.hpp"
 
 #include <fmt/format.h>
@@ -95,6 +96,8 @@ Grid& Grid::operator=(Grid&& other)
     return *this;
 }
 
+Grid::~Grid(){};
+
 std::shared_ptr<Tile> Grid::operator()(TileValueType row, TileValueType col)
 {
     return m_gridTiles(row, col);
@@ -129,7 +132,6 @@ std::vector<std::string> Grid::requestTileDisplayStringForCoordinate(const TileV
 
     return result;
 }
-
 
 void Grid::printGrid() const
 {

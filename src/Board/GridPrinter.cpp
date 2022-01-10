@@ -2,6 +2,7 @@
 
 #include "GlobalDefinitions.hpp"
 #include "Grid.hpp"
+#include "Subgrid.hpp"
 
 #include <iostream>
 #include <sstream>
