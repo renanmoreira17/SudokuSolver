@@ -177,8 +177,8 @@ class ElementsContainer
 
     iterator begin() { return iterator(&m_elements[0]); }
     iterator end() { return iterator(&m_elements[R * C]); }
-    const_iterator cbegin() const { return const_iterator(&m_elements[0]); }
-    const_iterator cend() const { return const_iterator(&m_elements[R * C]); }
+    const_iterator cbegin() const { return const_iterator((T*)&m_elements[0]); }
+    const_iterator cend() const { return const_iterator((T*)&m_elements[R * C]); }
     const_iterator begin() const { return cbegin(); }
     const_iterator end() const { return cend(); }
 

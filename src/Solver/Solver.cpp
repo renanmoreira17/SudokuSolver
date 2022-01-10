@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <iostream>
 #include <sstream>
 #include <utility>
@@ -53,23 +54,42 @@ void Solver::computeAllSuggestions(const bool clear)
     }
 }
 
+void Solver::initializeTechniques()
+{
+    // initialize by order of complexity
+    m_techniques.push_back(std::make_unique<SinglesTile>(*this));
+    m_techniques.push_back(std::make_unique<SinglesRegion>(*this));
+    m_techniques.push_back(std::make_unique<NakedPairs>(*this));
+}
+
 void Solver::solve()
 {
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     computeAllSuggestions();
     printGrid();
     // checar enquanto o board não tiver solucionado
-    while (true)
+    while (!isSolved())
     {
+        bool performed = false;
         for (auto&& technique : m_techniques)
         {
-            const bool techniqueRun = technique->run();
-            if (techniqueRun)
+            performed = technique->run();
+            if (performed)
             {
                 break;
             }
             // checar se solucionou
         }
+        if (!performed)
+        {
+            std::cout << "\nNão foi possível resolver o board!" << std::endl;
+            return;
+        }
     }
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::cout << "\nBoard resolvido em "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
+              << " milisegundos." << std::endl;
 }
 
 void Solver::initialize()
@@ -82,9 +102,7 @@ void Solver::initialize()
     }
 
     // initialize techniques
-    m_techniques.emplace_back(std::make_unique<NakedPairs>(*this));
-    m_techniques.emplace_back(std::make_unique<SinglesRegion>(*this));
-    m_techniques.emplace_back(std::make_unique<SinglesTile>(*this));
+    initializeTechniques();
 }
 
 std::vector<std::string>

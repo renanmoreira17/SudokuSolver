@@ -92,6 +92,8 @@ class Grid
     {
         return m_subgrids[index];
     }
+
+    bool isSolved() const;
 };
 
 #endif // __GRID_H__

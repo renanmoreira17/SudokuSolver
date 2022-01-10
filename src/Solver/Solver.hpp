@@ -26,6 +26,7 @@ class Solver : public Grid
     std::vector<std::unique_ptr<Technique>> m_techniques;
 
     void initialize();
+    void initializeTechniques();
 
     std::shared_ptr<Reporter> m_reporter;
 

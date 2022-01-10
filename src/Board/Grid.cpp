@@ -137,3 +137,13 @@ void Grid::printGrid() const
 {
     std::cout << m_gridPrinter->createBoardString() << std::endl;
 }
+
+bool Grid::isSolved() const
+{
+    for (const auto& tile : m_gridTiles)
+    {
+        if (!tile->hasValue())
+            return false;
+    }
+    return true;
+}
