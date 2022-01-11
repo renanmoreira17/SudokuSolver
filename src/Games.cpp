@@ -1,5 +1,7 @@
 #include "Games.hpp"
 
+#include <ctime>
+#include <iostream>
 #include <vector>
 
 const static std::vector<std::string> simpleGames = {
@@ -29,8 +31,22 @@ const static std::vector<std::string> expertGames = {
     ".........51..2..733....69.2.7.16.....5...3..7.369........235........4..67...1..3.",
     "..9.....43..6..2......53.........81.16.4.5..223..8...9...21....94..36.........6.."};
 
+// convert GameDifficulty to string
+std::string gameDifficultyToString(GameDifficulty difficulty)
+{
+    switch (difficulty)
+    {
+    case GameDifficulty::Simple: return "Simple";
+    case GameDifficulty::Easy: return "Easy";
+    case GameDifficulty::Intermediate: return "Intermediate";
+    case GameDifficulty::Expert: return "Expert";
+    default: return "Unknown";
+    }
+}
+
 std::string getGameOfDifficulty(GameDifficulty difficulty)
 {
+    srand(time(0));
     switch (difficulty)
     {
     case GameDifficulty::Simple: return simpleGames[rand() % simpleGames.size()];
@@ -39,6 +55,11 @@ std::string getGameOfDifficulty(GameDifficulty difficulty)
     case GameDifficulty::Expert: return expertGames[rand() % expertGames.size()];
     case GameDifficulty::Any:
         const auto randomDifficulty = static_cast<GameDifficulty>(rand() % 5);
+        if (randomDifficulty != GameDifficulty::Any)
+        {
+            std::cout << "Random difficulty: " << gameDifficultyToString(randomDifficulty)
+                      << std::endl;
+        }
         return getGameOfDifficulty(randomDifficulty);
     }
 }
