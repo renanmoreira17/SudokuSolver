@@ -17,8 +17,9 @@ int main()
     // std::string game(
     //     "5...8..49...5...3..673....115..........2.8..........187....415..3...2...49..5...3");
 
-    const auto game = getGameOfDifficulty(GameDifficulty::Intermediate);
+    const auto game = getGameOfDifficulty(GameDifficulty::Any);
 
+    // std::string game("...612..7...3.91.2.....7.4.7....6..1..3.9.....2....4591.....7.3.....1..5.9..3....");
     std::cout << "Game: \n" << game << std::endl << std::endl;
 
         Solver solver = Solver(game);

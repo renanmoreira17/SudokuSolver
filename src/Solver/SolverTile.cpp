@@ -107,3 +107,25 @@ bool SolverTile::removeSuggestion(TileValueType value)
     }
     return erased;
 }
+
+bool SolverTile::removeAllSuggestionsExceptFrom(
+    const std::vector<TileValueType>& exceptionSuggestions)
+{
+    bool removed = false;
+    const auto suggestionsCopy = getSuggestions();
+    for (const auto& suggestion : suggestionsCopy)
+    {
+        if (std::find(exceptionSuggestions.begin(), exceptionSuggestions.end(), suggestion) ==
+            exceptionSuggestions.cend())
+        {
+            removed |= removeSuggestion(suggestion);
+        }
+    }
+
+    return removed;
+}
+
+unsigned short SolverTile::getSuggestionsCount() const
+{
+    return static_cast<unsigned short>(m_suggestions.size());
+}

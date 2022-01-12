@@ -52,6 +52,19 @@ SolverRegion& SolverRegion::operator=(SolverRegion&& other)
     return *this;
 }
 
+const std::vector<std::shared_ptr<SolverTile>>& SolverRegion::getSolverTiles() const
+{
+    if (m_solverTiles == nullptr)
+    {
+        m_solverTiles = std::make_unique<std::vector<std::shared_ptr<SolverTile>>>();
+        for (const auto& tile : getTiles())
+        {
+            m_solverTiles->emplace_back(std::dynamic_pointer_cast<SolverTile>(tile));
+        }
+    }
+    return *m_solverTiles;
+}
+
 void SolverRegion::suggestionAdded(const unsigned value)
 {
     auto& number = m_suggestionsQuan[value];

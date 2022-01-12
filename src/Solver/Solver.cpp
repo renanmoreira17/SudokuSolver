@@ -1,6 +1,7 @@
 #include "Solver.hpp"
 #include "Board/Tile.hpp"
 #include "SolverTile.hpp"
+#include "Techniques/HiddenPairs.hpp"
 #include "Techniques/NakedPairs.hpp"
 #include "Techniques/SinglesRegion.hpp"
 #include "Techniques/SinglesTile.hpp"
@@ -59,6 +60,7 @@ void Solver::initializeTechniques()
     // initialize by order of complexity
     m_techniques.push_back(std::make_unique<SinglesTile>(*this));
     m_techniques.push_back(std::make_unique<SinglesRegion>(*this));
+    m_techniques.push_back(std::make_unique<HiddenPairs>(*this));
     m_techniques.push_back(std::make_unique<NakedPairs>(*this));
 }
 

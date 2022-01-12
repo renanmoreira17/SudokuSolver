@@ -13,7 +13,9 @@
 class Solver;
 class Line;
 class Subgrid;
+class SolverTile;
 
+// key: suggestion value (1-9) - value: number of times this suggestion appears in the region
 using SuggestionsQuan = std::map<TileValueType, TileValueType>;
 
 class SolverRegion : virtual public Region
@@ -22,6 +24,8 @@ class SolverRegion : virtual public Region
     Grid* m_grid;
     // Suggestions m_missing{1, 2, 3, 4, 5, 6, 7, 8, 9};
     SuggestionsQuan m_suggestionsQuan;
+
+    mutable std::unique_ptr<std::vector<std::shared_ptr<SolverTile>>> m_solverTiles;
 
   public:
     SolverRegion() = delete;
@@ -33,6 +37,8 @@ class SolverRegion : virtual public Region
     virtual ~SolverRegion() = default;
 
     Solver* getSolver() const;
+
+    const std::vector<std::shared_ptr<SolverTile>>& getSolverTiles() const;
 
     // Returns a map telling how many times each value is missing in this region
     const SuggestionsQuan& getSuggestionsQuan() const { return m_suggestionsQuan; }
