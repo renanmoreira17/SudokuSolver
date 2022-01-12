@@ -75,6 +75,35 @@ TileValueType SolverRegion::getSuggestionsQuanFor(TileValueType value) const
     return m_suggestionsQuan.at(value);
 }
 
+bool SolverRegion::removeSuggestionsFromTiles(
+    const std::vector<TileValueType>& values,
+    const std::optional<std::vector<std::shared_ptr<Tile>>>& exceptFromTiles)
+{
+    bool performed = false;
+    for (const std::shared_ptr<Tile>& tile : getTiles())
+    {
+        const auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
+        if (solverTile->getSuggestions().empty() ||
+            (exceptFromTiles.has_value() &&
+             std::any_of(exceptFromTiles->begin(),
+                         exceptFromTiles->end(),
+                         [&tile](const std::shared_ptr<Tile>& t) { return t == tile; })))
+        {
+            continue;
+        }
+
+        for (const auto& currentSuggestion : values)
+        {
+            const bool erased = solverTile->removeSuggestion(currentSuggestion);
+            performed |= erased;
+        }
+    }
+
+    return performed;
+}
+
+// SPECIFIC REGIONS
+
 SolverLine::SolverLine(Grid* grid, LineOrientation orientation, const short index)
     : Region(index, RegionType::LINE)
     , SolverRegion(grid, index, RegionType::LINE)

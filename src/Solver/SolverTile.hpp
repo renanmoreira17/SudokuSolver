@@ -24,7 +24,6 @@ class SolverTile : public Tile
     void computeSuggestions(bool clear = false);
 
     const Suggestions& getSuggestions() const { return m_suggestions; };
-    Suggestions& getSuggestions() { return m_suggestions; };
     bool hasSuggestion(TileValueType value) const;
     bool removeSuggestion(TileValueType value);
 

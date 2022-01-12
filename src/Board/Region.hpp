@@ -36,10 +36,7 @@ class Region
     Region& operator=(Region&& other) = default;
     virtual ~Region() = default;
 
-    std::shared_ptr<ElementList<std::shared_ptr<Tile>>> getElementList() const
-    {
-        return m_elementList;
-    };
+    const ElementList<std::shared_ptr<Tile>>& getTiles() const { return *m_elementList; };
 
     short getIndex() const { return m_index; }
     RegionType getType() const { return m_type; }
