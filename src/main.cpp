@@ -17,7 +17,7 @@ int main()
     // std::string game(
     //     "5...8..49...5...3..673....115..........2.8..........187....415..3...2...49..5...3");
 
-    const auto game = getGameOfDifficulty(GameDifficulty::Any);
+    const auto game = getGameOfDifficulty(GameDifficulty::Intermediate);
 
     std::cout << "Game: \n" << game << std::endl << std::endl;
 

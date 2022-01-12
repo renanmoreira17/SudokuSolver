@@ -39,7 +39,7 @@ bool NakedPairs::perform()
         if (region->isCompleted())
             continue;
 
-        std::list<const std::shared_ptr<SolverTile>> filteredSuggestions;
+        std::list<const std::shared_ptr<SolverTile>> solverTilesWith2Suggestions;
 
         // filtra todos tiles que tem a quantidade de sugestões == 2
         for (const auto& tile : *region)
@@ -47,53 +47,59 @@ bool NakedPairs::perform()
             const auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
             if (solverTile->getSuggestions().size() == 2)
             {
-                filteredSuggestions.push_back(solverTile);
+                solverTilesWith2Suggestions.push_back(solverTile);
             }
         }
 
-        if (filteredSuggestions.size() < 2)
+        if (solverTilesWith2Suggestions.size() < 2)
             continue;
 
-        auto it = filteredSuggestions.begin();
+        auto it = solverTilesWith2Suggestions.begin();
         // so pode ser feito uma vez por region, por mais que haja outros hidden pairs na region.
         // isso porque a remoçao de sugestoes de uma region pode interfereir a filteredSuggestions
         // se houver remoçao de uma das sugestoes dos possiveis hidden pairs
-        while (it != filteredSuggestions.end())
+        for (const auto& currentSolverTileWith2Suggestions : solverTilesWith2Suggestions)
         {
-            const auto& current = *it;
             // procura, no restante da lista, se há algum tile que possui a mesma sugestão
-            const auto found = std::find_if(
-                filteredSuggestions.begin(),
-                filteredSuggestions.end(),
-                [&](decltype(current) s) -> bool {
-                    return s != current && s->getSuggestions() == current->getSuggestions();
+            const auto foundSolverTileWithEqualSuggestions = std::find_if(
+                solverTilesWith2Suggestions.begin(),
+                solverTilesWith2Suggestions.end(),
+                [&](const std::shared_ptr<SolverTile>& iteratedSolverTileWith2Suggestions) -> bool {
+                    return (iteratedSolverTileWith2Suggestions !=
+                            currentSolverTileWith2Suggestions) &&
+                           (iteratedSolverTileWith2Suggestions->getSuggestions() ==
+                            currentSolverTileWith2Suggestions->getSuggestions());
                 });
 
-            if (found != filteredSuggestions.cend())
+            if (foundSolverTileWithEqualSuggestions != solverTilesWith2Suggestions.cend())
             {
                 // e remove as sugestões desses hiddens pairs dos outros tiles da region
-                for (const std::shared_ptr<Tile>& tile : *region)
-                {
-                    const auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
-                    if (solverTile == current || solverTile == *found ||
-                        solverTile->getSuggestions().empty())
-                        continue;
-                    for (const TileValueType& currentSuggestion : current->getSuggestions())
-                    {
-                        const bool erased = solverTile->removeSuggestion(currentSuggestion);
-                        performed |= erased;
-                    }
-                }
-                if (performed)
+                const auto& suggestionsFromCurrentSolverTile =
+                    currentSolverTileWith2Suggestions->getSuggestions();
+
+                const std::vector<TileValueType> suggestionsToBeRemoved(
+                    suggestionsFromCurrentSolverTile.cbegin(),
+                    suggestionsFromCurrentSolverTile.cend());
+
+                const std::vector<std::shared_ptr<Tile>> solverTilesWithNakedPairs(
+                    {currentSolverTileWith2Suggestions, *foundSolverTileWithEqualSuggestions});
+
+                const bool localPerformed =
+                    region->removeSuggestionsFromTiles(suggestionsToBeRemoved, /*exceptFromTiles=*/
+                                                       solverTilesWithNakedPairs);
+
+                performed |= localPerformed;
+
+                if (localPerformed)
                 {
                     m_solver.report(
                         "Naked Pairs:\nA região \"{}\" possui dois tiles com sugestões iguais, no "
                         "Tile {} e {}. Essas sugestões são: {}. Dessa forma, as sugestões dos "
                         "outros tiles da região foram removidas.",
                         *region,
-                        *current,
-                        **found,
-                        joinContainer(current->getSuggestions()));
+                        *currentSolverTileWith2Suggestions,
+                        **foundSolverTileWithEqualSuggestions,
+                        joinContainer(currentSolverTileWith2Suggestions->getSuggestions()));
 
                     break;
                 }

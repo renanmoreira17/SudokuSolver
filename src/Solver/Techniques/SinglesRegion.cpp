@@ -16,7 +16,7 @@ bool SinglesRegion::perform()
     bool performed = false;
     for (auto&& region : m_solver.getAllRegions())
     {
-        SuggestionsQuan& suggestionNum = region->getSuggestionsQuan();
+        const SuggestionsQuan& suggestionNum = region->getSuggestionsQuan();
         // procura na region, entre os numero de sugestões para cada valor,
         // se há algum com apenas 1 (single)
         // SuggestionsQuan -> 1st: value (suggestion), 2nd: quantity

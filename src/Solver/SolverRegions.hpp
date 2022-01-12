@@ -8,6 +8,7 @@
 #include "Board/Subgrid.hpp"
 
 #include <map>
+#include <optional>
 
 class Solver;
 class Line;
@@ -23,6 +24,7 @@ class SolverRegion : virtual public Region
     SuggestionsQuan m_suggestionsQuan;
 
   public:
+    SolverRegion() = delete;
     SolverRegion(Grid* grid, const unsigned index, RegionType type);
     SolverRegion(const SolverRegion& other) = default;
     SolverRegion(SolverRegion&& other);
@@ -33,11 +35,21 @@ class SolverRegion : virtual public Region
     Solver* getSolver() const;
 
     // Returns a map telling how many times each value is missing in this region
-    SuggestionsQuan& getSuggestionsQuan() { return m_suggestionsQuan; }
     const SuggestionsQuan& getSuggestionsQuan() const { return m_suggestionsQuan; }
 
     void suggestionAdded(const unsigned value);
     void suggestionRemoved(const unsigned value);
+
+    bool removeSuggestionsFromTiles(
+        const std::vector<TileValueType>& values,
+        const std::optional<std::vector<std::shared_ptr<Tile>>>& exceptFromTiles = std::nullopt);
+
+    bool removeSingleSuggestionFromTiles(
+        TileValueType values,
+        const std::optional<std::vector<std::shared_ptr<Tile>>>& exceptFromTiles = std::nullopt)
+    {
+        return removeSuggestionsFromTiles({values}, exceptFromTiles);
+    }
 
     TileValueType getSuggestionsQuanFor(TileValueType value) const;
 };
