@@ -3,6 +3,7 @@
 #include "SolverTile.hpp"
 #include "Techniques/HiddenPairs.hpp"
 #include "Techniques/NakedPairs.hpp"
+#include "Techniques/PointingPair.hpp"
 #include "Techniques/SinglesRegion.hpp"
 #include "Techniques/SinglesTile.hpp"
 
@@ -55,13 +56,17 @@ void Solver::computeAllSuggestions(const bool clear)
     }
 }
 
+#define INIT_TECHNIQUE(TechniqueType)                                                              \
+    m_techniques.emplace_back(std::make_unique<TechniqueType>(*this));
+
 void Solver::initializeTechniques()
 {
     // initialize by order of complexity
-    m_techniques.push_back(std::make_unique<SinglesTile>(*this));
-    m_techniques.push_back(std::make_unique<SinglesRegion>(*this));
-    m_techniques.push_back(std::make_unique<HiddenPairs>(*this));
-    m_techniques.push_back(std::make_unique<NakedPairs>(*this));
+    INIT_TECHNIQUE(SinglesTile);
+    INIT_TECHNIQUE(SinglesRegion);
+    INIT_TECHNIQUE(PointingPair);
+    INIT_TECHNIQUE(HiddenPairs);
+    INIT_TECHNIQUE(NakedPairs);
 }
 
 void Solver::solve()
@@ -96,14 +101,6 @@ void Solver::solve()
 
 void Solver::initialize()
 {
-    for (TileValueType i = 0; i < 9; i++)
-    {
-        m_allSolverRegions[i * 3 + 0] =
-            std::dynamic_pointer_cast<SolverRegion>(m_horizontalLines[i]);
-        m_allSolverRegions[i * 3 + 1] = std::dynamic_pointer_cast<SolverRegion>(m_verticalLines[i]);
-        m_allSolverRegions[i * 3 + 2] = std::dynamic_pointer_cast<SolverRegion>(m_subgrids[i]);
-    }
-
     // initialize techniques
     initializeTechniques();
 }
