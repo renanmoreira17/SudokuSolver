@@ -81,7 +81,7 @@ bool NakedPairs::perform()
                     suggestionsFromCurrentSolverTile.cbegin(),
                     suggestionsFromCurrentSolverTile.cend());
 
-                const std::vector<std::shared_ptr<Tile>> solverTilesWithNakedPairs(
+                const std::vector<std::shared_ptr<SolverTile>> solverTilesWithNakedPairs(
                     {currentSolverTileWith2Suggestions, *foundSolverTileWithEqualSuggestions});
 
                 const bool localPerformed =

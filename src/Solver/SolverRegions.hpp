@@ -46,13 +46,14 @@ class SolverRegion : virtual public Region
     void suggestionAdded(const unsigned value);
     void suggestionRemoved(const unsigned value);
 
-    bool removeSuggestionsFromTiles(
-        const std::vector<TileValueType>& values,
-        const std::optional<std::vector<std::shared_ptr<Tile>>>& exceptFromTiles = std::nullopt);
+    bool removeSuggestionsFromTiles(const std::vector<TileValueType>& values,
+                                    const std::optional<std::vector<std::shared_ptr<SolverTile>>>&
+                                        exceptFromTiles = std::nullopt);
 
     bool removeSingleSuggestionFromTiles(
         TileValueType values,
-        const std::optional<std::vector<std::shared_ptr<Tile>>>& exceptFromTiles = std::nullopt)
+        const std::optional<std::vector<std::shared_ptr<SolverTile>>>& exceptFromTiles =
+            std::nullopt)
     {
         return removeSuggestionsFromTiles({values}, exceptFromTiles);
     }

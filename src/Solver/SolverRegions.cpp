@@ -90,17 +90,17 @@ TileValueType SolverRegion::getSuggestionsQuanFor(TileValueType value) const
 
 bool SolverRegion::removeSuggestionsFromTiles(
     const std::vector<TileValueType>& values,
-    const std::optional<std::vector<std::shared_ptr<Tile>>>& exceptFromTiles)
+    const std::optional<std::vector<std::shared_ptr<SolverTile>>>& exceptFromTiles)
 {
     bool performed = false;
-    for (const std::shared_ptr<Tile>& tile : getTiles())
+    for (const std::shared_ptr<SolverTile>& solverTile : getSolverTiles())
     {
-        const auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
         if (solverTile->getSuggestions().empty() ||
             (exceptFromTiles.has_value() &&
-             std::any_of(exceptFromTiles->begin(),
-                         exceptFromTiles->end(),
-                         [&tile](const std::shared_ptr<Tile>& t) { return t == tile; })))
+             std::any_of(
+                 exceptFromTiles->begin(),
+                 exceptFromTiles->end(),
+                 [&solverTile](const std::shared_ptr<SolverTile>& t) { return t == solverTile; })))
         {
             continue;
         }
