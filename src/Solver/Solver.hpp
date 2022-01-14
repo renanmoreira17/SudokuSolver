@@ -21,7 +21,11 @@ class SolverComponentsContructor : public ComponentsConstructor
 class Solver : public Grid
 {
   private:
-    std::array<std::shared_ptr<SolverRegion>, 27> m_allRegions;
+    mutable std::vector<std::shared_ptr<SolverRegion>> m_allSolverRegions;
+
+    mutable std::vector<std::shared_ptr<SolverSubgrid>> m_allSolverSubgrids;
+    mutable std::vector<std::shared_ptr<SolverLine>> m_allSolverHorizontalLines;
+    mutable std::vector<std::shared_ptr<SolverLine>> m_allSolverVerticalLines;
 
     std::vector<std::unique_ptr<Technique>> m_techniques;
 
@@ -39,11 +43,10 @@ class Solver : public Grid
     const std::array<SolverRegion* const, 3> getSolverRegions(const Tile& tile);
     const std::array<const SolverRegion* const, 3> getSolverRegions(const Tile& tile) const;
 
-    std::array<std::shared_ptr<SolverRegion>, 27>& getAllRegions() { return m_allRegions; }
-    const std::array<std::shared_ptr<SolverRegion>, 27>& getAllRegions() const
-    {
-        return m_allRegions;
-    }
+    const std::vector<std::shared_ptr<SolverRegion>>& getAllRegions() const;
+    const std::vector<std::shared_ptr<SolverSubgrid>>& getAllSolverSubgrids() const;
+    const std::vector<std::shared_ptr<SolverLine>>& getAllSolverHorizontalLines() const;
+    const std::vector<std::shared_ptr<SolverLine>>& getAllSolverVerticalLines() const;
 
     void computeAllSuggestions(const bool clear = false);
     void computeTileSuggestions(const Tile& tile, const bool clear = false);

@@ -98,13 +98,73 @@ void Solver::initialize()
 {
     for (TileValueType i = 0; i < 9; i++)
     {
-        m_allRegions[i * 3 + 0] = std::dynamic_pointer_cast<SolverRegion>(m_horizontalLines[i]);
-        m_allRegions[i * 3 + 1] = std::dynamic_pointer_cast<SolverRegion>(m_verticalLines[i]);
-        m_allRegions[i * 3 + 2] = std::dynamic_pointer_cast<SolverRegion>(m_subgrids[i]);
+        m_allSolverRegions[i * 3 + 0] =
+            std::dynamic_pointer_cast<SolverRegion>(m_horizontalLines[i]);
+        m_allSolverRegions[i * 3 + 1] = std::dynamic_pointer_cast<SolverRegion>(m_verticalLines[i]);
+        m_allSolverRegions[i * 3 + 2] = std::dynamic_pointer_cast<SolverRegion>(m_subgrids[i]);
     }
 
     // initialize techniques
     initializeTechniques();
+}
+
+const std::vector<std::shared_ptr<SolverRegion>>& Solver::getAllRegions() const
+{
+    if (m_allSolverRegions.empty())
+    {
+        const auto& solverSubgrids = getAllSolverSubgrids();
+        m_allSolverRegions.insert(
+            m_allSolverRegions.end(), solverSubgrids.begin(), solverSubgrids.end());
+        const auto& solverHorizontalLines = getAllSolverHorizontalLines();
+        m_allSolverRegions.insert(
+            m_allSolverRegions.end(), solverHorizontalLines.begin(), solverHorizontalLines.end());
+        const auto& solverVerticalLines = getAllSolverVerticalLines();
+        m_allSolverRegions.insert(
+            m_allSolverRegions.end(), solverVerticalLines.begin(), solverVerticalLines.end());
+    }
+    return m_allSolverRegions;
+}
+
+const std::vector<std::shared_ptr<SolverSubgrid>>& Solver::getAllSolverSubgrids() const
+{
+    if (m_allSolverSubgrids.empty())
+    {
+        const auto& subgrids = getSubgrids();
+        std::transform(
+            subgrids.begin(),
+            subgrids.end(),
+            std::back_inserter(m_allSolverSubgrids),
+            [](const auto& subgrid) { return std::dynamic_pointer_cast<SolverSubgrid>(subgrid); });
+    }
+    return m_allSolverSubgrids;
+}
+
+const std::vector<std::shared_ptr<SolverLine>>& Solver::getAllSolverHorizontalLines() const
+{
+    if (m_allSolverHorizontalLines.empty())
+    {
+        const auto& horizontalLines = getHorizontalLines();
+        std::transform(
+            horizontalLines.begin(),
+            horizontalLines.end(),
+            std::back_inserter(m_allSolverHorizontalLines),
+            [](const auto& line) { return std::dynamic_pointer_cast<SolverLine>(line); });
+    }
+    return m_allSolverHorizontalLines;
+}
+
+const std::vector<std::shared_ptr<SolverLine>>& Solver::getAllSolverVerticalLines() const
+{
+    if (m_allSolverVerticalLines.empty())
+    {
+        const auto& verticalLines = getVerticalLines();
+        std::transform(
+            verticalLines.begin(),
+            verticalLines.end(),
+            std::back_inserter(m_allSolverVerticalLines),
+            [](const auto& line) { return std::dynamic_pointer_cast<SolverLine>(line); });
+    }
+    return m_allSolverVerticalLines;
 }
 
 std::vector<std::string>
