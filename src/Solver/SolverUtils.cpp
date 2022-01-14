@@ -2,7 +2,9 @@
 
 #include "Board/Tile.hpp"
 
-bool areTilesInTheSameLine(const Tile& tile1, const Tile& tile2, LineOrientation lineOrientation)
+bool SolverUtils::areTilesInTheSameLine(const Tile& tile1,
+                                        const Tile& tile2,
+                                        LineOrientation lineOrientation)
 {
     if (tile1.getCoordinates().row == tile2.getCoordinates().row)
     {
@@ -18,7 +20,7 @@ bool areTilesInTheSameLine(const Tile& tile1, const Tile& tile2, LineOrientation
     }
 }
 
-bool areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2)
+bool SolverUtils::areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2)
 {
     const auto& tile1Coordinates = tile1.getCoordinates();
     const auto& tile2Coordinates = tile2.getCoordinates();
