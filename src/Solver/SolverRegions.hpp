@@ -57,6 +57,8 @@ class SolverRegion : virtual public Region
         return removeSuggestionsFromTiles({values}, exceptFromTiles);
     }
 
+    std::vector<std::shared_ptr<SolverTile>> getTilesWithSuggestion(TileValueType value) const;
+
     TileValueType getSuggestionsQuanFor(TileValueType value) const;
 };
 

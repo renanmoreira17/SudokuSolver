@@ -115,6 +115,21 @@ bool SolverRegion::removeSuggestionsFromTiles(
     return performed;
 }
 
+std::vector<std::shared_ptr<SolverTile>>
+SolverRegion::getTilesWithSuggestion(TileValueType value) const
+{
+    std::vector<std::shared_ptr<SolverTile>> tiles;
+    for (const std::shared_ptr<SolverTile>& solverTile : getSolverTiles())
+    {
+        if (solverTile->getSuggestions().empty())
+            continue;
+
+        if (solverTile->hasSuggestion(value))
+            tiles.emplace_back(solverTile);
+    }
+    return tiles;
+}
+
 // SPECIFIC REGIONS
 
 SolverLine::SolverLine(Grid* grid, LineOrientation orientation, const short index)
