@@ -7,6 +7,8 @@
 #include <unordered_set>
 
 class Solver;
+class SolverLine;
+class SolverSubgrid;
 
 using Suggestions = std::unordered_set<TileValueType>;
 
@@ -28,6 +30,10 @@ class SolverTile : public Tile
     bool removeSuggestion(TileValueType value);
     bool removeAllSuggestionsExceptFrom(const std::vector<TileValueType>& exceptionSuggestions);
     unsigned short getSuggestionsCount() const;
+
+    SolverLine* getSolverHorizontalLine() const;
+    SolverLine* getSolverVerticalLine() const;
+    SolverSubgrid* getSolverSugrid() const;
 
     bool canPlaceValueInTile(TileValueType value, bool forceCheck = false) const;
 };

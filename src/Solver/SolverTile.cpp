@@ -129,3 +129,18 @@ unsigned short SolverTile::getSuggestionsCount() const
 {
     return static_cast<unsigned short>(m_suggestions.size());
 }
+
+SolverLine* SolverTile::getSolverHorizontalLine() const
+{
+    return dynamic_cast<SolverLine*>(getHorizontalLine());
+}
+
+SolverLine* SolverTile::getSolverVerticalLine() const
+{
+    return dynamic_cast<SolverLine*>(getVerticalLine());
+}
+
+SolverSubgrid* SolverTile::getSolverSugrid() const
+{
+    return dynamic_cast<SolverSubgrid*>(getSubgrid());
+}
