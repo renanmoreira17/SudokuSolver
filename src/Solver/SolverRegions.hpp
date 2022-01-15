@@ -30,9 +30,7 @@ class SolverRegion : virtual public Region
   public:
     SolverRegion() = delete;
     SolverRegion(Grid* grid, const unsigned index, RegionType type);
-    SolverRegion(const SolverRegion& other) = default;
     SolverRegion(SolverRegion&& other);
-    SolverRegion& operator=(const SolverRegion& other) = default;
     SolverRegion& operator=(SolverRegion&& other);
     virtual ~SolverRegion() = default;
 
@@ -70,9 +68,7 @@ class SolverLine
   private:
   public:
     SolverLine(Grid* grid, LineOrientation orientation, const short index);
-    SolverLine(const SolverLine& other) = default;
     SolverLine(SolverLine&& other) = default;
-    SolverLine& operator=(const SolverLine& other) = default;
     SolverLine& operator=(SolverLine&& other) = default;
     ~SolverLine() {}
 };
@@ -84,9 +80,7 @@ class SolverSubgrid
   private:
   public:
     SolverSubgrid(Grid* grid, const short index);
-    SolverSubgrid(const SolverSubgrid& other) = default;
     SolverSubgrid(SolverSubgrid&& other) = default;
-    SolverSubgrid& operator=(const SolverSubgrid& other) = default;
     SolverSubgrid& operator=(SolverSubgrid&& other) = default;
     ~SolverSubgrid() {}
 };
