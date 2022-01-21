@@ -1,6 +1,8 @@
 #include "SolverUtils.hpp"
 
 #include "Board/Tile.hpp"
+#include "SolverTile.hpp"
+#include "SuggestionsQuantity.hpp"
 
 bool SolverUtils::areTilesInTheSameLine(const Tile& tile1,
                                         const Tile& tile2,
@@ -31,4 +33,19 @@ bool SolverUtils::areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2)
     const auto tile2SubgridCol = tile2Coordinates.col / 3;
 
     return tile1SubgridRow == tile2SubgridRow && tile1SubgridCol == tile2SubgridCol;
+}
+
+SuggestionsQuantity
+SolverUtils::collectSuggestionInformation(const std::vector<std::shared_ptr<SolverTile>>& tiles)
+{
+    SuggestionsQuantity suggestionsQuan;
+    for (const auto& tile : tiles)
+    {
+        const auto& tileSuggestions = tile->getSuggestions();
+        for (const auto& suggestion : tileSuggestions)
+        {
+            suggestionsQuan.addSuggestion(suggestion);
+        }
+    }
+    return suggestionsQuan;
 }

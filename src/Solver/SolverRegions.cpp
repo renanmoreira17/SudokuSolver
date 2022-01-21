@@ -11,9 +11,7 @@
 SolverRegion::SolverRegion(Grid* grid, const unsigned index, const RegionType type)
     : Region(index, type)
     , m_grid(grid)
-{
-    for (TileValueType i = 1; i <= 9; i++) { m_suggestionsQuan[i] = 0; }
-}
+{}
 
 SolverRegion::SolverRegion(SolverRegion&& other)
     : Region(other)
@@ -67,25 +65,17 @@ const std::vector<std::shared_ptr<SolverTile>>& SolverRegion::getSolverTiles() c
 
 void SolverRegion::suggestionAdded(const unsigned value)
 {
-    auto& number = m_suggestionsQuan[value];
-    if (number == 9)
-        throw std::out_of_range("Trying to increase suggestions number, but it's already at 9!");
-    ++number;
+    m_suggestionsQuan.addSuggestion(value);
 }
 
 void SolverRegion::suggestionRemoved(const unsigned value)
 {
-    auto& number = m_suggestionsQuan[value];
-    if (number == 0)
-        throw std::out_of_range("Trying to decrease suggestions number, but it's already at 0!");
-    --number;
+    m_suggestionsQuan.removeSuggestion(value);
 }
 
 TileValueType SolverRegion::getSuggestionsQuanFor(TileValueType value) const
 {
-    if (value > 9)
-        throw std::out_of_range("Trying to get suggestions number for a value greater than 9!");
-    return m_suggestionsQuan.at(value);
+    return m_suggestionsQuan.getSuggestionsQuantityFor(value);
 }
 
 bool SolverRegion::removeSuggestionsFromTiles(

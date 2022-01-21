@@ -3,6 +3,7 @@
 #include "SolverTile.hpp"
 #include "Techniques/HiddenPairs.hpp"
 #include "Techniques/NakedPairs.hpp"
+#include "Techniques/NakedTriples.hpp"
 #include "Techniques/PointingPair.hpp"
 #include "Techniques/SinglesRegion.hpp"
 #include "Techniques/SinglesTile.hpp"
@@ -67,6 +68,7 @@ void Solver::initializeTechniques()
     INIT_TECHNIQUE(PointingPair);
     INIT_TECHNIQUE(HiddenPairs);
     INIT_TECHNIQUE(NakedPairs);
+    INIT_TECHNIQUE(NakedTriples);
 }
 
 void Solver::solve()

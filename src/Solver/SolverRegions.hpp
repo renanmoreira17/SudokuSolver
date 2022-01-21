@@ -6,6 +6,7 @@
 #include "Board/Line.hpp"
 #include "Board/Region.hpp"
 #include "Board/Subgrid.hpp"
+#include "SuggestionsQuantity.hpp"
 
 #include <map>
 #include <optional>
@@ -15,15 +16,12 @@ class Line;
 class Subgrid;
 class SolverTile;
 
-// key: suggestion value (1-9) - value: number of times this suggestion appears in the region
-using SuggestionsQuan = std::map<TileValueType, TileValueType>;
-
 class SolverRegion : virtual public Region
 {
   private:
     Grid* m_grid;
     // Suggestions m_missing{1, 2, 3, 4, 5, 6, 7, 8, 9};
-    SuggestionsQuan m_suggestionsQuan;
+    SuggestionsQuantity m_suggestionsQuan;
 
     mutable std::unique_ptr<std::vector<std::shared_ptr<SolverTile>>> m_solverTiles;
 
@@ -39,7 +37,7 @@ class SolverRegion : virtual public Region
     const std::vector<std::shared_ptr<SolverTile>>& getSolverTiles() const;
 
     // Returns a map telling how many times each value is missing in this region
-    const SuggestionsQuan& getSuggestionsQuan() const { return m_suggestionsQuan; }
+    const SuggestionsQuantity& getSuggestionsQuan() const { return m_suggestionsQuan; }
 
     void suggestionAdded(const unsigned value);
     void suggestionRemoved(const unsigned value);

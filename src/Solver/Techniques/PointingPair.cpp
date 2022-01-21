@@ -59,7 +59,7 @@ bool PointingPair::perform()
                 // if the number of appearances of suggestion in the line being targeted is equal to
                 // 2, then there are no other suggestions to remove and therefore this is not a
                 // pointing pair
-                if (targetLineSuggestionsQuan.at(suggestion) <= 2)
+                if (targetLineSuggestionsQuan.getSuggestionsQuantityFor(suggestion) <= 2)
                 {
                     continue;
                 }

@@ -61,7 +61,7 @@ bool HiddenPairs::perform()
             continue;
         }
 
-        const SuggestionsQuan& suggestionQuan = region->getSuggestionsQuan();
+        const SuggestionsQuantity& suggestionQuan = region->getSuggestionsQuan();
         // suggestions with exactly 2 appearances
         std::vector<TileValueType> suggestionsWith2Appearances;
         for (const auto& suggestionPair : suggestionQuan)
