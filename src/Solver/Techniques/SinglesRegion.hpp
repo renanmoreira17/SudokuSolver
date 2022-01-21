@@ -3,17 +3,6 @@
 
 #include "Solver/Technique.hpp"
 
-class SinglesRegion : public Technique
-{
-  protected:
-    bool analyze() override;
-    bool perform() override;
-
-  public:
-    SinglesRegion(Solver& solver)
-        : Technique(solver)
-    {}
-    ~SinglesRegion() = default;
-};
+NEW_TECHNIQUE(SinglesRegion);
 
 #endif // __SINGLESREGION_H__

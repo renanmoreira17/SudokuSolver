@@ -21,4 +21,18 @@ class Technique
     bool run() { return analyze() ? perform() : false; }
 };
 
+#define NEW_TECHNIQUE(name)                                                                        \
+    class name : public Technique                                                                  \
+    {                                                                                              \
+      protected:                                                                                   \
+        bool analyze() override;                                                                   \
+        bool perform() override;                                                                   \
+                                                                                                   \
+      public:                                                                                      \
+        name(Solver& solver)                                                                       \
+            : Technique(solver)                                                                    \
+        {}                                                                                         \
+        ~name() = default;                                                                         \
+    }
+
 #endif // __TECHNIQUE_H__
