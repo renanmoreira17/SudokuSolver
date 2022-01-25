@@ -4,6 +4,7 @@
 #include "Grid.hpp"
 #include "Subgrid.hpp"
 
+#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <string>

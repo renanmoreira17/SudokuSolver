@@ -4,6 +4,7 @@
 #include "Solver/SolverTile.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <iterator>
 
 bool SinglesRegion::analyze()
