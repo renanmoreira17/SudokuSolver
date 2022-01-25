@@ -26,7 +26,6 @@ bool NakedTriples::perform()
 {
     for (const auto& region : m_solver.getAllRegions())
     {
-        const auto& regionSuggestionsQuan = region->getSuggestionsQuan();
         std::vector<std::shared_ptr<SolverTile>> tilesWith2Or3Suggestions;
         const auto& regionTiles = region->getSolverTiles();
         std::copy_if(regionTiles.begin(),

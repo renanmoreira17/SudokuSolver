@@ -4,11 +4,14 @@
 #include "Board/Tile.hpp"
 #include "GlobalDefinitions.hpp"
 
+#include <string>
 #include <unordered_set>
+#include <vector>
 
 class Solver;
 class SolverLine;
 class SolverSubgrid;
+class SolverRegion;
 
 using Suggestions = std::unordered_set<TileValueType>;
 
@@ -35,7 +38,13 @@ class SolverTile : public Tile
     SolverLine* getSolverVerticalLine() const;
     SolverSubgrid* getSolverSugrid() const;
 
+    std::vector<SolverRegion*> getSolverRegions() const;
+
     bool canPlaceValueInTile(TileValueType value, bool forceCheck = false) const;
+
+#ifdef DEBUG
+    std::string toString() const;
+#endif
 };
 
 #endif // __SOLVERTILE_H__

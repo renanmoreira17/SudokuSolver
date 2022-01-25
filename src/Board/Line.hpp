@@ -21,6 +21,15 @@ class Line : virtual public Region
     virtual ~Line() = default;
 
     const LineOrientation& getLineOrientation() const { return m_orientation; }
+
+    RegionSpecificType getRegionSpecificType() const override
+    {
+        switch (getLineOrientation())
+        {
+        case LineOrientation::HORIZONTAL: return RegionSpecificType::HORIZONTAL_LINE;
+        case LineOrientation::VERTICAL: return RegionSpecificType::VERTICAL_LINE;
+        }
+    }
 };
 
 #endif // __LINE_H__

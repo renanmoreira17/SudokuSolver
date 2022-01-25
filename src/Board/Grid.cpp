@@ -138,6 +138,21 @@ void Grid::printGrid() const
     std::cout << m_gridPrinter->createBoardString() << std::endl;
 }
 
+#ifdef DEBUG
+#include <sstream>
+void Grid::printGridDebug() const
+{
+    const auto boardString = m_gridPrinter->createBoardString();
+    auto ss = std::stringstream{boardString};
+
+    for (std::string line; std::getline(ss, line, '\n');)
+    {
+        std::replace(line.begin(), line.end(), '\\', '|');
+        std::cout << line << "\n";
+    }
+}
+#endif
+
 bool Grid::isSolved() const
 {
     for (const auto& tile : m_gridTiles)

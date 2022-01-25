@@ -45,6 +45,13 @@ class Grid
 
     void printGrid() const;
 
+#ifdef DEBUG
+  public:
+    void printGridDebug() const;
+
+  protected:
+#endif
+
   public:
     Grid(std::unique_ptr<ComponentsConstructor>&& constructor =
              std::make_unique<ComponentsConstructor>());

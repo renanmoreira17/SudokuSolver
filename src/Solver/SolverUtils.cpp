@@ -35,6 +35,13 @@ bool SolverUtils::areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2)
     return tile1SubgridRow == tile2SubgridRow && tile1SubgridCol == tile2SubgridCol;
 }
 
+bool SolverUtils::areTilesInTheSameRegion(const Tile& tile1, const Tile& tile2)
+{
+    return areTilesInTheSameLine(tile1, tile2, LineOrientation::HORIZONTAL) ||
+           areTilesInTheSameLine(tile1, tile2, LineOrientation::VERTICAL) ||
+           areTilesInTheSameSubgrid(tile1, tile2);
+}
+
 SuggestionsQuantity
 SolverUtils::collectSuggestionInformation(const std::vector<std::shared_ptr<SolverTile>>& tiles)
 {

@@ -3,10 +3,18 @@
 
 using TileValueType = unsigned short;
 
-enum LineOrientation
+enum class LineOrientation
 {
     VERTICAL,
     HORIZONTAL
+};
+
+enum class RegionSpecificType
+{
+    UNKNOWN,
+    HORIZONTAL_LINE,
+    VERTICAL_LINE,
+    SUBGRID
 };
 
 #endif // __GLOBALDEFINITIONS_H__

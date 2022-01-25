@@ -144,3 +144,30 @@ SolverSubgrid* SolverTile::getSolverSugrid() const
 {
     return dynamic_cast<SolverSubgrid*>(getSubgrid());
 }
+
+std::vector<SolverRegion*> SolverTile::getSolverRegions() const
+{
+    return {getSolverHorizontalLine(), getSolverVerticalLine(), getSolverSugrid()};
+}
+
+#ifdef DEBUG
+#include "Util/UtilFunctions.hpp"
+#include <fmt/format.h>
+
+std::string SolverTile::toString() const
+{
+    std::stringstream ss;
+    const auto& coordinates = getCoordinates();
+    ss << fmt::format("Tile {}{}: ", convertRowToLetter(coordinates.row), coordinates.col + 1);
+    if (hasValue())
+    {
+        ss << "Value: " << getValue() << " ";
+    }
+    else
+    {
+        ss << "Suggestions: ";
+        for (const auto& suggestion : getSuggestions()) { ss << suggestion << " "; }
+    }
+    return ss.str();
+}
+#endif
