@@ -9,6 +9,7 @@
 #include <memory>
 #include <optional>
 #include <unordered_set>
+#include <cassert>
 
 #include "Util/UtilFunctions.hpp"
 #include <fmt/format.h>

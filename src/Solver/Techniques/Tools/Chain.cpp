@@ -1,5 +1,7 @@
 #include "Chain.hpp"
 
+#include <cassert>
+
 ChainLinkElement::ChainLinkElement(const std::shared_ptr<SolverTile>& sourceTile)
     : m_sourceTile(sourceTile)
 {}

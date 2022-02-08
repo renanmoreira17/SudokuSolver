@@ -48,7 +48,7 @@ Grid::Grid(const std::string& boardStr, std::unique_ptr<ComponentsConstructor>&&
 {
     for (std::string::size_type i = 0; i < boardStr.size(); i++)
     {
-        if (boardStr[i] == '.')
+        if (boardStr[i] == '.' || boardStr[i] == '0')
             continue;
         const TileValueType col = i % 9;
         const TileValueType row = i / 9;

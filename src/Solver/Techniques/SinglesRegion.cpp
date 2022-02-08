@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <cassert>
 
 bool SinglesRegion::analyze()
 {

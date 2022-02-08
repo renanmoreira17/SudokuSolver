@@ -4,6 +4,7 @@
 #include "Solver/SolverUtils.hpp"
 
 #include <algorithm>
+#include <cassert>
 
 bool PointingPair::analyze()
 {
