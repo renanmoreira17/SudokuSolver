@@ -2,15 +2,19 @@
 
 #include "Solver/Solver.hpp"
 #include "Solver/SolverUtils.hpp"
+#include "Tools/Chain.hpp"
+#include "Tools/Traversal.hpp"
 
 #include <map>
 #include <memory>
 #include <optional>
 #include <unordered_set>
 
-#ifdef DEBUG
 #include "Util/UtilFunctions.hpp"
 #include <fmt/format.h>
+#include <iostream>
+
+#ifdef DEBUG
 #endif
 
 namespace
@@ -42,6 +46,7 @@ std::string convertElementLinkStateToString(const ElementLinkState state)
     }
 }
 
+/*
 class ChainLinkElement : public std::enable_shared_from_this<ChainLinkElement>
 {
   private:
@@ -222,75 +227,193 @@ class Chain
     }
 #endif // DEBUG
 };
+*/
 
-using FoundElement = std::optional<std::shared_ptr<ChainLinkElement>>;
-
-template<typename ActionFunction>
-static FoundElement
-traverseElements(const std::shared_ptr<ChainLinkElement>& element,
-                 std::unordered_set<std::shared_ptr<ChainLinkElement>>& traversedElements,
-                 ActionFunction&& actionFn)
+class SinglesChainLinkElement : public ChainLinkElement
 {
-    const auto hasVisitedElement =
-        [&traversedElements](const std::shared_ptr<ChainLinkElement>& element) {
-            return traversedElements.find(element) != traversedElements.cend();
-        };
+  protected:
+    SinglesChainLinkElement(const std::shared_ptr<SolverTile>& sourceTile)
+        : ChainLinkElement(sourceTile)
+    {}
 
-    if (!hasVisitedElement(element))
+  public:
+    SinglesChainLinkElement() = delete;
+
+    static std::shared_ptr<SinglesChainLinkElement>
+    create(const std::shared_ptr<SolverTile>& sourceTile)
     {
-        traversedElements.emplace(element);
-        const auto result = actionFn(element);
-        if (result)
-        {
-            return element;
-        }
+        return std::shared_ptr<SinglesChainLinkElement>(new SinglesChainLinkElement(sourceTile));
     }
 
-    for (const auto& child : element->getLinksTo())
+    RegionSpecificType getLinkType() const { return m_linkType; }
+    void setLinkType(RegionSpecificType type) { m_linkType = type; }
+    ElementLinkState getLinkState() const { return m_linkState; }
+    void setLinkState(const ElementLinkState state) { m_linkState = state; }
+
+    void linkTo(const std::shared_ptr<ChainLinkElement>& targetTile) override
     {
-        if (hasVisitedElement(child))
+        ChainLinkElement::linkTo(targetTile);
+        std::dynamic_pointer_cast<SinglesChainLinkElement>(targetTile)
+            ->setLinkState(!getLinkState());
+    }
+
+  private:
+    RegionSpecificType m_linkType{RegionSpecificType::UNKNOWN};
+    ElementLinkState m_linkState{ElementLinkState::NONE};
+};
+
+class SinglesChain : public Chain
+{
+  public:
+    SinglesChain(Solver& solver, const TileValueType targetChainValue)
+        : m_solver(solver)
+        , m_targetChainValue(targetChainValue)
+    {}
+    SinglesChain() = delete;
+
+    void buildChain()
+    {
+        for (const auto& subgrid : m_solver.getAllRegions())
         {
-            continue;
+            const auto& suggestionsQuan = subgrid->getSuggestionsQuan();
+            if (suggestionsQuan.getSuggestionsQuantityFor(m_targetChainValue) != 2)
+            {
+                continue;
+            }
+
+            const auto tiles = subgrid->getTilesWithSuggestion(m_targetChainValue);
+            const auto& rootTile = tiles.front();
+
+            buildChainForElement(rootTile);
         }
-        const auto childResult = traverseElements(child, traversedElements, actionFn);
-        if (childResult)
+#ifdef DEBUG
+        printChain();
+#endif
+    }
+
+    std::shared_ptr<ChainLinkElement>
+    createRootElement(const std::shared_ptr<SolverTile>& tile) override
+    {
+        m_visitedTiles.clear();
+        const auto element = SinglesChainLinkElement::create(tile);
+        element->setLinkState(ElementLinkState::RED);
+        return element;
+    }
+
+  protected:
+    virtual std::vector<std::shared_ptr<ChainLinkElement>>
+    getLinksFromElement(const std::shared_ptr<ChainLinkElement>& element,
+                        const std::optional<std::shared_ptr<ChainLinkElement>>& origin) override
+    {
+        const auto& sourceTile = element->getSourceTile();
+        const auto insertedInfo = m_visitedTiles.insert(sourceTile);
+        if (!insertedInfo.second)
         {
-            return childResult;
+            return {};
+        }
+
+        std::vector<std::shared_ptr<ChainLinkElement>> result;
+        for (const SolverRegion* region : sourceTile->getSolverRegions())
+        {
+            auto tiles = region->getTilesWithSuggestion(m_targetChainValue);
+            if (tiles.size() != 2)
+            {
+                continue;
+            }
+
+            // This skips both the current tile which we're finding links for and the tile
+            // which originated this link. If we included the origin tile, we would have
+            // a duplicated link.
+            // Also, we check if the tile has already been visited. This might be the case if
+            // we previously found a link with the tile in a different region of the source tile,
+            // and we don't want to make double links
+            std::erase_if(tiles, [&](const std::shared_ptr<SolverTile>& tile) {
+                return tile == sourceTile ||
+                       (origin.has_value() && tile == origin.value()->getSourceTile()) ||
+                       hasVisitedTile(tile);
+            });
+            if (tiles.empty())
+            {
+                continue;
+            }
+
+            assert(tiles.size() == 1);
+
+            const auto targetElement = SinglesChainLinkElement::create(tiles.front());
+            targetElement->setLinkType(region->getRegionSpecificType());
+            result.push_back(targetElement);
+        }
+
+        return result;
+    }
+
+    bool shouldLinkToElement(const std::shared_ptr<ChainLinkElement>& element,
+                             const std::shared_ptr<ChainLinkElement>&) const override
+    {
+        return !hasVisitedTile(element->getSourceTile());
+    }
+
+    bool hasVisitedTile(const std::shared_ptr<SolverTile>& tile) const
+    {
+        return m_visitedTiles.find(tile) != m_visitedTiles.cend();
+    }
+
+  public:
+    TileValueType getTargetChainValue() const { return m_targetChainValue; }
+
+  private:
+    Solver& m_solver;
+    const TileValueType m_targetChainValue;
+    std::unordered_set<std::shared_ptr<SolverTile>> m_visitedTiles;
+
+#ifdef DEBUG
+    void printChain() const
+    {
+        for (const auto& rootElement : getRootElements())
+        {
+            fmt::print("Chain: {}\n", m_targetChainValue);
+            const auto& rootElementCoord = rootElement->getSourceTile()->getCoordinates();
+            fmt::print(
+                "Root: {}{}\n", convertRowToLetter(rootElementCoord.row), rootElementCoord.col + 1);
+            fmt::print("Links:\n");
+            std::function<void(const std::shared_ptr<SinglesChainLinkElement>&, int)>
+                printLinksFor = [&](const std::shared_ptr<SinglesChainLinkElement>& element,
+                                    int depth = 0) {
+                    const auto& sourceTileCoord = element->getSourceTile()->getCoordinates();
+                    const auto& links = element->getLinksTo();
+                    // if (!links.empty())
+                    // {
+                    //     fmt::print("Entering depth {}\n", depth);
+                    // }
+                    for (const auto& linkedTo : links)
+                    {
+                        const auto singlesChainLinkedTo =
+                            std::dynamic_pointer_cast<SinglesChainLinkElement>(linkedTo);
+                        const auto& targetTileCoord = linkedTo->getSourceTile()->getCoordinates();
+                        const std::string depthStr = std::string(depth * 2, ' ');
+                        fmt::print(
+                            "{}{}{}({}) -> {}{}({}) (Linked through: {})\n",
+                            depthStr,
+                            convertRowToLetter(sourceTileCoord.row),
+                            sourceTileCoord.col + 1,
+                            convertElementLinkStateToString(element->getLinkState()),
+                            convertRowToLetter(targetTileCoord.row),
+                            targetTileCoord.col + 1,
+                            convertElementLinkStateToString(singlesChainLinkedTo->getLinkState()),
+                            convertRegionSpecificTypeToString(singlesChainLinkedTo->getLinkType()));
+                        printLinksFor(singlesChainLinkedTo, depth + 1);
+                    }
+                    // if (!links.empty())
+                    // {
+                    //     fmt::print("Exiting depth {}\n", depth);
+                    // }
+                };
+            printLinksFor(std::dynamic_pointer_cast<SinglesChainLinkElement>(rootElement), 0);
+            fmt::print("\n");
         }
     }
-    const auto parent = element->getLinkedFrom().lock();
-    if (parent && !hasVisitedElement(parent))
-    {
-        const auto parentResult = traverseElements(parent, traversedElements, actionFn);
-        if (parentResult)
-        {
-            return parentResult;
-        }
-    }
-    return std::nullopt;
-}
-
-static std::shared_ptr<ChainLinkElement>
-getExtremityElementFromRoot(const std::shared_ptr<ChainLinkElement>& rootElement)
-{
-    auto auxElement = rootElement;
-    while (!auxElement->getLinksTo().empty()) { auxElement = auxElement->getLinksTo().front(); }
-    return auxElement;
-}
-
-static bool doesChainContainTile(const std::shared_ptr<ChainLinkElement>& rootElement,
-                                 const std::shared_ptr<SolverTile>& tile)
-{
-    std::unordered_set<std::shared_ptr<ChainLinkElement>> traversedElements;
-    const auto result =
-        traverseElements(rootElement,
-                         traversedElements,
-                         [&tile](const std::shared_ptr<ChainLinkElement>& element) -> bool {
-                             return tile == element->getSourceTile();
-                         });
-
-    return result.has_value();
-}
+#endif // DEBUG
+};
 
 template<typename A, typename B>
 std::pair<B, A> flip_pair(const std::pair<A, B>& p)
@@ -309,7 +432,7 @@ std::multimap<B, A> flip_map(const std::unordered_map<A, B>& src)
 class SinglesChainsAnalyzer
 {
   public:
-    SinglesChainsAnalyzer(Chain& chain, Solver& solver)
+    SinglesChainsAnalyzer(SinglesChain& chain, Solver& solver)
         : m_chain(chain)
         , m_solver(solver)
     {}
@@ -328,20 +451,58 @@ class SinglesChainsAnalyzer
     {
         for (const auto& rootElement : m_chain.getRootElements())
         {
-            const std::shared_ptr<ChainLinkElement> extremityElement =
-                getExtremityElementFromRoot(rootElement);
+            std::shared_ptr<ChainLinkElement> foundTwiceInRegionElement;
 
-            std::unordered_set<std::shared_ptr<ChainLinkElement>> traversedElements;
+            const auto lookForTwiceLambda =
+                [&foundTwiceInRegionElement](const std::shared_ptr<ChainLinkElement>& element) {
+                    const auto elementSingles =
+                        std::dynamic_pointer_cast<SinglesChainLinkElement>(element);
 
-            const auto lookForTwiceLambda = [](const std::shared_ptr<ChainLinkElement>& element) {
-                std::unordered_set<std::shared_ptr<ChainLinkElement>> visitedElements;
-                return lookForTwiceInRegion(element, element, false, visitedElements);
-            };
+                    Traversal twiceInRegionTraversal(
+                        element,
+                        [&elementSingles](const std::shared_ptr<ChainLinkElement>& elementReg) {
+                            const auto elementRegSingles =
+                                std::dynamic_pointer_cast<SinglesChainLinkElement>(elementReg);
+                            if (elementSingles != elementRegSingles &&
+                                elementSingles->getLinkState() == elementRegSingles->getLinkState())
+                            {
+                                const bool sameRegion = SolverUtils::areTilesInTheSameRegion(
+                                    *elementSingles->getSourceTile(),
+                                    *elementRegSingles->getSourceTile());
+                                if (sameRegion)
+                                {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        });
+                    const auto result = twiceInRegionTraversal.traverse();
+                    if (result)
+                    {
+                        foundTwiceInRegionElement = result.value();
+                        return true;
+                    }
+                    return false;
+                };
 
-            const auto result =
-                traverseElements(extremityElement, traversedElements, lookForTwiceLambda);
+            Traversal twiceInLambdaTraversal(rootElement, lookForTwiceLambda);
+            const auto result = twiceInLambdaTraversal.traverse();
             if (result)
             {
+                const auto elementSingles =
+                    std::dynamic_pointer_cast<SinglesChainLinkElement>(result.value());
+                const auto elementSinglesReg =
+                    std::dynamic_pointer_cast<SinglesChainLinkElement>(foundTwiceInRegionElement);
+                // treat twice in region
+                m_solver.report(
+                    "\n\nTwice in region = {} {} from {} and {} {} from {} equal = {}\n\n",
+                    *elementSingles->getSourceTile(),
+                    convertRegionSpecificTypeToString(elementSingles->getLinkType()),
+                    *elementSingles->getLinkedFrom().lock()->getSourceTile(),
+                    *elementSinglesReg->getSourceTile(),
+                    convertRegionSpecificTypeToString(elementSinglesReg->getLinkType()),
+                    *elementSinglesReg->getLinkedFrom().lock()->getSourceTile(),
+                    elementSingles == elementSinglesReg);
                 return true;
             }
         }
@@ -354,14 +515,14 @@ class SinglesChainsAnalyzer
         for (const auto& rootElement : m_chain.getRootElements())
         {
             const std::shared_ptr<ChainLinkElement> extremityElement =
-                getExtremityElementFromRoot(rootElement);
+                Traversal::getExtremityElementFrom(rootElement);
             for (const auto& tile : m_solver.getGridTiles())
             {
                 const auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
                 if (!solverTile->hasSuggestion(chainedValue))
                     continue;
 
-                if (doesChainContainTile(rootElement, solverTile))
+                if (Traversal::doesChainContainTile(rootElement, solverTile))
                     continue;
 
                 // find all linked elements who can see the solverTile
@@ -374,29 +535,30 @@ class SinglesChainsAnalyzer
                                                                     *solverTile);
                     };
 
-                std::unordered_set<std::shared_ptr<ChainLinkElement>> traversedElements;
                 std::vector<std::shared_ptr<ChainLinkElement>> seeingElements;
 
-                FoundElement hasFound;
-                do {
-                    const auto startPosition = hasFound.value_or(extremityElement);
-                    hasFound =
-                        traverseElements(startPosition, traversedElements, checkIfSameRegionLambda);
-                    if (hasFound)
-                    {
-                        seeingElements.emplace_back(hasFound.value());
-                    }
-                } while (hasFound);
+                Traversal seeingTraversal(extremityElement, checkIfSameRegionLambda);
+                auto hasFound = seeingTraversal.traverse();
+                while (hasFound)
+                {
+                    const auto& foundValue = hasFound.value();
+                    seeingElements.push_back(foundValue);
+                    hasFound = seeingTraversal.continueTraversing(foundValue);
+                }
 
                 if (seeingElements.size() < 2)
                     continue;
 
-                const auto referenceLinkState = seeingElements.front()->getLinkState();
+                const auto referenceLinkState =
+                    std::dynamic_pointer_cast<SinglesChainLinkElement>(seeingElements.front())
+                        ->getLinkState();
                 assert(referenceLinkState != ElementLinkState::NONE);
                 bool areStatesHomogeneous = true;
                 for (const auto& element : seeingElements)
                 {
-                    areStatesHomogeneous = element->getLinkState() == referenceLinkState;
+                    areStatesHomogeneous =
+                        std::dynamic_pointer_cast<SinglesChainLinkElement>(element)
+                            ->getLinkState() == referenceLinkState;
                     if (!areStatesHomogeneous)
                         break;
                 }
@@ -419,61 +581,8 @@ class SinglesChainsAnalyzer
         return false;
     }
 
-    using PairInSameRegion = std::optional<
-        std::pair<std::shared_ptr<ChainLinkElement>, std::shared_ptr<ChainLinkElement>>>;
-
-    static PairInSameRegion
-    lookForTwiceInRegion(const std::shared_ptr<ChainLinkElement>& sourceElement,
-                         const std::shared_ptr<ChainLinkElement>& iteratingElement,
-                         bool shouldSkipLayer,
-                         std::unordered_set<std::shared_ptr<ChainLinkElement>>& visitedElements)
-    {
-        visitedElements.emplace(iteratingElement);
-
-        if (!shouldSkipLayer && sourceElement != iteratingElement)
-        {
-            const bool sameRegion = SolverUtils::areTilesInTheSameRegion(
-                *sourceElement->getSourceTile(), *iteratingElement->getSourceTile());
-            if (sameRegion)
-            {
-                assert(sourceElement->getLinkState() == iteratingElement->getLinkState());
-                return std::make_pair(sourceElement, iteratingElement);
-            }
-        }
-
-        // first, check for all children of current node
-        for (const auto& child : iteratingElement->getLinksTo())
-        {
-            if (visitedElements.find(child) != visitedElements.cend())
-            {
-                continue;
-            }
-
-            const auto result =
-                lookForTwiceInRegion(sourceElement, child, !shouldSkipLayer, visitedElements);
-            if (result)
-            {
-                return result;
-            }
-        }
-
-        // then, check for the ancestor
-        const auto parent = iteratingElement->getLinkedFrom().lock();
-        if (parent && parent != sourceElement &&
-            visitedElements.find(parent) == visitedElements.cend())
-        {
-            const auto result =
-                lookForTwiceInRegion(sourceElement, parent, !shouldSkipLayer, visitedElements);
-            if (result)
-            {
-                return result;
-            }
-        }
-        return std::nullopt;
-    }
-
   private:
-    Chain& m_chain;
+    SinglesChain& m_chain;
     Solver& m_solver;
 };
 
@@ -521,7 +630,7 @@ bool SinglesChains::perform()
             continue;
         }
         const auto targetSuggestion = valueSuggestions.second;
-        Chain chain(m_solver, targetSuggestion);
+        SinglesChain chain(m_solver, targetSuggestion);
         chain.buildChain();
         SinglesChainsAnalyzer SCsAnalyzer(chain, m_solver);
         const auto result = SCsAnalyzer.analyzeAndPerform();
