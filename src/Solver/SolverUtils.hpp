@@ -7,6 +7,7 @@
 #include <vector>
 
 class Tile;
+class Region;
 class SuggestionsQuantity;
 class SolverTile;
 
@@ -16,6 +17,8 @@ bool areTilesInTheSameLine(const Tile& tile1, const Tile& tile2, LineOrientation
 bool areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2);
 
 bool areTilesInTheSameRegion(const Tile& tile1, const Tile& tile2);
+
+Region* getTilesCommonRegion(const Tile& tile1, const Tile& tile2);
 
 SuggestionsQuantity
 collectSuggestionInformation(const std::vector<std::shared_ptr<SolverTile>>& tiles);

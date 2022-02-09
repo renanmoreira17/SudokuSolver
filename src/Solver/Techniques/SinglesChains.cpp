@@ -5,11 +5,11 @@
 #include "Tools/Chain.hpp"
 #include "Tools/Traversal.hpp"
 
+#include <cassert>
 #include <map>
 #include <memory>
 #include <optional>
 #include <unordered_set>
-#include <cassert>
 
 #include "Util/UtilFunctions.hpp"
 #include <fmt/format.h>
@@ -240,8 +240,7 @@ class SinglesChainLinkElement : public ChainLinkElement
   public:
     SinglesChainLinkElement() = delete;
 
-    static std::shared_ptr<SinglesChainLinkElement>
-    create(const std::shared_ptr<SolverTile>& sourceTile)
+    static std::shared_ptr<SinglesChainLinkElement> create(const std::shared_ptr<SolverTile>& sourceTile)
     {
         return std::shared_ptr<SinglesChainLinkElement>(new SinglesChainLinkElement(sourceTile));
     }
@@ -254,8 +253,7 @@ class SinglesChainLinkElement : public ChainLinkElement
     void linkTo(const std::shared_ptr<ChainLinkElement>& targetTile) override
     {
         ChainLinkElement::linkTo(targetTile);
-        std::dynamic_pointer_cast<SinglesChainLinkElement>(targetTile)
-            ->setLinkState(!getLinkState());
+        std::dynamic_pointer_cast<SinglesChainLinkElement>(targetTile)->setLinkState(!getLinkState());
     }
 
   private:
@@ -292,8 +290,7 @@ class SinglesChain : public Chain
 #endif
     }
 
-    std::shared_ptr<ChainLinkElement>
-    createRootElement(const std::shared_ptr<SolverTile>& tile) override
+    std::shared_ptr<ChainLinkElement> createRootElement(const std::shared_ptr<SolverTile>& tile) override
     {
         m_visitedTiles.clear();
         const auto element = SinglesChainLinkElement::create(tile);
@@ -362,7 +359,59 @@ class SinglesChain : public Chain
   public:
     TileValueType getTargetChainValue() const { return m_targetChainValue; }
 
+    std::string buildChainString(const std::shared_ptr<ChainLinkElement>& rootElement) const
+    {
+        return genericBuildChainString(
+            rootElement,
+            [](const std::shared_ptr<SinglesChainLinkElement>& source,
+               const std::shared_ptr<SinglesChainLinkElement>& linkedTo) {
+                const auto& sourceTileCoord = source->getSourceTile()->getCoordinates();
+                const auto& targetTileCoord = linkedTo->getSourceTile()->getCoordinates();
+                return fmt::format("{}{}({}) -> {}{}({})",
+                                   convertRowToLetter(sourceTileCoord.row),
+                                   sourceTileCoord.col + 1,
+                                   convertElementLinkStateToString(source->getLinkState()),
+                                   convertRowToLetter(targetTileCoord.row),
+                                   targetTileCoord.col + 1,
+                                   convertElementLinkStateToString(linkedTo->getLinkState()));
+            });
+    }
+
   private:
+    std::string
+    genericBuildChainString(const std::shared_ptr<ChainLinkElement>& rootElement,
+                            const std::function<std::string(const std::shared_ptr<SinglesChainLinkElement>&,
+                                                            const std::shared_ptr<SinglesChainLinkElement>&)>&
+                                chainLinkStringFunction) const
+    {
+        std::string result;
+        std::function<void(const std::shared_ptr<SinglesChainLinkElement>&, int)> generateLinksFor =
+            [&](const std::shared_ptr<SinglesChainLinkElement>& element, int depth = 0) {
+                const auto& links = element->getLinksTo();
+                // if (!links.empty())
+                // {
+                //     fmt::print("Entering depth {}\n", depth);
+                // }
+                for (const auto& linkedTo : links)
+                {
+                    const auto singlesChainLinkedTo =
+                        std::dynamic_pointer_cast<SinglesChainLinkElement>(linkedTo);
+
+                    const std::string depthStr = std::string(depth * 2, ' ');
+                    const auto linkString = chainLinkStringFunction(element, singlesChainLinkedTo);
+                    result += depthStr + linkString + '\n';
+
+                    generateLinksFor(singlesChainLinkedTo, depth + 1);
+                }
+                // if (!links.empty())
+                // {
+                //     fmt::print("Exiting depth {}\n", depth);
+                // }
+            };
+        generateLinksFor(std::dynamic_pointer_cast<SinglesChainLinkElement>(rootElement), 0);
+        return result;
+    }
+
     Solver& m_solver;
     const TileValueType m_targetChainValue;
     std::unordered_set<std::shared_ptr<SolverTile>> m_visitedTiles;
@@ -374,43 +423,24 @@ class SinglesChain : public Chain
         {
             fmt::print("Chain: {}\n", m_targetChainValue);
             const auto& rootElementCoord = rootElement->getSourceTile()->getCoordinates();
-            fmt::print(
-                "Root: {}{}\n", convertRowToLetter(rootElementCoord.row), rootElementCoord.col + 1);
+            fmt::print("Root: {}{}\n", convertRowToLetter(rootElementCoord.row), rootElementCoord.col + 1);
             fmt::print("Links:\n");
-            std::function<void(const std::shared_ptr<SinglesChainLinkElement>&, int)>
-                printLinksFor = [&](const std::shared_ptr<SinglesChainLinkElement>& element,
-                                    int depth = 0) {
-                    const auto& sourceTileCoord = element->getSourceTile()->getCoordinates();
-                    const auto& links = element->getLinksTo();
-                    // if (!links.empty())
-                    // {
-                    //     fmt::print("Entering depth {}\n", depth);
-                    // }
-                    for (const auto& linkedTo : links)
-                    {
-                        const auto singlesChainLinkedTo =
-                            std::dynamic_pointer_cast<SinglesChainLinkElement>(linkedTo);
-                        const auto& targetTileCoord = linkedTo->getSourceTile()->getCoordinates();
-                        const std::string depthStr = std::string(depth * 2, ' ');
-                        fmt::print(
-                            "{}{}{}({}) -> {}{}({}) (Linked through: {})\n",
-                            depthStr,
-                            convertRowToLetter(sourceTileCoord.row),
-                            sourceTileCoord.col + 1,
-                            convertElementLinkStateToString(element->getLinkState()),
-                            convertRowToLetter(targetTileCoord.row),
-                            targetTileCoord.col + 1,
-                            convertElementLinkStateToString(singlesChainLinkedTo->getLinkState()),
-                            convertRegionSpecificTypeToString(singlesChainLinkedTo->getLinkType()));
-                        printLinksFor(singlesChainLinkedTo, depth + 1);
-                    }
-                    // if (!links.empty())
-                    // {
-                    //     fmt::print("Exiting depth {}\n", depth);
-                    // }
-                };
-            printLinksFor(std::dynamic_pointer_cast<SinglesChainLinkElement>(rootElement), 0);
-            fmt::print("\n");
+            const auto chainStr = genericBuildChainString(
+                rootElement,
+                [](const std::shared_ptr<SinglesChainLinkElement>& source,
+                   const std::shared_ptr<SinglesChainLinkElement>& linkedTo) {
+                    const auto& sourceTileCoord = source->getSourceTile()->getCoordinates();
+                    const auto& targetTileCoord = linkedTo->getSourceTile()->getCoordinates();
+                    return fmt::format("{}{}({}) -> {}{}({}) (Linked through: {})",
+                                       convertRowToLetter(sourceTileCoord.row),
+                                       sourceTileCoord.col + 1,
+                                       convertElementLinkStateToString(source->getLinkState()),
+                                       convertRowToLetter(targetTileCoord.row),
+                                       targetTileCoord.col + 1,
+                                       convertElementLinkStateToString(linkedTo->getLinkState()),
+                                       convertRegionSpecificTypeToString(linkedTo->getLinkType()));
+                });
+            fmt::print("{}\n", chainStr);
         }
     }
 #endif // DEBUG
@@ -456,20 +486,17 @@ class SinglesChainsAnalyzer
 
             const auto lookForTwiceLambda =
                 [&foundTwiceInRegionElement](const std::shared_ptr<ChainLinkElement>& element) {
-                    const auto elementSingles =
-                        std::dynamic_pointer_cast<SinglesChainLinkElement>(element);
+                    const auto elementSingles = std::dynamic_pointer_cast<SinglesChainLinkElement>(element);
 
                     Traversal twiceInRegionTraversal(
-                        element,
-                        [&elementSingles](const std::shared_ptr<ChainLinkElement>& elementReg) {
+                        element, [&elementSingles](const std::shared_ptr<ChainLinkElement>& elementReg) {
                             const auto elementRegSingles =
                                 std::dynamic_pointer_cast<SinglesChainLinkElement>(elementReg);
                             if (elementSingles != elementRegSingles &&
                                 elementSingles->getLinkState() == elementRegSingles->getLinkState())
                             {
                                 const bool sameRegion = SolverUtils::areTilesInTheSameRegion(
-                                    *elementSingles->getSourceTile(),
-                                    *elementRegSingles->getSourceTile());
+                                    *elementSingles->getSourceTile(), *elementRegSingles->getSourceTile());
                                 if (sameRegion)
                                 {
                                     return true;
@@ -490,20 +517,48 @@ class SinglesChainsAnalyzer
             const auto result = twiceInLambdaTraversal.traverse();
             if (result)
             {
+                const auto resultElement = std::dynamic_pointer_cast<SinglesChainLinkElement>(result.value());
+                const auto referenceState = resultElement->getLinkState();
+                const auto referenceSuggestion = m_chain.getTargetChainValue();
+
+                std::vector<std::string> suggestionRemovedTiles;
+
+                Traversal removeColorTraversal(
+                    resultElement, [&](const std::shared_ptr<ChainLinkElement>& element) {
+                        const auto singlesElement =
+                            std::dynamic_pointer_cast<SinglesChainLinkElement>(element);
+
+                        if (singlesElement->getLinkState() == referenceState)
+                        {
+                            const auto& elementSolverTile = singlesElement->getSourceTile();
+                            const bool res = elementSolverTile->removeSuggestion(referenceSuggestion);
+                            assert(res);
+                            suggestionRemovedTiles.push_back(fmt::format("{}", *elementSolverTile));
+                        }
+                        return false;
+                    });
+                removeColorTraversal.traverse();
+
                 const auto elementSingles =
                     std::dynamic_pointer_cast<SinglesChainLinkElement>(result.value());
                 const auto elementSinglesReg =
                     std::dynamic_pointer_cast<SinglesChainLinkElement>(foundTwiceInRegionElement);
-                // treat twice in region
+
+                const auto& resultSolverTile = result.value()->getSourceTile();
+                const auto& otherSolverTile = foundTwiceInRegionElement->getSourceTile();
+
                 m_solver.report(
-                    "\n\nTwice in region = {} {} from {} and {} {} from {} equal = {}\n\n",
-                    *elementSingles->getSourceTile(),
-                    convertRegionSpecificTypeToString(elementSingles->getLinkType()),
-                    *elementSingles->getLinkedFrom().lock()->getSourceTile(),
-                    *elementSinglesReg->getSourceTile(),
-                    convertRegionSpecificTypeToString(elementSinglesReg->getLinkType()),
-                    *elementSinglesReg->getLinkedFrom().lock()->getSourceTile(),
-                    elementSingles == elementSinglesReg);
+                    "Singles Region - Twice in Region\nConsidere a Chain abaixo:\n\n{}\nA região {} possui "
+                    "dois Tiles marcados com a mesma cor \"{}\", sendo eles {} e {}. Dessa forma, a sugestão "
+                    "{} pode ser removida de todos os tiles da cor \"{}\", sendo eles: {}.",
+                    m_chain.buildChainString(rootElement),
+                    *SolverUtils::getTilesCommonRegion(*resultSolverTile, *otherSolverTile),
+                    convertElementLinkStateToString(referenceState),
+                    *resultSolverTile,
+                    *otherSolverTile,
+                    referenceSuggestion,
+                    convertElementLinkStateToString(referenceState),
+                    joinContainer(suggestionRemovedTiles));
                 return true;
             }
         }
@@ -532,8 +587,7 @@ class SinglesChainsAnalyzer
                     [&solverTile, chainedValue](const std::shared_ptr<ChainLinkElement>& element) {
                         const auto elementSolverTile = element->getSourceTile();
                         assert(elementSolverTile->hasSuggestion(chainedValue));
-                        return SolverUtils::areTilesInTheSameRegion(*elementSolverTile,
-                                                                    *solverTile);
+                        return SolverUtils::areTilesInTheSameRegion(*elementSolverTile, *solverTile);
                     };
 
                 std::vector<std::shared_ptr<ChainLinkElement>> seeingElements;
@@ -554,12 +608,13 @@ class SinglesChainsAnalyzer
                     std::dynamic_pointer_cast<SinglesChainLinkElement>(seeingElements.front())
                         ->getLinkState();
                 assert(referenceLinkState != ElementLinkState::NONE);
+
                 bool areStatesHomogeneous = true;
                 for (const auto& element : seeingElements)
                 {
                     areStatesHomogeneous =
-                        std::dynamic_pointer_cast<SinglesChainLinkElement>(element)
-                            ->getLinkState() == referenceLinkState;
+                        std::dynamic_pointer_cast<SinglesChainLinkElement>(element)->getLinkState() ==
+                        referenceLinkState;
                     if (!areStatesHomogeneous)
                         break;
                 }
@@ -567,13 +622,23 @@ class SinglesChainsAnalyzer
                 if (areStatesHomogeneous)
                     continue;
 
+                std::vector<std::string> seeingElementsStrings;
+                for (const auto& element : seeingElements)
+                {
+                    seeingElementsStrings.push_back(fmt::format("{}", *element->getSourceTile()));
+                }
+
                 solverTile->removeSuggestion(chainedValue);
-                m_solver.report("Singles Chains - Two Colors elsewhere\nO tile {} pode ver duas "
-                                "cores diferentes na chain criada para a sugestão {}. Dessa forma, "
-                                "a sugestão {} pode ser retirada do tile.",
-                                *solverTile,
-                                chainedValue,
-                                chainedValue);
+                m_solver.report(
+                    "Singles Chains - Two Colors elsewhere\nConsidere a Chain abaixo:\n\n{}\nO "
+                    "tile {} pode ver duas cores diferentes na chain criada para a sugestão {}, "
+                    "através dos tiles {}. Dessa forma, a sugestão {} pode ser retirada do tile {}.",
+                    m_chain.buildChainString(rootElement),
+                    *solverTile,
+                    chainedValue,
+                    joinContainer(seeingElementsStrings),
+                    chainedValue,
+                    *solverTile);
 
                 return true;
                 // traverseElements(rootElement);
@@ -595,8 +660,7 @@ bool SinglesChains::analyze()
     for (const auto& region : m_solver.getAllRegions())
     {
         const auto& suggestionsQuan = region->getSuggestionsQuan();
-        const auto& suggestionsWith2Appearances =
-            suggestionsQuan.getSuggestionsWithQuantityEqualTo(2);
+        const auto& suggestionsWith2Appearances = suggestionsQuan.getSuggestionsWithQuantityEqualTo(2);
         for (const auto& suggestion : suggestionsWith2Appearances)
         {
             ++suggestionsPerValue[suggestion];
@@ -615,12 +679,8 @@ bool SinglesChains::perform()
     for (const auto& region : m_solver.getAllRegions())
     {
         const auto& suggestionsQuan = region->getSuggestionsQuan();
-        const auto& suggestionsWith2Appearances =
-            suggestionsQuan.getSuggestionsWithQuantityEqualTo(2);
-        for (const auto& suggestion : suggestionsWith2Appearances)
-        {
-            ++suggestionsPerValue[suggestion];
-        }
+        const auto& suggestionsWith2Appearances = suggestionsQuan.getSuggestionsWithQuantityEqualTo(2);
+        for (const auto& suggestion : suggestionsWith2Appearances) { ++suggestionsPerValue[suggestion]; }
     }
 
     const auto valuePerSuggestions = flip_map(suggestionsPerValue);

@@ -16,8 +16,7 @@
 #include <sstream>
 #include <utility>
 
-std::shared_ptr<Tile>
-SolverComponentsContructor::createTile(Grid* grid, TileValueType row, TileValueType col)
+std::shared_ptr<Tile> SolverComponentsContructor::createTile(Grid* grid, TileValueType row, TileValueType col)
 {
     return std::static_pointer_cast<Tile>(std::make_shared<SolverTile>(grid, row, col));
 }
@@ -58,8 +57,7 @@ void Solver::computeAllSuggestions(const bool clear)
     }
 }
 
-#define INIT_TECHNIQUE(TechniqueType)                                                              \
-    m_techniques.emplace_back(std::make_unique<TechniqueType>(*this));
+#define INIT_TECHNIQUE(TechniqueType) m_techniques.emplace_back(std::make_unique<TechniqueType>(*this));
 
 void Solver::initializeTechniques()
 {
@@ -101,6 +99,12 @@ void Solver::solve()
     std::cout << "\nBoard resolvido em "
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
               << " milisegundos." << std::endl;
+
+    fmt::print("\nTechniques report:\n");
+    for (const auto& technique : m_techniques)
+    {
+        fmt::print("  {:<20}: {}\n", technique->getTechniqueName(), technique->getRanCount());
+    }
 }
 
 void Solver::initialize()
@@ -114,8 +118,7 @@ const std::vector<std::shared_ptr<SolverRegion>>& Solver::getAllRegions() const
     if (m_allSolverRegions.empty())
     {
         const auto& solverSubgrids = getAllSolverSubgrids();
-        m_allSolverRegions.insert(
-            m_allSolverRegions.end(), solverSubgrids.begin(), solverSubgrids.end());
+        m_allSolverRegions.insert(m_allSolverRegions.end(), solverSubgrids.begin(), solverSubgrids.end());
         const auto& solverHorizontalLines = getAllSolverHorizontalLines();
         m_allSolverRegions.insert(
             m_allSolverRegions.end(), solverHorizontalLines.begin(), solverHorizontalLines.end());
@@ -131,11 +134,10 @@ const std::vector<std::shared_ptr<SolverSubgrid>>& Solver::getAllSolverSubgrids(
     if (m_allSolverSubgrids.empty())
     {
         const auto& subgrids = getSubgrids();
-        std::transform(
-            subgrids.begin(),
-            subgrids.end(),
-            std::back_inserter(m_allSolverSubgrids),
-            [](const auto& subgrid) { return std::dynamic_pointer_cast<SolverSubgrid>(subgrid); });
+        std::transform(subgrids.begin(),
+                       subgrids.end(),
+                       std::back_inserter(m_allSolverSubgrids),
+                       [](const auto& subgrid) { return std::dynamic_pointer_cast<SolverSubgrid>(subgrid); });
     }
     return m_allSolverSubgrids;
 }
@@ -145,11 +147,10 @@ const std::vector<std::shared_ptr<SolverLine>>& Solver::getAllSolverHorizontalLi
     if (m_allSolverHorizontalLines.empty())
     {
         const auto& horizontalLines = getHorizontalLines();
-        std::transform(
-            horizontalLines.begin(),
-            horizontalLines.end(),
-            std::back_inserter(m_allSolverHorizontalLines),
-            [](const auto& line) { return std::dynamic_pointer_cast<SolverLine>(line); });
+        std::transform(horizontalLines.begin(),
+                       horizontalLines.end(),
+                       std::back_inserter(m_allSolverHorizontalLines),
+                       [](const auto& line) { return std::dynamic_pointer_cast<SolverLine>(line); });
     }
     return m_allSolverHorizontalLines;
 }
@@ -159,18 +160,16 @@ const std::vector<std::shared_ptr<SolverLine>>& Solver::getAllSolverVerticalLine
     if (m_allSolverVerticalLines.empty())
     {
         const auto& verticalLines = getVerticalLines();
-        std::transform(
-            verticalLines.begin(),
-            verticalLines.end(),
-            std::back_inserter(m_allSolverVerticalLines),
-            [](const auto& line) { return std::dynamic_pointer_cast<SolverLine>(line); });
+        std::transform(verticalLines.begin(),
+                       verticalLines.end(),
+                       std::back_inserter(m_allSolverVerticalLines),
+                       [](const auto& line) { return std::dynamic_pointer_cast<SolverLine>(line); });
     }
     return m_allSolverVerticalLines;
 }
 
-std::vector<std::string>
-Solver::requestTileDisplayStringForCoordinate(const TileValueType row,
-                                              const TileValueType col) const
+std::vector<std::string> Solver::requestTileDisplayStringForCoordinate(const TileValueType row,
+                                                                       const TileValueType col) const
 {
     const auto solverTile = std::dynamic_pointer_cast<SolverTile>(m_gridTiles(row, col));
     if (solverTile->hasValue())
