@@ -3,17 +3,6 @@
 
 #include "Solver/Technique.hpp"
 
-class SinglesTile : public Technique
-{
-  protected:
-    bool analyze() override;
-    bool perform() override;
-
-  public:
-    SinglesTile(Solver& solver)
-        : Technique(solver)
-    {}
-    ~SinglesTile() = default;
-};
+NEW_TECHNIQUE(SinglesTile);
 
 #endif // __SINGLESTILE_H__

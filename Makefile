@@ -11,9 +11,17 @@ LIBS     := $(shell find $(LIB) \( -name '*.cpp' -o -name '*.cc' \))
 OBJS     := $(patsubst $(SRC)/%.cpp,$(OBJ)/%.o,$(SRCS))
 LIBOBJS  := $(filter %.o, $(LIBS:$(LIB)/%.cpp=$(LIBOBJ)/%.o) $(LIBS:$(LIB)/%.cc=$(LIBOBJ)/%.o))
 EXE      := $(TARGET)/SudokuSolver
-CXXFLAGS := -I$(SRC) -I$(LIB) -std=c++20 -stdlib=libc++ -g -Wall -Wextra -Wpedantic -MD -MP
+CXXFLAGS := -I$(SRC) -I$(LIB) -std=c++20 -stdlib=libc++ -Wall -Wextra -Wpedantic -MD -MP
 LDLIBS   := -lm
 LDFLAGS  :=
+
+DEBUG    ?= 0
+
+ifeq ($(DEBUG),1)
+    CXXFLAGS += -g -O0 -DDEBUG
+else
+    CXXFLAGS += -O2
+endif
 
 .PHONY: all run clean printstuff
 

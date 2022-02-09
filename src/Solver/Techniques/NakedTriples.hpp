@@ -3,17 +3,6 @@
 
 #include "Solver/Technique.hpp"
 
-class NakedTriples : public Technique
-{
-  protected:
-    bool analyze() override;
-    bool perform() override;
-
-  public:
-    NakedTriples(Solver& solver)
-        : Technique(solver)
-    {}
-    ~NakedTriples() {}
-};
+NEW_TECHNIQUE(NakedTriples);
 
 #endif // __NAKEDTRIPLES_H__

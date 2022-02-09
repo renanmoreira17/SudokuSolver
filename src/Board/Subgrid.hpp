@@ -19,6 +19,11 @@ class Subgrid : virtual public Region
     Subgrid& operator=(Subgrid&& other);
     ~Subgrid() {}
 
+    RegionSpecificType getRegionSpecificType() const override
+    {
+        return RegionSpecificType::SUBGRID;
+    }
+
     const std::shared_ptr<Tile> getTile(const TileValueType row, const TileValueType col) const;
     const std::shared_ptr<Tile> operator()(const TileValueType row, const TileValueType col) const;
 };

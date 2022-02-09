@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
+#include <cassert>
 
 bool SinglesRegion::analyze()
 {

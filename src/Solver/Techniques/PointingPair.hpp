@@ -3,17 +3,6 @@
 
 #include "Solver/Technique.hpp"
 
-class PointingPair : public Technique
-{
-  protected:
-    bool analyze() override;
-    bool perform() override;
-
-  public:
-    PointingPair(Solver& solver)
-        : Technique(solver)
-    {}
-    ~PointingPair() = default;
-};
+NEW_TECHNIQUE(PointingPair);
 
 #endif // __POINTINGPAIR_H__

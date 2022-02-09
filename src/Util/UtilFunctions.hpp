@@ -9,6 +9,8 @@
 
 char convertRowToLetter(TileValueType row);
 
+std::string convertRegionSpecificTypeToString(RegionSpecificType regionSpecificType);
+
 template<typename ContainerType>
 std::string joinContainer(const ContainerType& container, const std::string& separator = ", ")
 {

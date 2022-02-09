@@ -20,6 +20,8 @@ class Region
         SUBGRID
     };
 
+    virtual RegionSpecificType getRegionSpecificType() const = 0;
+
   protected:
     std::shared_ptr<ElementList<std::shared_ptr<Tile>>> m_elementList;
     short m_index;

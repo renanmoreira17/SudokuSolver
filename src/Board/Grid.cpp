@@ -48,7 +48,7 @@ Grid::Grid(const std::string& boardStr, std::unique_ptr<ComponentsConstructor>&&
 {
     for (std::string::size_type i = 0; i < boardStr.size(); i++)
     {
-        if (boardStr[i] == '.')
+        if (boardStr[i] == '.' || boardStr[i] == '0')
             continue;
         const TileValueType col = i % 9;
         const TileValueType row = i / 9;
@@ -137,6 +137,21 @@ void Grid::printGrid() const
 {
     std::cout << m_gridPrinter->createBoardString() << std::endl;
 }
+
+#ifdef DEBUG
+#include <sstream>
+void Grid::printGridDebug() const
+{
+    const auto boardString = m_gridPrinter->createBoardString();
+    auto ss = std::stringstream{boardString};
+
+    for (std::string line; std::getline(ss, line, '\n');)
+    {
+        std::replace(line.begin(), line.end(), '\\', '|');
+        std::cout << line << "\n";
+    }
+}
+#endif
 
 bool Grid::isSolved() const
 {

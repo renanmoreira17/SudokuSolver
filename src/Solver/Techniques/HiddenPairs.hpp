@@ -3,17 +3,6 @@
 
 #include "Solver/Technique.hpp"
 
-class HiddenPairs : public Technique
-{
-  protected:
-    bool analyze() override;
-    bool perform() override;
-
-  public:
-    HiddenPairs(Solver& solver)
-        : Technique(solver)
-    {}
-    ~HiddenPairs() {}
-};
+NEW_TECHNIQUE(HiddenPairs);
 
 #endif // __HIDDENPAIRS_H__
