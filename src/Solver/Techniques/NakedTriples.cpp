@@ -10,10 +10,10 @@ bool NakedTriples::analyze()
     for (const auto& region : m_solver.getAllRegions())
     {
         const auto& regionSuggestionsQuan = region->getSuggestionsQuan();
-        const auto suggestionCount = std::count_if(
-            regionSuggestionsQuan.begin(), regionSuggestionsQuan.end(), [](const auto& quanPair) {
-                return quanPair.second == 3 || quanPair.second == 2;
-            });
+        const auto suggestionCount =
+            std::count_if(regionSuggestionsQuan.begin(),
+                          regionSuggestionsQuan.end(),
+                          [](const auto& quanPair) { return quanPair.second == 3 || quanPair.second == 2; });
         if (suggestionCount >= 3)
         {
             return true;
@@ -26,12 +26,12 @@ bool NakedTriples::perform()
 {
     for (const auto& region : m_solver.getAllRegions())
     {
-        std::vector<std::shared_ptr<SolverTile>> tilesWith2Or3Suggestions;
+        SolverTileVec tilesWith2Or3Suggestions;
         const auto& regionTiles = region->getSolverTiles();
         std::copy_if(regionTiles.begin(),
                      regionTiles.end(),
                      std::back_inserter(tilesWith2Or3Suggestions),
-                     [](const std::shared_ptr<SolverTile>& tile) {
+                     [](const SolverTilePtr& tile) {
                          const auto suggestionCount = tile->getSuggestionsCount();
                          return suggestionCount == 2 || suggestionCount == 3;
                      });
@@ -48,13 +48,11 @@ bool NakedTriples::perform()
              tile1 != std::prev(tilesWith2Or3Suggestions.end(), 2);
              ++tile1)
         {
-            for (auto tile2 = tile1 + 1; tile2 != std::prev(tilesWith2Or3Suggestions.end(), 1);
-                 ++tile2)
+            for (auto tile2 = tile1 + 1; tile2 != std::prev(tilesWith2Or3Suggestions.end(), 1); ++tile2)
             {
                 for (auto tile3 = tile2 + 1; tile3 != tilesWith2Or3Suggestions.end(); ++tile3)
                 {
-                    const std::vector<std::shared_ptr<SolverTile>> currentCombination = {
-                        *tile1, *tile2, *tile3};
+                    const SolverTileVec currentCombination = {*tile1, *tile2, *tile3};
                     const auto currentCombinationSuggestionsQuan =
                         SolverUtils::collectSuggestionInformation(currentCombination);
 

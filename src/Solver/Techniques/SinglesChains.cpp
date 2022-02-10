@@ -49,14 +49,14 @@ std::string convertElementLinkStateToString(const ElementLinkState state)
 class SinglesChainLinkElement : public ChainLinkElement
 {
   protected:
-    SinglesChainLinkElement(const std::shared_ptr<SolverTile>& sourceTile)
+    SinglesChainLinkElement(const SolverTilePtr& sourceTile)
         : ChainLinkElement(sourceTile)
     {}
 
   public:
     SinglesChainLinkElement() = delete;
 
-    static std::shared_ptr<SinglesChainLinkElement> create(const std::shared_ptr<SolverTile>& sourceTile)
+    static std::shared_ptr<SinglesChainLinkElement> create(const SolverTilePtr& sourceTile)
     {
         return std::shared_ptr<SinglesChainLinkElement>(new SinglesChainLinkElement(sourceTile));
     }
@@ -106,7 +106,7 @@ class SinglesChain : public Chain
 #endif
     }
 
-    std::shared_ptr<ChainLinkElement> createRootElement(const std::shared_ptr<SolverTile>& tile) override
+    std::shared_ptr<ChainLinkElement> createRootElement(const SolverTilePtr& tile) override
     {
         m_visitedTiles.clear();
         const auto element = SinglesChainLinkElement::create(tile);
@@ -141,7 +141,7 @@ class SinglesChain : public Chain
             // Also, we check if the tile has already been visited. This might be the case if
             // we previously found a link with the tile in a different region of the source tile,
             // and we don't want to make double links
-            std::erase_if(tiles, [&](const std::shared_ptr<SolverTile>& tile) {
+            std::erase_if(tiles, [&](const SolverTilePtr& tile) {
                 return tile == sourceTile ||
                        (origin.has_value() && tile == origin.value()->getSourceTile()) ||
                        hasVisitedTile(tile);
@@ -167,7 +167,7 @@ class SinglesChain : public Chain
         return !hasVisitedTile(element->getSourceTile());
     }
 
-    bool hasVisitedTile(const std::shared_ptr<SolverTile>& tile) const
+    bool hasVisitedTile(const SolverTilePtr& tile) const
     {
         return m_visitedTiles.find(tile) != m_visitedTiles.cend();
     }
@@ -230,7 +230,7 @@ class SinglesChain : public Chain
 
     Solver& m_solver;
     const TileValueType m_targetChainValue;
-    std::unordered_set<std::shared_ptr<SolverTile>> m_visitedTiles;
+    std::unordered_set<SolverTilePtr> m_visitedTiles;
 
 #ifdef DEBUG
     void printChain() const

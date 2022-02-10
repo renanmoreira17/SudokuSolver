@@ -50,11 +50,11 @@ SolverRegion& SolverRegion::operator=(SolverRegion&& other)
     return *this;
 }
 
-const std::vector<std::shared_ptr<SolverTile>>& SolverRegion::getSolverTiles() const
+const SolverTileVec& SolverRegion::getSolverTiles() const
 {
     if (m_solverTiles == nullptr)
     {
-        m_solverTiles = std::make_unique<std::vector<std::shared_ptr<SolverTile>>>();
+        m_solverTiles = std::make_unique<SolverTileVec>();
         for (const auto& tile : getTiles())
         {
             m_solverTiles->emplace_back(std::dynamic_pointer_cast<SolverTile>(tile));
@@ -78,19 +78,17 @@ TileValueType SolverRegion::getSuggestionsQuanFor(TileValueType value) const
     return m_suggestionsQuan.getSuggestionsQuantityFor(value);
 }
 
-bool SolverRegion::removeSuggestionsFromTiles(
-    const std::vector<TileValueType>& values,
-    const std::optional<std::vector<std::shared_ptr<SolverTile>>>& exceptFromTiles)
+bool SolverRegion::removeSuggestionsFromTiles(const std::vector<TileValueType>& values,
+                                              const std::optional<SolverTileVec>& exceptFromTiles)
 {
     bool performed = false;
-    for (const std::shared_ptr<SolverTile>& solverTile : getSolverTiles())
+    for (const SolverTilePtr& solverTile : getSolverTiles())
     {
         if (solverTile->getSuggestions().empty() ||
             (exceptFromTiles.has_value() &&
-             std::any_of(
-                 exceptFromTiles->begin(),
-                 exceptFromTiles->end(),
-                 [&solverTile](const std::shared_ptr<SolverTile>& t) { return t == solverTile; })))
+             std::any_of(exceptFromTiles->begin(),
+                         exceptFromTiles->end(),
+                         [&solverTile](const SolverTilePtr& t) { return t == solverTile; })))
         {
             continue;
         }
@@ -105,11 +103,10 @@ bool SolverRegion::removeSuggestionsFromTiles(
     return performed;
 }
 
-std::vector<std::shared_ptr<SolverTile>>
-SolverRegion::getTilesWithSuggestion(TileValueType value) const
+SolverTileVec SolverRegion::getTilesWithSuggestion(TileValueType value) const
 {
-    std::vector<std::shared_ptr<SolverTile>> tiles;
-    for (const std::shared_ptr<SolverTile>& solverTile : getSolverTiles())
+    SolverTileVec tiles;
+    for (const SolverTilePtr& solverTile : getSolverTiles())
     {
         if (solverTile->getSuggestions().empty())
             continue;

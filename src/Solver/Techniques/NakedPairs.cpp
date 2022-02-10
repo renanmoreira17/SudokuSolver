@@ -15,7 +15,7 @@ bool NakedPairs::analyze()
         short suggestionQuan = 0;
         for (auto&& tile : *region)
         {
-            // cast tile to std::shared_ptr<SolverTile>, check if the number of suggestions is
+            // cast tile to SolverTilePtr, check if the number of suggestions is
             // greater than 2, if so, increments suggestionQuan, and if suggestionQuan is greater
             // than 2, then return true
             if (std::dynamic_pointer_cast<SolverTile>(tile)->getSuggestions().size() >= 2)
@@ -39,7 +39,7 @@ bool NakedPairs::perform()
         if (region->isCompleted())
             continue;
 
-        std::list<const std::shared_ptr<SolverTile>> solverTilesWith2Suggestions;
+        std::list<const SolverTilePtr> solverTilesWith2Suggestions;
 
         // filtra todos tiles que tem a quantidade de sugestões == 2
         for (const auto& tile : *region)
@@ -64,9 +64,8 @@ bool NakedPairs::perform()
             const auto foundSolverTileWithEqualSuggestions = std::find_if(
                 solverTilesWith2Suggestions.begin(),
                 solverTilesWith2Suggestions.end(),
-                [&](const std::shared_ptr<SolverTile>& iteratedSolverTileWith2Suggestions) -> bool {
-                    return (iteratedSolverTileWith2Suggestions !=
-                            currentSolverTileWith2Suggestions) &&
+                [&](const SolverTilePtr& iteratedSolverTileWith2Suggestions) -> bool {
+                    return (iteratedSolverTileWith2Suggestions != currentSolverTileWith2Suggestions) &&
                            (iteratedSolverTileWith2Suggestions->getSuggestions() ==
                             currentSolverTileWith2Suggestions->getSuggestions());
                 });
@@ -78,10 +77,9 @@ bool NakedPairs::perform()
                     currentSolverTileWith2Suggestions->getSuggestions();
 
                 const std::vector<TileValueType> suggestionsToBeRemoved(
-                    suggestionsFromCurrentSolverTile.cbegin(),
-                    suggestionsFromCurrentSolverTile.cend());
+                    suggestionsFromCurrentSolverTile.cbegin(), suggestionsFromCurrentSolverTile.cend());
 
-                const std::vector<std::shared_ptr<SolverTile>> solverTilesWithNakedPairs(
+                const SolverTileVec solverTilesWithNakedPairs(
                     {currentSolverTileWith2Suggestions, *foundSolverTileWithEqualSuggestions});
 
                 const bool localPerformed =

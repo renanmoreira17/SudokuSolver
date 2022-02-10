@@ -2,9 +2,7 @@
 #define __SOLVERUTILS_H__
 
 #include "GlobalDefinitions.hpp"
-
-#include <memory>
-#include <vector>
+#include "SolverTypes.hpp"
 
 class Tile;
 class Region;
@@ -20,8 +18,7 @@ bool areTilesInTheSameRegion(const Tile& tile1, const Tile& tile2);
 
 Region* getTilesCommonRegion(const Tile& tile1, const Tile& tile2);
 
-SuggestionsQuantity
-collectSuggestionInformation(const std::vector<std::shared_ptr<SolverTile>>& tiles);
+SuggestionsQuantity collectSuggestionInformation(const SolverTileVec& tiles);
 } // namespace SolverUtils
 
 #endif // __SOLVERUTILS_H__

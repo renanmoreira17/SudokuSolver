@@ -1,6 +1,8 @@
 #ifndef __TRAVERSAL_H__
 #define __TRAVERSAL_H__
 
+#include "Solver/SolverTypes.hpp"
+
 #include <memory>
 #include <unordered_set>
 
@@ -23,7 +25,7 @@ class Traversal
     getExtremityElementFrom(const std::shared_ptr<ChainLinkElement>& rootElement);
 
     static bool doesChainContainTile(const std::shared_ptr<ChainLinkElement>& rootElement,
-                                     const std::shared_ptr<SolverTile>& tile);
+                                     const SolverTilePtr& tile);
 
   private:
     FoundElement internalTraverse(const std::shared_ptr<ChainLinkElement>& element);

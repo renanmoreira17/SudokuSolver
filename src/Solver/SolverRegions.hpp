@@ -6,6 +6,7 @@
 #include "Board/Line.hpp"
 #include "Board/Region.hpp"
 #include "Board/Subgrid.hpp"
+#include "SolverTypes.hpp"
 #include "SuggestionsQuantity.hpp"
 
 #include <map>
@@ -23,7 +24,7 @@ class SolverRegion : virtual public Region
     // Suggestions m_missing{1, 2, 3, 4, 5, 6, 7, 8, 9};
     SuggestionsQuantity m_suggestionsQuan;
 
-    mutable std::unique_ptr<std::vector<std::shared_ptr<SolverTile>>> m_solverTiles;
+    mutable std::unique_ptr<SolverTileVec> m_solverTiles;
 
   public:
     SolverRegion() = delete;
@@ -34,7 +35,7 @@ class SolverRegion : virtual public Region
 
     Solver* getSolver() const;
 
-    const std::vector<std::shared_ptr<SolverTile>>& getSolverTiles() const;
+    const SolverTileVec& getSolverTiles() const;
 
     // Returns a map telling how many times each value is missing in this region
     const SuggestionsQuantity& getSuggestionsQuan() const { return m_suggestionsQuan; }
@@ -43,18 +44,15 @@ class SolverRegion : virtual public Region
     void suggestionRemoved(const unsigned value);
 
     bool removeSuggestionsFromTiles(const std::vector<TileValueType>& values,
-                                    const std::optional<std::vector<std::shared_ptr<SolverTile>>>&
-                                        exceptFromTiles = std::nullopt);
+                                    const std::optional<SolverTileVec>& exceptFromTiles = std::nullopt);
 
-    bool removeSingleSuggestionFromTiles(
-        TileValueType values,
-        const std::optional<std::vector<std::shared_ptr<SolverTile>>>& exceptFromTiles =
-            std::nullopt)
+    bool removeSingleSuggestionFromTiles(TileValueType values,
+                                         const std::optional<SolverTileVec>& exceptFromTiles = std::nullopt)
     {
         return removeSuggestionsFromTiles({values}, exceptFromTiles);
     }
 
-    std::vector<std::shared_ptr<SolverTile>> getTilesWithSuggestion(TileValueType value) const;
+    SolverTileVec getTilesWithSuggestion(TileValueType value) const;
 
     TileValueType getSuggestionsQuanFor(TileValueType value) const;
 };

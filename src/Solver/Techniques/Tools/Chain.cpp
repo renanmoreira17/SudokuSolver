@@ -2,11 +2,11 @@
 
 #include <cassert>
 
-ChainLinkElement::ChainLinkElement(const std::shared_ptr<SolverTile>& sourceTile)
+ChainLinkElement::ChainLinkElement(const SolverTilePtr& sourceTile)
     : m_sourceTile(sourceTile)
 {}
 
-const std::shared_ptr<SolverTile>& ChainLinkElement::getSourceTile() const
+const SolverTilePtr& ChainLinkElement::getSourceTile() const
 {
     return m_sourceTile;
 }
@@ -31,7 +31,7 @@ const std::vector<std::shared_ptr<ChainLinkElement>>& Chain::getRootElements() c
     return m_rootElements;
 }
 
-void Chain::buildChainForElement(const std::shared_ptr<SolverTile>& tile)
+void Chain::buildChainForElement(const SolverTilePtr& tile)
 {
     const auto currentRootElement = createRootElement(tile);
 

@@ -3,6 +3,7 @@
 
 #include "Board/Tile.hpp"
 #include "GlobalDefinitions.hpp"
+#include "SolverTypes.hpp"
 
 #include <string>
 #include <unordered_set>

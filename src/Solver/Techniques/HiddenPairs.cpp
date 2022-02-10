@@ -74,11 +74,11 @@ bool HiddenPairs::perform()
 
         // filter tiles that have suggestions present in suggestionsWith2Appearances and
         // at least 2 suggestions
-        std::vector<std::shared_ptr<SolverTile>> solverTilesWithAtLeast2DesiredSuggestions;
+        SolverTileVec solverTilesWithAtLeast2DesiredSuggestions;
         std::copy_if(region->getSolverTiles().begin(),
                      region->getSolverTiles().end(),
                      std::back_inserter(solverTilesWithAtLeast2DesiredSuggestions),
-                     [&suggestionsWith2Appearances](const std::shared_ptr<SolverTile>& solverTile) {
+                     [&suggestionsWith2Appearances](const SolverTilePtr& solverTile) {
                          if (solverTile->getSuggestionsCount() < 2)
                          {
                              return false;
@@ -104,8 +104,8 @@ bool HiddenPairs::perform()
         }
 
         const auto& suggestionIntersection =
-            [&suggestionsWith2Appearances](const std::shared_ptr<SolverTile>& solverTile1,
-                                           const std::shared_ptr<SolverTile>& solverTile2) {
+            [&suggestionsWith2Appearances](const SolverTilePtr& solverTile1,
+                                           const SolverTilePtr& solverTile2) {
                 std::vector<TileValueType> intersection;
                 for (const auto& suggestion : solverTile1->getSuggestions())
                 {
@@ -132,8 +132,7 @@ bool HiddenPairs::perform()
                  otherSolverTileIt != solverTilesWithAtLeast2DesiredSuggestions.end();
                  ++otherSolverTileIt)
             {
-                const auto& intersection =
-                    suggestionIntersection(*currentSolverTileIt, *otherSolverTileIt);
+                const auto& intersection = suggestionIntersection(*currentSolverTileIt, *otherSolverTileIt);
                 // if there were 2 equal suggestions in this iteration, it means that they
                 // are the hidden pairs
                 // this is because the suggestions used to filter the tiles only appear
@@ -146,8 +145,7 @@ bool HiddenPairs::perform()
                     auto& solverTile2 = *otherSolverTileIt;
                     // if both tiles have only 2 suggestions, then there are no extra suggestions
                     // to remove
-                    if (solverTile1->getSuggestionsCount() == 2 &&
-                        solverTile2->getSuggestionsCount() == 2)
+                    if (solverTile1->getSuggestionsCount() == 2 && solverTile2->getSuggestionsCount() == 2)
                     {
                         continue;
                     }

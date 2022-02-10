@@ -45,8 +45,7 @@ bool SolverUtils::areTilesInTheSameRegion(const Tile& tile1, const Tile& tile2)
            areTilesInTheSameSubgrid(tile1, tile2);
 }
 
-SuggestionsQuantity
-SolverUtils::collectSuggestionInformation(const std::vector<std::shared_ptr<SolverTile>>& tiles)
+SuggestionsQuantity SolverUtils::collectSuggestionInformation(const SolverTileVec& tiles)
 {
     SuggestionsQuantity suggestionsQuan;
     for (const auto& tile : tiles)

@@ -34,7 +34,7 @@ void SolverTile::setValue(TileValueType value)
         // não passara pelo tile que está sendo setado porque agora ele contem um valor.
         for (const auto& tile : *region)
         {
-            // cast tile to std::shared_ptr<SolverTile>
+            // cast tile to SolverTilePtr
             auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
             if (solverTile->hasValue())
                 continue;

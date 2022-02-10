@@ -14,14 +14,12 @@ Traversal::FoundElement Traversal::traverse()
     return internalTraverse(m_rootElement);
 }
 
-Traversal::FoundElement
-Traversal::continueTraversing(const std::shared_ptr<ChainLinkElement>& fromElement)
+Traversal::FoundElement Traversal::continueTraversing(const std::shared_ptr<ChainLinkElement>& fromElement)
 {
     return internalTraverse(fromElement);
 }
 
-Traversal::FoundElement
-Traversal::internalTraverse(const std::shared_ptr<ChainLinkElement>& element)
+Traversal::FoundElement Traversal::internalTraverse(const std::shared_ptr<ChainLinkElement>& element)
 {
     const auto hasVisitedElement = [this](const std::shared_ptr<ChainLinkElement>& element) {
         return m_traversedElements.find(element) != m_traversedElements.cend();
@@ -70,12 +68,11 @@ Traversal::getExtremityElementFrom(const std::shared_ptr<ChainLinkElement>& root
 }
 
 bool Traversal::doesChainContainTile(const std::shared_ptr<ChainLinkElement>& rootElement,
-                                     const std::shared_ptr<SolverTile>& tile)
+                                     const SolverTilePtr& tile)
 {
-    Traversal findTraversal(rootElement,
-                            [&tile](const std::shared_ptr<ChainLinkElement>& element) -> bool {
-                                return tile == element->getSourceTile();
-                            });
+    Traversal findTraversal(rootElement, [&tile](const std::shared_ptr<ChainLinkElement>& element) -> bool {
+        return tile == element->getSourceTile();
+    });
     const auto result = findTraversal.traverse();
 
     return result.has_value();

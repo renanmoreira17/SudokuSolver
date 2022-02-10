@@ -52,7 +52,7 @@ void Solver::computeAllSuggestions(const bool clear)
     {
         if (tile->hasValue())
             continue;
-        // cast tile to std::shared_ptr<SolverTile> and call computeSuggestions
+        // cast tile to SolverTilePtr and call computeSuggestions
         std::dynamic_pointer_cast<SolverTile>(tile)->computeSuggestions(clear);
     }
 }
