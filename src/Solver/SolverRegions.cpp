@@ -1,7 +1,10 @@
 #include "SolverRegions.hpp"
+
 #include "Board/Line.hpp"
 #include "Board/Subgrid.hpp"
+
 #include "Solver.hpp"
+#include "SolverUtils.hpp"
 
 #include <algorithm>
 #include <exception>
@@ -115,6 +118,126 @@ SolverTileVec SolverRegion::getTilesWithSuggestion(TileValueType value) const
             tiles.emplace_back(solverTile);
     }
     return tiles;
+}
+
+template<typename Container, typename Iterator>
+static std::vector<Container> createCombination(const int k, Iterator begin, Iterator end)
+{
+    if (k == 0)
+    {
+        return std::vector<Container>();
+    }
+    std::vector<Container> result;
+    auto currentEnd = std::prev(end, k - 1);
+    for (auto it = begin; it != currentEnd; ++it)
+    {
+        std::vector<Container> internalResult = createCombination<Container>(k - 1, it + 1, end);
+        if (internalResult.empty())
+        {
+            result.emplace_back(Container{*it});
+        }
+        else
+        {
+            for (const auto& subCombs : internalResult)
+            {
+                Container currentResult{*it};
+                currentResult.insert(currentResult.end(), subCombs.begin(), subCombs.end());
+                result.emplace_back(std::move(currentResult));
+            }
+        }
+    }
+    return result;
+};
+
+template<typename Container>
+static std::vector<Container> createCombination(const int k, const Container& container)
+{
+    return createCombination<Container>(k, container.begin(), container.end());
+};
+
+SolverTileVec SolverRegion::findLockedSetOfSuggestions(const std::unordered_set<TileValueType>& values) const
+{
+    const auto requestedSize = values.size();
+    if (requestedSize <= 1 || requestedSize > 4)
+    {
+        return {};
+    }
+
+    SolverTileVec candidateTiles;
+    std::copy_if(getSolverTiles().begin(),
+                 getSolverTiles().end(),
+                 std::back_inserter(candidateTiles),
+                 [&](const SolverTilePtr& tile) {
+                     const auto suggestionCount = tile->getSuggestionsCount();
+                     return suggestionCount >= 2 && suggestionCount <= requestedSize &&
+                            std::any_of(values.begin(), values.end(), [&](TileValueType suggestion) {
+                                return tile->hasSuggestion(suggestion);
+                            });
+                 });
+
+    if (candidateTiles.size() < requestedSize)
+    {
+        return {};
+    }
+
+    const std::vector<SolverTileVec> combinations = createCombination(requestedSize, candidateTiles);
+
+    for (const auto& combination : combinations)
+    {
+        const auto combinationSuggestionsQuan = SolverUtils::collectSuggestionInformation(combination);
+        const auto validSuggestions = combinationSuggestionsQuan.getValidSuggestions();
+        if (validSuggestions.size() != requestedSize)
+        {
+            continue;
+        }
+        bool shouldSkip = false;
+        for (const auto& value : values)
+        {
+            const auto quan = combinationSuggestionsQuan.getSuggestionsQuantityFor(value);
+            if (quan < 2)
+            {
+                shouldSkip = true;
+                break;
+            }
+        }
+        if (shouldSkip)
+        {
+            continue;
+        }
+        const bool isFreeOfSingleSuggestion =
+            combinationSuggestionsQuan.getSuggestionsWithQuantityEqualTo(1).empty();
+        if (isFreeOfSingleSuggestion)
+        {
+            return combination;
+        }
+    }
+
+    return {};
+}
+
+std::vector<SolverTileVec> SolverRegion::findLockedSetsOfSize(const unsigned short n) const
+{
+    const auto& suggestionsQuan = getSuggestionsQuan();
+    const auto targetSuggestions = suggestionsQuan.getSuggestionsWithQuantityGreaterThan(1);
+    if (targetSuggestions.size() < n)
+    {
+        return std::vector<SolverTileVec>();
+    }
+
+    std::vector<SolverTileVec> result;
+
+    const auto combinations = createCombination(n, targetSuggestions);
+    for (const auto& combination : combinations)
+    {
+        auto lockedSet =
+            findLockedSetOfSuggestions(std::unordered_set(combination.begin(), combination.end()));
+        if (!lockedSet.empty())
+        {
+            result.emplace_back(std::move(lockedSet));
+        }
+    }
+
+    return result;
 }
 
 // SPECIFIC REGIONS

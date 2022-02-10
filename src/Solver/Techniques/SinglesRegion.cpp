@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <cassert>
 #include <iterator>
-#include <cassert>
 
 bool SinglesRegion::analyze()
 {
@@ -22,9 +21,9 @@ bool SinglesRegion::perform()
         // procura na region, entre os numero de sugestões para cada valor,
         // se há algum com apenas 1 (single)
         // SuggestionsQuan -> 1st: value (suggestion), 2nd: quantity
-        auto found = std::find_if(suggestionNum.cbegin(),
-                                  suggestionNum.cend(),
-                                  [](const auto& in) -> bool { return in.second == 1; });
+        auto found = std::find_if(suggestionNum.cbegin(), suggestionNum.cend(), [](const auto& in) -> bool {
+            return in.second == 1;
+        });
         if (found != suggestionNum.cend())
         {
             // a key desse iterator será o valor que tem apenas 1 sugestão
@@ -38,12 +37,11 @@ bool SinglesRegion::perform()
             solverTile->setValue(value);
             performed = true;
 
-            m_solver.report(
-                "Singles-Region:\nA região \"{}\" apresenta somente 1 sugestão do "
-                "valor {}, no Tile {}. Dessa forma, esse Tile foi definido com esse valor.",
-                *region,
-                value,
-                **foundTile);
+            m_solver.report("Singles-Region:\nA região \"{}\" apresenta somente 1 sugestão do "
+                            "valor {}, no Tile {}. Dessa forma, esse Tile foi definido com esse valor.",
+                            *region,
+                            value,
+                            **foundTile);
         }
     }
     return performed;

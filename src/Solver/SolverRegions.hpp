@@ -11,6 +11,7 @@
 
 #include <map>
 #include <optional>
+#include <unordered_set>
 
 class Solver;
 class Line;
@@ -55,6 +56,9 @@ class SolverRegion : virtual public Region
     SolverTileVec getTilesWithSuggestion(TileValueType value) const;
 
     TileValueType getSuggestionsQuanFor(TileValueType value) const;
+
+    SolverTileVec findLockedSetOfSuggestions(const std::unordered_set<TileValueType>& values) const;
+    std::vector<SolverTileVec> findLockedSetsOfSize(unsigned short n) const;
 };
 
 class SolverLine
