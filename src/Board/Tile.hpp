@@ -1,7 +1,7 @@
 #ifndef __TILE_H__
 #define __TILE_H__
 
-#include "GlobalDefinitions.hpp"
+#include "Util/GlobalDefinitions.hpp"
 
 #include <array>
 

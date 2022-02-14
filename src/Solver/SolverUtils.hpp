@@ -1,7 +1,7 @@
 #ifndef __SOLVERUTILS_H__
 #define __SOLVERUTILS_H__
 
-#include "GlobalDefinitions.hpp"
+#include "Util/GlobalDefinitions.hpp"
 #include "SolverTypes.hpp"
 
 class Tile;

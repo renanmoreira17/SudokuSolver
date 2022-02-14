@@ -1,12 +1,12 @@
-add_executable(SudokuSolver main.cpp)
+include_directories(.)
 
-add_library(GlobalDefinitions INTERFACE GlobalDefinitions.hpp)
-target_include_directories(GlobalDefinitions INTERFACE .)
-
+add_subdirectory(Util)
 add_subdirectory(Board)
 add_subdirectory(Solver)
-add_subdirectory(Util)
+add_subdirectory(GamesManager)
 
-target_link_libraries(${PROJECT_NAME} Board Solver)
+add_executable(SudokuSolver main.cpp)
+
+target_link_libraries(${PROJECT_NAME} Board Solver Games)
 
 # add_definitions(DEBUG)

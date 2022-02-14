@@ -9,7 +9,7 @@
 
 #include "ElementList.hpp"
 #include "ElementsContainer.hpp"
-#include "GlobalDefinitions.hpp"
+#include "Util/GlobalDefinitions.hpp"
 
 class Region
 {

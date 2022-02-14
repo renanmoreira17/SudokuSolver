@@ -2,7 +2,7 @@
 #define __SOLVERTILE_H__
 
 #include "Board/Tile.hpp"
-#include "GlobalDefinitions.hpp"
+#include "Util/GlobalDefinitions.hpp"
 #include "SolverTypes.hpp"
 
 #include <string>

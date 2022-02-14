@@ -1,6 +1,7 @@
 #include "GridPrinter.hpp"
 
-#include "GlobalDefinitions.hpp"
+#include "Util/UtilFunctions.hpp"
+#include "Util/GlobalDefinitions.hpp"
 #include "Grid.hpp"
 #include "Subgrid.hpp"
 

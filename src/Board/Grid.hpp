@@ -2,7 +2,7 @@
 #define __GRID_H__
 
 #include "ElementsContainer.hpp"
-#include "GlobalDefinitions.hpp"
+#include "Util/GlobalDefinitions.hpp"
 
 #include <memory>
 #include <string>

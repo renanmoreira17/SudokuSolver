@@ -1,7 +1,7 @@
 #ifndef __SUGGESTIONSQUANTITY_H__
 #define __SUGGESTIONSQUANTITY_H__
 
-#include "GlobalDefinitions.hpp"
+#include "Util/GlobalDefinitions.hpp"
 
 #include <unordered_map>
 #include <vector>
