@@ -24,9 +24,9 @@ class Tile
 
     TileValueType m_value;
 
-    mutable Line* m_horizontalLine;
-    mutable Line* m_verticalLine;
-    mutable Subgrid* m_subgrid;
+    mutable Line* m_horizontalLine{nullptr};
+    mutable Line* m_verticalLine{nullptr};
+    mutable Subgrid* m_subgrid{nullptr};
 
   public:
     Tile(Grid* grid, Coordinates coordinates, const TileValueType value = 0);
