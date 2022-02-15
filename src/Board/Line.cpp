@@ -6,9 +6,8 @@
 #include <utility>
 
 Line::Line(Grid* grid, LineOrientation orientation, const short index)
-    : Region(index, RegionType::LINE)
+    : Region(index, RegionType::LINE, grid)
     , m_orientation(orientation)
-    , m_grid(grid)
 {
 
     const auto lamb = [&](const std::shared_ptr<Tile>& tile) {
@@ -20,7 +19,6 @@ Line::Line(Grid* grid, LineOrientation orientation, const short index)
 
 Line::Line(Line&& other)
     : Region(other)
-    , m_grid(other.m_grid)
 {
     m_index = other.m_index;
     m_orientation = other.m_orientation;
@@ -31,7 +29,6 @@ Line::Line(Line&& other)
         tile->setLine(m_orientation, this);
     } while ((head = head->next()));
 
-    other.m_grid = nullptr;
     other.m_elementList = nullptr;
 }
 
@@ -42,7 +39,6 @@ Line& Line::operator=(Line&& other)
 
     Region::operator=(std::move(other));
 
-    m_grid = other.m_grid;
     m_index = other.m_index;
     m_orientation = other.m_orientation;
 
@@ -52,7 +48,6 @@ Line& Line::operator=(Line&& other)
         tile->setLine(m_orientation, this);
     } while ((head = head->next()));
 
-    other.m_grid = nullptr;
     other.m_elementList = nullptr;
 
     return *this;

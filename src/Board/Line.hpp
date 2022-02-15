@@ -10,7 +10,6 @@ class Line : virtual public Region
 {
   private:
     LineOrientation m_orientation;
-    Grid* m_grid;
 
   public:
     Line(Grid* grid, LineOrientation orientation, const short index);

@@ -8,9 +8,6 @@ class Tile;
 
 class Subgrid : virtual public Region
 {
-  private:
-    Grid* m_grid;
-
   public:
     Subgrid(Grid* grid, const short index);
     Subgrid(const Subgrid& other) = default;

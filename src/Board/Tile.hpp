@@ -50,6 +50,8 @@ class Tile
     void setSubgrid(Subgrid* const& subgrid) const;
     Subgrid* getSubgrid() const;
 
+    Grid* getGrid() const;
+
     const std::tuple<Line*, Line*, Subgrid*> getRegionsTuple();
     const std::tuple<const Line*, const Line*, const Subgrid*> getRegionsTuple() const;
 

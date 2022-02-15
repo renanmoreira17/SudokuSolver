@@ -22,15 +22,19 @@ class Region
 
     virtual RegionSpecificType getRegionSpecificType() const = 0;
 
+  private:
+    Grid* m_grid;
+
   protected:
     std::shared_ptr<ElementList<std::shared_ptr<Tile>>> m_elementList;
     short m_index;
     RegionType m_type;
 
   public:
-    Region(const short index, const RegionType regionType)
+    Region(const short index, const RegionType regionType, Grid* grid)
         : m_index(index)
         , m_type(regionType)
+        , m_grid(grid)
     {}
     Region(const Region& other) = default;
     Region(Region&& other) = default;
@@ -43,13 +47,15 @@ class Region
     short getIndex() const { return m_index; }
     RegionType getType() const { return m_type; }
 
+    Grid* getGrid() const;
+
     bool hasValue(const TileValueType value) const
     {
         const auto first = m_elementList->cbegin();
         const auto last = m_elementList->cend();
 
-        const auto found = std::find_if(
-            first, last, [&](const std::shared_ptr<Tile>& ele) { return *ele == value; });
+        const auto found =
+            std::find_if(first, last, [&](const std::shared_ptr<Tile>& ele) { return *ele == value; });
         return found != last;
     }
 
@@ -71,18 +77,15 @@ class Region
     {
         return m_elementList->cbegin();
     }
-    typename ElementList<std::shared_ptr<Tile>>::const_iterator cend() const
-    {
-        return m_elementList->cend();
-    }
+    typename ElementList<std::shared_ptr<Tile>>::const_iterator cend() const { return m_elementList->cend(); }
     typename ElementList<std::shared_ptr<Tile>>::const_iterator begin() const { return cbegin(); }
     typename ElementList<std::shared_ptr<Tile>>::const_iterator end() const { return cend(); }
 
-    static std::shared_ptr<ElementList<std::shared_ptr<Tile>>> make_line(
-        LineOrientation orientation,
-        TileValueType index,
-        GridTiles& gridElements,
-        const std::optional<const std::function<void(const std::shared_ptr<Tile>&)>>& applyElement)
+    static std::shared_ptr<ElementList<std::shared_ptr<Tile>>>
+    make_line(LineOrientation orientation,
+              TileValueType index,
+              GridTiles& gridElements,
+              const std::optional<const std::function<void(const std::shared_ptr<Tile>&)>>& applyElement)
     {
         LineElementWrapper<std::shared_ptr<Tile>>* lastElementWrapper = nullptr;
         for (TileValueType i = 0; i < 9; i++)
@@ -95,17 +98,16 @@ class Region
             if (applyElement)
                 applyElement.value()(element);
 
-            auto elementWrapper =
-                new LineElementWrapper<std::shared_ptr<Tile>>(&element, lastElementWrapper);
+            auto elementWrapper = new LineElementWrapper<std::shared_ptr<Tile>>(&element, lastElementWrapper);
             lastElementWrapper = elementWrapper;
         }
         return std::make_shared<ElementList<std::shared_ptr<Tile>>>(lastElementWrapper);
     }
 
-    static std::shared_ptr<ElementList<std::shared_ptr<Tile>>> make_subgrid(
-        TileValueType index,
-        GridTiles& gridElements,
-        const std::optional<const std::function<void(const std::shared_ptr<Tile>&)>>& applyElement)
+    static std::shared_ptr<ElementList<std::shared_ptr<Tile>>>
+    make_subgrid(TileValueType index,
+                 GridTiles& gridElements,
+                 const std::optional<const std::function<void(const std::shared_ptr<Tile>&)>>& applyElement)
     {
         SubgridElementWrapper<std::shared_ptr<Tile>>* lastElementWrapper = nullptr;
 
@@ -122,8 +124,7 @@ class Region
             if (applyElement)
                 applyElement.value()(element);
 
-            auto tileWrapper =
-                new SubgridElementWrapper<std::shared_ptr<Tile>>(&element, lastElementWrapper);
+            auto tileWrapper = new SubgridElementWrapper<std::shared_ptr<Tile>>(&element, lastElementWrapper);
             lastElementWrapper = tileWrapper;
         }
         return std::make_shared<ElementList<std::shared_ptr<Tile>>>(lastElementWrapper);

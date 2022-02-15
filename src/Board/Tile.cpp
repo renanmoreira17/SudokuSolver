@@ -157,3 +157,8 @@ Tile& Tile::operator=(const TileValueType value)
     setValue(value);
     return *this;
 }
+
+Grid* Tile::getGrid() const
+{
+    return m_grid;
+}

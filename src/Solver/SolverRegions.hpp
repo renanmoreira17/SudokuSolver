@@ -21,7 +21,6 @@ class SolverTile;
 class SolverRegion : virtual public Region
 {
   private:
-    Grid* m_grid;
     // Suggestions m_missing{1, 2, 3, 4, 5, 6, 7, 8, 9};
     SuggestionsQuantity m_suggestionsQuan;
 
