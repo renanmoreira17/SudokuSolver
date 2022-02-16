@@ -58,7 +58,7 @@ TEST_CASE("Test tile region manipulation", "[Tile]")
         REQUIRE(tile.getSubgrid() == subgrid);
     }
 
-    SECTION("Test getting all regions")
+    SECTION("Test getting all regions - tuple")
     {
         Line* hLine = (Line*)0x1234;
         Line* vLine = (Line*)0x4321;
@@ -70,6 +70,21 @@ TEST_CASE("Test tile region manipulation", "[Tile]")
         REQUIRE(hLine == fHLine);
         REQUIRE(vLine == fVLine);
         REQUIRE(subgrid == fSubgrid);
+    }
+
+    SECTION("Test getting all regions - array")
+    {
+        Line hLine(&grid, LineOrientation::HORIZONTAL, 1);
+        Line vLine(&grid, LineOrientation::VERTICAL, 2);
+        Subgrid subgrid(&grid, 3);
+        tile.setHorizontalLine(&hLine);
+        tile.setVerticalLine(&vLine);
+        tile.setSubgrid(&subgrid);
+
+        const std::vector<Region*> allRegions = {&hLine, &vLine, &subgrid};
+        const auto fRegions = tile.getRegions();
+        const std::vector<Region*> vfRegions(fRegions.begin(), fRegions.end());
+        REQUIRE(allRegions == vfRegions);
     }
 }
 
