@@ -38,6 +38,8 @@ class Region
     Region& operator=(Region&& other) = default;
     virtual ~Region() = default;
 
+    void setElementList(const std::shared_ptr<ElementList<std::shared_ptr<Tile>>>& elementList);
+
     const ElementList<std::shared_ptr<Tile>>& getTiles() const;
 
     short getIndex() const;

@@ -16,6 +16,11 @@ const ElementList<std::shared_ptr<Tile>>& Region::getTiles() const
     return *m_elementList;
 }
 
+void Region::setElementList(const std::shared_ptr<ElementList<std::shared_ptr<Tile>>>& elementList)
+{
+    m_elementList = elementList;
+}
+
 short Region::getIndex() const
 {
     return m_index;
