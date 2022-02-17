@@ -25,7 +25,7 @@ short Region::getIndex() const
 {
     return m_index;
 }
-RegionType Region::getType() const
+Region::RegionType Region::getType() const
 {
     return m_type;
 }
@@ -77,7 +77,7 @@ typename ElementList<std::shared_ptr<Tile>>::const_iterator Region::end() const
     return cend();
 }
 
-static std::shared_ptr<ElementList<std::shared_ptr<Tile>>>
+std::shared_ptr<ElementList<std::shared_ptr<Tile>>>
 Region::make_line(LineOrientation orientation,
                   TileValueType index,
                   GridTiles& gridElements,
@@ -100,7 +100,7 @@ Region::make_line(LineOrientation orientation,
     return std::make_shared<ElementList<std::shared_ptr<Tile>>>(lastElementWrapper);
 }
 
-static std::shared_ptr<ElementList<std::shared_ptr<Tile>>> Region::make_subgrid(
+std::shared_ptr<ElementList<std::shared_ptr<Tile>>> Region::make_subgrid(
     TileValueType index,
     GridTiles& gridElements,
     const std::optional<const std::function<void(const std::shared_ptr<Tile>&)>>& applyElement)
