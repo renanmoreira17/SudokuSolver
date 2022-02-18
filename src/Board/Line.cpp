@@ -52,3 +52,35 @@ Line& Line::operator=(Line&& other)
 
     return *this;
 }
+
+Line::Line(const Line& other)
+    : Region(other)
+{
+    m_index = other.m_index;
+    m_orientation = other.m_orientation;
+
+    auto* head = m_elementList->getHead();
+    do {
+        auto& tile = head->getElement();
+        tile->setLine(m_orientation, this);
+    } while ((head = head->next()));
+}
+
+Line& Line::operator=(const Line& other)
+{
+    if (&other == this)
+        return *this;
+
+    Region::operator=(other);
+
+    m_index = other.m_index;
+    m_orientation = other.m_orientation;
+
+    auto* head = m_elementList->getHead();
+    do {
+        auto& tile = head->getElement();
+        tile->setLine(m_orientation, this);
+    } while ((head = head->next()));
+
+    return *this;
+}
