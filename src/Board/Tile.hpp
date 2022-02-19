@@ -4,6 +4,7 @@
 #include "Util/GlobalDefinitions.hpp"
 
 #include <array>
+#include <memory>
 
 class Region;
 class Grid;
@@ -25,9 +26,9 @@ class Tile
   public:
     Tile(Grid* grid, Coordinates coordinates, const TileValueType value = 0);
     Tile(const Tile& other);
-    Tile(Tile&& other);
-    Tile& operator=(const Tile& other);
-    Tile& operator=(Tile&& other);
+    Tile(Tile&& other) = delete;
+    Tile& operator=(const Tile& other) = delete;
+    Tile& operator=(Tile&& other) = delete;
     virtual ~Tile() = default;
 
     bool operator==(const TileValueType value) const;

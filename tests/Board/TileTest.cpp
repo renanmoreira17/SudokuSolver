@@ -112,3 +112,17 @@ TEST_CASE("Test tile value manipulation", "[Tile]")
         REQUIRE(tile.getValue() == 4);
     }
 }
+
+TEST_CASE("Test Tile move constructor", "[Tile]")
+{
+    Grid grid;
+
+    const auto& tile = grid(1, 2);
+    Tile tile2(tile);
+    REQUIRE(tile2.getCoordinates() == tile.getCoordinates());
+    REQUIRE(tile2.getValue() == tile.getValue());
+    REQUIRE(tile2.getGrid() == nullptr);
+    REQUIRE(tile2.getHorizontalLine() == nullptr);
+    REQUIRE(tile2.getVerticalLine() == nullptr);
+    REQUIRE(tile2.getSubgrid() == nullptr);
+}

@@ -15,59 +15,9 @@ Tile::Tile(const Tile& other)
     m_grid = other.m_grid;
     m_coordinates = other.m_coordinates;
     m_value = other.m_value;
-    m_horizontalLine = other.m_horizontalLine;
-    m_verticalLine = other.m_verticalLine;
-    m_subgrid = other.m_subgrid;
-}
-
-Tile::Tile(Tile&& other)
-{
-    m_grid = std::move(other.m_grid);
-    m_coordinates = std::move(other.m_coordinates);
-    m_value = std::move(other.m_value);
-    m_horizontalLine = std::move(other.m_horizontalLine);
-    m_verticalLine = std::move(other.m_verticalLine);
-    m_subgrid = std::move(other.m_subgrid);
-
-    other.m_grid = nullptr;
-    other.m_horizontalLine = nullptr;
-    other.m_verticalLine = nullptr;
-    other.m_subgrid = nullptr;
-}
-
-Tile& Tile::operator=(const Tile& other)
-{
-    if (this == &other)
-        return *this;
-
-    m_grid = other.m_grid;
-    m_coordinates = other.m_coordinates;
-    m_value = other.m_value;
-    m_horizontalLine = other.m_horizontalLine;
-    m_verticalLine = other.m_verticalLine;
-    m_subgrid = other.m_subgrid;
-
-    return *this;
-}
-
-Tile& Tile::operator=(Tile&& other)
-{
-    if (this == &other)
-        return *this;
-
-    m_grid = std::move(other.m_grid);
-    m_coordinates = std::move(other.m_coordinates);
-    m_value = std::move(other.m_value);
-    m_horizontalLine = std::move(other.m_horizontalLine);
-    m_verticalLine = std::move(other.m_verticalLine);
-    m_subgrid = std::move(other.m_subgrid);
-
-    other.m_grid = nullptr;
-    other.m_horizontalLine = nullptr;
-    other.m_verticalLine = nullptr;
-    other.m_subgrid = nullptr;
-
-    return *this;
+    m_horizontalLine = nullptr;
+    m_verticalLine = nullptr;
+    m_subgrid = nullptr;
 }
 
 const Coordinates& Tile::getCoordinates() const
