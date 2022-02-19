@@ -140,7 +140,11 @@ TEST_CASE("Test Line move constructors/assign operators", "[Line]")
     SECTION("Operator - Vertical")
     {
         Line line(&gridMoc, LineOrientation::VERTICAL, refRowCol);
-        Line lineMoved = std::move(line);
+
+        Grid auxGrid;
+        Line lineMoved(&auxGrid, LineOrientation::VERTICAL, refRowCol);
+        lineMoved = std::move(line);
+
         REQUIRE(lineMoved.getGrid() == &gridMoc);
         REQUIRE(lineMoved.getIndex() == refRowCol);
         REQUIRE(lineMoved.getType() == Region::RegionType::LINE);
