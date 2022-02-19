@@ -28,12 +28,73 @@ class ElementList
     {}
     ~ElementList()
     {
-        ElementWrapper<T>* ptr;
-        while ((ptr = m_head))
+        ElementWrapper<T>* ptr = m_head;
+        while (ptr != nullptr)
         {
-            m_head = m_head->next();
+            ElementWrapper<T>* next = ptr->next();
             delete ptr;
+            ptr = next;
         }
+    }
+
+    ElementList(const ElementList& other)
+    {
+        ElementWrapper<T>* lastWrapper = nullptr;
+        auto* ptr = other.m_head;
+        while (ptr)
+        {
+            auto* newWrapper = new ElementWrapper<T>(&ptr->getElement(), lastWrapper);
+            if (!lastWrapper)
+                m_head = newWrapper;
+            lastWrapper = newWrapper;
+            ptr = ptr->next();
+        }
+
+        m_tail = lastWrapper;
+    }
+
+    ElementList(ElementList&& other)
+    {
+        m_head = other.m_head;
+        m_tail = other.m_tail;
+
+        other.m_head = nullptr;
+        other.m_tail = nullptr;
+    }
+
+    ElementList& operator=(const ElementList& other)
+    {
+        if (&other == this)
+            return *this;
+
+        ElementWrapper<T>* lastWrapper = nullptr;
+        auto* ptr = other.m_head;
+        while (ptr)
+        {
+            auto* newWrapper = new ElementWrapper<T>(&ptr->getElement(), lastWrapper);
+            if (!lastWrapper)
+                m_head = newWrapper;
+            lastWrapper = newWrapper;
+            ptr = ptr->next();
+        }
+
+        m_tail = lastWrapper;
+
+        return *this;
+    }
+
+    ElementList& operator=(ElementList&& other)
+    {
+        if (&other == this)
+            return *this;
+
+        m_head = other.m_head;
+        m_tail = other.m_tail;
+
+        other.m_head = nullptr;
+        other.m_tail = nullptr;
+
+        return *this;
     }
 
     ElementWrapper<T>* const& getHead() const { return m_head; }

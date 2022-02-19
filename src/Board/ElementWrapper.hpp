@@ -3,41 +3,74 @@
 
 class Tile;
 
-template <typename T>
+template<typename T>
 class ElementWrapper
 {
-private:
+  private:
     T* m_element;
 
-    ElementWrapper* m_next;
-    ElementWrapper* m_previous;
-public:
-    ElementWrapper(T* const & element)
-    : m_element(element)
-    , m_next(nullptr)
-    , m_previous(nullptr)
-    {
-    }
+    ElementWrapper* m_next{nullptr};
+    ElementWrapper* m_previous{nullptr};
 
-    ElementWrapper(T* const & element, ElementWrapper* const & previous)
-    : m_element(element)
-    , m_next(nullptr)
-    , m_previous(previous)
+  public:
+    ElementWrapper(T* const& element)
+        : m_element(element)
+        , m_next(nullptr)
+        , m_previous(nullptr)
+    {}
+
+    ElementWrapper(T* const& element, ElementWrapper* const& previous)
+        : m_element(element)
+        , m_next(nullptr)
+        , m_previous(previous)
     {
         if (previous)
             previous->m_next = this;
     }
     ~ElementWrapper() {}
 
-    ElementWrapper* const & next() const
+    ElementWrapper(const ElementWrapper& other) = delete;
+    ElementWrapper(ElementWrapper&& other)
     {
-        return m_next;
+        m_element = other.m_element;
+        m_next = other.m_next;
+        m_previous = other.m_previous;
+
+        other.m_next = nullptr;
+        other.m_previous = nullptr;
+        other.m_element = nullptr;
+
+        if (m_next)
+            m_next->m_previous = this;
+        if (m_previous)
+            m_previous->m_next = this;
+    }
+    ElementWrapper& operator=(const ElementWrapper& other) = delete;
+
+    ElementWrapper& operator=(ElementWrapper&& other)
+    {
+        if (&other == this)
+            return *this;
+
+        m_element = other.m_element;
+        m_next = other.m_next;
+        m_previous = other.m_previous;
+
+        other.m_next = nullptr;
+        other.m_previous = nullptr;
+        other.m_element = nullptr;
+
+        if (m_next)
+            m_next->m_previous = this;
+        if (m_previous)
+            m_previous->m_next = this;
+
+        return *this;
     }
 
-    ElementWrapper* const & previous() const
-    {
-        return m_previous;
-    }
+    ElementWrapper* const& next() const { return m_next; }
+
+    ElementWrapper* const& previous() const { return m_previous; }
 
     bool hasNext() const { return m_next; }
     bool hasPrevious() const { return m_previous; }
@@ -47,35 +80,37 @@ public:
 };
 
 template<typename T>
-class LineElementWrapper: public ElementWrapper<T>
+class LineElementWrapper : public ElementWrapper<T>
 {
-private:
-
-public:
-    LineElementWrapper(T* const & element)
-    : ElementWrapper<T>(element) {}
-    LineElementWrapper(T* const & element, LineElementWrapper<T>* const & previous)
-    : ElementWrapper<T>(element, previous) {}
+  private:
+  public:
+    LineElementWrapper(T* const& element)
+        : ElementWrapper<T>(element)
+    {}
+    LineElementWrapper(T* const& element, LineElementWrapper<T>* const& previous)
+        : ElementWrapper<T>(element, previous)
+    {}
     ~LineElementWrapper() {}
 };
 
 using LineTileWrapper = LineElementWrapper<Tile>;
 
 template<typename T>
-class SubgridElementWrapper: public ElementWrapper<T>
+class SubgridElementWrapper : public ElementWrapper<T>
 {
-private:
+  private:
     /* data */
-public:
-    SubgridElementWrapper(T* const & element)
-    : ElementWrapper<T>(element) {}
-    SubgridElementWrapper(T* const & element, SubgridElementWrapper<T>* const & previous)
-    : ElementWrapper<T>(element, previous) {}
+  public:
+    SubgridElementWrapper(T* const& element)
+        : ElementWrapper<T>(element)
+    {}
+    SubgridElementWrapper(T* const& element, SubgridElementWrapper<T>* const& previous)
+        : ElementWrapper<T>(element, previous)
+    {}
     ~SubgridElementWrapper() {}
 
     const ElementWrapper<T>* up() const;
     const ElementWrapper<T>* down() const;
-
 };
 
 using SubgridTileWrapper = SubgridElementWrapper<Tile>;
