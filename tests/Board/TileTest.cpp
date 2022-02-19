@@ -118,9 +118,10 @@ TEST_CASE("Test Tile move constructor", "[Tile]")
     Grid grid;
 
     const auto& tile = grid(1, 2);
-    Tile tile2(tile);
-    REQUIRE(tile2.getCoordinates() == tile.getCoordinates());
-    REQUIRE(tile2.getValue() == tile.getValue());
+    Tile tile2(*tile);
+    REQUIRE(tile2.getCoordinates().col == tile->getCoordinates().col);
+    REQUIRE(tile2.getCoordinates().row == tile->getCoordinates().row);
+    REQUIRE(tile2.getValue() == tile->getValue());
     REQUIRE(tile2.getGrid() == nullptr);
     REQUIRE(tile2.getHorizontalLine() == nullptr);
     REQUIRE(tile2.getVerticalLine() == nullptr);

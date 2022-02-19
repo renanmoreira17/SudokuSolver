@@ -12,7 +12,7 @@ Tile::Tile(Grid* grid, Coordinates coordinates, const TileValueType value)
 
 Tile::Tile(const Tile& other)
 {
-    m_grid = other.m_grid;
+    m_grid = nullptr;
     m_coordinates = other.m_coordinates;
     m_value = other.m_value;
     m_horizontalLine = nullptr;
