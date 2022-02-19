@@ -128,3 +128,131 @@ TEST_CASE("Test chained Element wrapper creation", "[ElementWrapper]")
         CHECK(last.next() == nullptr);
     }
 }
+
+TEST_CASE("Test Move ctrs/assign operator")
+{
+    int firstMocInt = 1;
+    int middleMocInt = 2;
+    int lastMocInt = 3;
+
+    SECTION("Move ctr - first")
+    {
+        ElementWrapper<int> first(&firstMocInt);
+        ElementWrapper<int> middle(&middleMocInt, &first);
+        ElementWrapper<int> last(&lastMocInt, &middle);
+
+        ElementWrapper<int> firstMoved(std::move(first));
+
+        REQUIRE(&firstMoved.getElement() == &firstMocInt);
+        REQUIRE(firstMoved.previous() == nullptr);
+        REQUIRE(firstMoved.next() == &middle);
+
+        REQUIRE(first.getElementPtr() == nullptr);
+        REQUIRE(first.previous() == nullptr);
+        REQUIRE(first.next() == nullptr);
+    }
+
+    SECTION("Move ctr - middle")
+    {
+        ElementWrapper<int> first(&firstMocInt);
+        ElementWrapper<int> middle(&middleMocInt, &first);
+        ElementWrapper<int> last(&lastMocInt, &middle);
+
+        ElementWrapper<int> middleMoved(std::move(middle));
+
+        REQUIRE(&middleMoved.getElement() == &middleMocInt);
+        REQUIRE(middleMoved.previous() == &first);
+        REQUIRE(middleMoved.next() == &last);
+
+        REQUIRE(middle.getElementPtr() == nullptr);
+        REQUIRE(middle.previous() == nullptr);
+        REQUIRE(middle.next() == nullptr);
+    }
+
+    SECTION("Move ctr - last")
+    {
+        ElementWrapper<int> first(&firstMocInt);
+        ElementWrapper<int> middle(&middleMocInt, &first);
+        ElementWrapper<int> last(&lastMocInt, &middle);
+
+        ElementWrapper<int> lastMoved(std::move(last));
+
+        REQUIRE(&lastMoved.getElement() == &lastMocInt);
+        REQUIRE(lastMoved.previous() == &middle);
+        REQUIRE(lastMoved.next() == nullptr);
+
+        REQUIRE(last.getElementPtr() == nullptr);
+        REQUIRE(last.previous() == nullptr);
+        REQUIRE(last.next() == nullptr);
+    }
+
+    SECTION("Move assign - first")
+    {
+        ElementWrapper<int> first(&firstMocInt);
+        ElementWrapper<int> middle(&middleMocInt, &first);
+        ElementWrapper<int> last(&lastMocInt, &middle);
+
+        int auxInt = 0;
+        ElementWrapper<int> firstMoved(&auxInt);
+        firstMoved = std::move(first);
+
+        REQUIRE(&firstMoved.getElement() == &firstMocInt);
+        REQUIRE(firstMoved.previous() == nullptr);
+        REQUIRE(firstMoved.next() == &middle);
+
+        REQUIRE(first.getElementPtr() == nullptr);
+        REQUIRE(first.previous() == nullptr);
+        REQUIRE(first.next() == nullptr);
+    }
+
+    SECTION("Move assign - middle")
+    {
+        ElementWrapper<int> first(&firstMocInt);
+        ElementWrapper<int> middle(&middleMocInt, &first);
+        ElementWrapper<int> last(&lastMocInt, &middle);
+
+        int auxInt = 0;
+        ElementWrapper<int> middleMoved(&auxInt);
+        middleMoved = std::move(middle);
+
+        REQUIRE(&middleMoved.getElement() == &middleMocInt);
+        REQUIRE(middleMoved.previous() == &first);
+        REQUIRE(middleMoved.next() == &last);
+
+        REQUIRE(middle.getElementPtr() == nullptr);
+        REQUIRE(middle.previous() == nullptr);
+        REQUIRE(middle.next() == nullptr);
+    }
+
+    SECTION("Move assign - last")
+    {
+        ElementWrapper<int> first(&firstMocInt);
+        ElementWrapper<int> middle(&middleMocInt, &first);
+        ElementWrapper<int> last(&lastMocInt, &middle);
+
+        int auxInt = 0;
+        ElementWrapper<int> lastMoved(&auxInt);
+        lastMoved = std::move(last);
+
+        REQUIRE(&lastMoved.getElement() == &lastMocInt);
+        REQUIRE(lastMoved.previous() == &middle);
+        REQUIRE(lastMoved.next() == nullptr);
+
+        REQUIRE(last.getElementPtr() == nullptr);
+        REQUIRE(last.previous() == nullptr);
+        REQUIRE(last.next() == nullptr);
+    }
+
+    SECTION("Move assign - itself")
+    {
+        ElementWrapper<int> first(&firstMocInt);
+        ElementWrapper<int> middle(&middleMocInt, &first);
+        ElementWrapper<int> last(&lastMocInt, &middle);
+
+        middle = std::move(middle);
+
+        REQUIRE(&middle.getElement() == &middleMocInt);
+        REQUIRE(middle.previous() == &first);
+        REQUIRE(middle.next() == &last);
+    }
+}

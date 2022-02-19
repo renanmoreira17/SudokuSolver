@@ -75,6 +75,7 @@ class ElementWrapper
     bool hasNext() const { return m_next; }
     bool hasPrevious() const { return m_previous; }
 
+    T* const& getElementPtr() const { return m_element; }
     T& getElement() { return *m_element; };
     const T& getElement() const { return *m_element; }
 };
