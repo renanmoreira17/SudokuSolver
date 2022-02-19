@@ -1,7 +1,8 @@
 #include "Games.hpp"
 
-#include <ctime>
 #include <iostream>
+#include <random>
+
 #include <vector>
 
 const static std::vector<std::string> simpleGames = {
@@ -44,21 +45,27 @@ std::string gameDifficultyToString(GameDifficulty difficulty)
     }
 }
 
-std::string getGameOfDifficulty(GameDifficulty difficulty)
+const std::string& getGameOfDifficulty(GameDifficulty difficulty)
 {
-    srand(time(0));
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist(0, 1000);
+
+    const auto getRandomNumber = [&](const unsigned int upTo) -> unsigned int {
+        return dist(rng) % upTo;
+    };
+
     switch (difficulty)
     {
-    case GameDifficulty::Simple: return simpleGames[rand() % simpleGames.size()];
-    case GameDifficulty::Easy: return easyGames[rand() % easyGames.size()];
-    case GameDifficulty::Intermediate: return intermediateGames[rand() % intermediateGames.size()];
-    case GameDifficulty::Expert: return expertGames[rand() % expertGames.size()];
+    case GameDifficulty::Simple: return simpleGames[getRandomNumber(simpleGames.size())];
+    case GameDifficulty::Easy: return easyGames[getRandomNumber(easyGames.size())];
+    case GameDifficulty::Intermediate: return intermediateGames[getRandomNumber(intermediateGames.size())];
+    case GameDifficulty::Expert: return expertGames[getRandomNumber(expertGames.size())];
     case GameDifficulty::Any:
-        const auto randomDifficulty = static_cast<GameDifficulty>(rand() % 5);
+        const auto randomDifficulty = static_cast<GameDifficulty>(getRandomNumber(5));
         if (randomDifficulty != GameDifficulty::Any)
         {
-            std::cout << "Random difficulty: " << gameDifficultyToString(randomDifficulty)
-                      << std::endl;
+            std::cout << "Random difficulty: " << gameDifficultyToString(randomDifficulty) << std::endl;
         }
         return getGameOfDifficulty(randomDifficulty);
     }

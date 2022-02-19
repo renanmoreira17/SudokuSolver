@@ -52,3 +52,7 @@ Line& Line::operator=(Line&& other)
 
     return *this;
 }
+
+Line::Line(const Line& other, Grid* grid)
+    : Line(grid, other.getLineOrientation(), other.getIndex())
+{}

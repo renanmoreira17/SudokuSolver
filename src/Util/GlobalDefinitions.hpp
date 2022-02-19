@@ -21,6 +21,8 @@ struct Coordinates
 {
     TileValueType row;
     TileValueType col;
+
+    bool operator==(const Coordinates& other) const;
 };
 
 #endif // __GLOBALDEFINITIONS_H__

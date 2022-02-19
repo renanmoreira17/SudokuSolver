@@ -46,6 +46,7 @@ class Region
     short getIndex() const;
     RegionType getType() const;
 
+    void setGrid(Grid* grid);
     Grid* getGrid() const;
 
     bool hasValue(const TileValueType value) const;

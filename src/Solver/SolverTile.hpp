@@ -23,6 +23,7 @@ class SolverTile : public Tile
 
   public:
     SolverTile(Grid* grid, TileValueType row, TileValueType col);
+    SolverTile(const SolverTile& other, Grid* grid);
     ~SolverTile() = default;
 
     void setValue(TileValueType value) override;

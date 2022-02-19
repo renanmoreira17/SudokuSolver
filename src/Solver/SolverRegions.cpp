@@ -243,8 +243,20 @@ SolverLine::SolverLine(Grid* grid, LineOrientation orientation, const short inde
     , Line(grid, orientation, index)
 {}
 
+SolverLine::SolverLine(const SolverLine& other, Grid* grid)
+    : SolverLine(grid, other.getLineOrientation(), other.getIndex())
+{
+    m_suggestionsQuan = other.m_suggestionsQuan;
+}
+
 SolverSubgrid::SolverSubgrid(Grid* grid, const short index)
     : Region(index, RegionType::SUBGRID, grid)
     , SolverRegion(grid, index, RegionType::SUBGRID)
     , Subgrid(grid, index)
 {}
+
+SolverSubgrid::SolverSubgrid(const SolverSubgrid& other, Grid* grid)
+    : SolverSubgrid(grid, other.getIndex())
+{
+    m_suggestionsQuan = other.m_suggestionsQuan;
+}

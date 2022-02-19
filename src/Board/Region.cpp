@@ -1,5 +1,10 @@
 #include "Region.hpp"
 
+void Region::setGrid(Grid* grid)
+{
+    m_grid = grid;
+}
+
 Grid* Region::getGrid() const
 {
     return m_grid;

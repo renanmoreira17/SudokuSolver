@@ -26,6 +26,7 @@ class Tile
   public:
     Tile(Grid* grid, Coordinates coordinates, const TileValueType value = 0);
     Tile(const Tile& other);
+    Tile(const Tile& other, Grid* grid);
     Tile(Tile&& other) = delete;
     Tile& operator=(const Tile& other) = delete;
     Tile& operator=(Tile&& other) = delete;
@@ -45,6 +46,7 @@ class Tile
     void setSubgrid(Subgrid* const& subgrid) const;
     Subgrid* getSubgrid() const;
 
+    void setGrid(Grid* grid);
     Grid* getGrid() const;
 
     const std::tuple<Line*, Line*, Subgrid*> getRegionsTuple();

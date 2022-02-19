@@ -20,6 +20,16 @@ Tile::Tile(const Tile& other)
     m_subgrid = nullptr;
 }
 
+Tile::Tile(const Tile& other, Grid* grid)
+{
+    m_grid = grid;
+    m_coordinates = other.m_coordinates;
+    m_value = other.m_value;
+    m_horizontalLine = nullptr;
+    m_verticalLine = nullptr;
+    m_subgrid = nullptr;
+}
+
 const Coordinates& Tile::getCoordinates() const
 {
     return m_coordinates;
@@ -106,6 +116,11 @@ Tile& Tile::operator=(const TileValueType value)
 {
     setValue(value);
     return *this;
+}
+
+void Tile::setGrid(Grid* grid)
+{
+    m_grid = grid;
 }
 
 Grid* Tile::getGrid() const
