@@ -16,7 +16,7 @@ Subgrid::Subgrid(Grid* grid, const short index)
 }
 
 Subgrid::Subgrid(Subgrid&& other)
-    : Region(other)
+    : Region(std::move(other))
 {
     m_index = other.m_index;
 

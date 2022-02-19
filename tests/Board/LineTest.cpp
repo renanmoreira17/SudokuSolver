@@ -79,3 +79,81 @@ TEST_CASE("Test if Line's Tiles have their region correctly setted", "[Line]")
         for (const auto& tile : line.getTiles()) { REQUIRE(tile->getVerticalLine() == &line); }
     }
 }
+
+TEST_CASE("Test Line move constructors/assign operators", "[Line]")
+{
+    Grid gridMoc;
+    auto refRowCol = GENERATE(range(0, 8));
+
+    SECTION("Contructor - Horizontal")
+    {
+        Line line(&gridMoc, LineOrientation::HORIZONTAL, refRowCol);
+        Line lineMoved(std::move(line));
+        REQUIRE(lineMoved.getGrid() == &gridMoc);
+        REQUIRE(lineMoved.getIndex() == refRowCol);
+        REQUIRE(lineMoved.getType() == Region::RegionType::LINE);
+        REQUIRE(lineMoved.getLineOrientation() == LineOrientation::HORIZONTAL);
+        REQUIRE(lineMoved.getRegionSpecificType() == RegionSpecificType::HORIZONTAL_LINE);
+        for (const auto& tile : lineMoved.getTiles())
+        {
+            REQUIRE(tile == gridMoc(tile->getCoordinates().row, tile->getCoordinates().col));
+            REQUIRE(tile->getHorizontalLine() == &lineMoved);
+        }
+
+        REQUIRE_FALSE(line.getElementList());
+    }
+
+    SECTION("Contructor - Vertical")
+    {
+        Line line(&gridMoc, LineOrientation::VERTICAL, refRowCol);
+        Line lineMoved(std::move(line));
+        REQUIRE(lineMoved.getGrid() == &gridMoc);
+        REQUIRE(lineMoved.getIndex() == refRowCol);
+        REQUIRE(lineMoved.getType() == Region::RegionType::LINE);
+        REQUIRE(lineMoved.getLineOrientation() == LineOrientation::VERTICAL);
+        REQUIRE(lineMoved.getRegionSpecificType() == RegionSpecificType::VERTICAL_LINE);
+        for (const auto& tile : lineMoved.getTiles())
+        {
+            REQUIRE(tile == gridMoc(tile->getCoordinates().row, tile->getCoordinates().col));
+            REQUIRE(tile->getVerticalLine() == &lineMoved);
+        }
+
+        REQUIRE_FALSE(line.getElementList());
+    }
+
+    SECTION("Operator - Horizontal")
+    {
+        Line line(&gridMoc, LineOrientation::HORIZONTAL, refRowCol);
+        Line lineMoved = std::move(line);
+        REQUIRE(lineMoved.getGrid() == &gridMoc);
+        REQUIRE(lineMoved.getIndex() == refRowCol);
+        REQUIRE(lineMoved.getType() == Region::RegionType::LINE);
+        REQUIRE(lineMoved.getLineOrientation() == LineOrientation::HORIZONTAL);
+        REQUIRE(lineMoved.getRegionSpecificType() == RegionSpecificType::HORIZONTAL_LINE);
+        for (const auto& tile : lineMoved.getTiles())
+        {
+            REQUIRE(tile == gridMoc(tile->getCoordinates().row, tile->getCoordinates().col));
+            REQUIRE(tile->getHorizontalLine() == &lineMoved);
+        }
+
+        REQUIRE_FALSE(line.getElementList());
+    }
+
+    SECTION("Operator - Vertical")
+    {
+        Line line(&gridMoc, LineOrientation::VERTICAL, refRowCol);
+        Line lineMoved = std::move(line);
+        REQUIRE(lineMoved.getGrid() == &gridMoc);
+        REQUIRE(lineMoved.getIndex() == refRowCol);
+        REQUIRE(lineMoved.getType() == Region::RegionType::LINE);
+        REQUIRE(lineMoved.getLineOrientation() == LineOrientation::VERTICAL);
+        REQUIRE(lineMoved.getRegionSpecificType() == RegionSpecificType::VERTICAL_LINE);
+        for (const auto& tile : lineMoved.getTiles())
+        {
+            REQUIRE(tile == gridMoc(tile->getCoordinates().row, tile->getCoordinates().col));
+            REQUIRE(tile->getVerticalLine() == &lineMoved);
+        }
+
+        REQUIRE_FALSE(line.getElementList());
+    }
+}

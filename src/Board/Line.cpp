@@ -18,18 +18,18 @@ Line::Line(Grid* grid, LineOrientation orientation, const short index)
 }
 
 Line::Line(Line&& other)
-    : Region(other)
+    : Region(std::move(other))
 {
     m_index = other.m_index;
     m_orientation = other.m_orientation;
 
-    auto* head = m_elementList->getHead();
-    do {
-        auto& tile = head->getElement();
+    auto* ptr = m_elementList->getHead();
+    while (ptr)
+    {
+        auto& tile = ptr->getElement();
         tile->setLine(m_orientation, this);
-    } while ((head = head->next()));
-
-    other.m_elementList = nullptr;
+        ptr = ptr->next();
+    }
 }
 
 Line& Line::operator=(Line&& other)
@@ -42,45 +42,13 @@ Line& Line::operator=(Line&& other)
     m_index = other.m_index;
     m_orientation = other.m_orientation;
 
-    auto* head = m_elementList->getHead();
-    do {
-        auto& tile = head->getElement();
+    auto* ptr = m_elementList->getHead();
+    while (ptr)
+    {
+        auto& tile = ptr->getElement();
         tile->setLine(m_orientation, this);
-    } while ((head = head->next()));
-
-    other.m_elementList = nullptr;
-
-    return *this;
-}
-
-Line::Line(const Line& other)
-    : Region(other)
-{
-    m_index = other.m_index;
-    m_orientation = other.m_orientation;
-
-    auto* head = m_elementList->getHead();
-    do {
-        auto& tile = head->getElement();
-        tile->setLine(m_orientation, this);
-    } while ((head = head->next()));
-}
-
-Line& Line::operator=(const Line& other)
-{
-    if (&other == this)
-        return *this;
-
-    Region::operator=(other);
-
-    m_index = other.m_index;
-    m_orientation = other.m_orientation;
-
-    auto* head = m_elementList->getHead();
-    do {
-        auto& tile = head->getElement();
-        tile->setLine(m_orientation, this);
-    } while ((head = head->next()));
+        ptr = ptr->next();
+    }
 
     return *this;
 }

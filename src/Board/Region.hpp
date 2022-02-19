@@ -32,12 +32,13 @@ class Region
 
   public:
     Region(const short index, const RegionType regionType, Grid* grid);
-    Region(const Region& other) = default;
+    Region(const Region& other) = delete;
     Region(Region&& other) = default;
-    Region& operator=(const Region& other) = default;
+    Region& operator=(const Region& other) = delete;
     Region& operator=(Region&& other) = default;
     virtual ~Region() = default;
 
+    const std::shared_ptr<ElementList<std::shared_ptr<Tile>>>& getElementList() const;
     void setElementList(const std::shared_ptr<ElementList<std::shared_ptr<Tile>>>& elementList);
 
     const ElementList<std::shared_ptr<Tile>>& getTiles() const;

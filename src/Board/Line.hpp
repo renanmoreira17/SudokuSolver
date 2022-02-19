@@ -13,9 +13,7 @@ class Line : virtual public Region
 
   public:
     Line(Grid* grid, LineOrientation orientation, const short index);
-    Line(const Line& other);
     Line(Line&& other);
-    Line& operator=(const Line& other);
     Line& operator=(Line&& other);
     virtual ~Line() = default;
 

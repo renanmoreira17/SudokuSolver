@@ -16,7 +16,7 @@ SolverRegion::SolverRegion(Grid* grid, const unsigned index, const RegionType ty
 {}
 
 SolverRegion::SolverRegion(SolverRegion&& other)
-    : Region(other)
+    : Region(std::move(other))
 {
     m_suggestionsQuan = std::move(other.m_suggestionsQuan);
 
