@@ -6,8 +6,6 @@
 #include "Board/Region.hpp"
 #include "Board/Tile.hpp"
 
-#include <fmt/format.h>
-
 TEST_CASE("Test Line creation", "[Line]")
 {
     Grid gridMoc;
