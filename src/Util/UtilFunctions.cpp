@@ -15,3 +15,26 @@ std::string convertRegionSpecificTypeToString(RegionSpecificType regionSpecificT
     default: return "UNKNOWN";
     }
 }
+
+Coordinates transformRelativeSubgridToAbsoluteCoordinates(const Coordinates& relativeCoordinates,
+                                                          TileValueType subgridIndex)
+{
+    const TileValueType offsetCol = subgridIndex % 3;
+    const TileValueType offsetRow = subgridIndex / 3;
+
+    const TileValueType col = offsetCol * 3 + relativeCoordinates.col;
+    const TileValueType row = offsetRow * 3 + relativeCoordinates.row;
+
+    return {row, col};
+}
+Coordinates transformSubgridIndexedToAbsoluteCoordinates(const TileValueType indexedCoordinate,
+                                                         const TileValueType subgridIndex)
+{
+    const TileValueType offsetCol = subgridIndex % 3;
+    const TileValueType offsetRow = subgridIndex / 3;
+
+    const TileValueType col = offsetCol * 3 + indexedCoordinate % 3;
+    const TileValueType row = offsetRow * 3 + indexedCoordinate / 3;
+
+    return {row, col};
+}

@@ -5,12 +5,6 @@
 
 #include <array>
 
-struct Coordinates
-{
-    TileValueType row;
-    TileValueType col;
-};
-
 class Region;
 class Grid;
 class Line;

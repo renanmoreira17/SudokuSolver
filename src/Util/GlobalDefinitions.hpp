@@ -17,4 +17,10 @@ enum class RegionSpecificType
     SUBGRID
 };
 
+struct Coordinates
+{
+    TileValueType row;
+    TileValueType col;
+};
+
 #endif // __GLOBALDEFINITIONS_H__
