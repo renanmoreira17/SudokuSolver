@@ -39,7 +39,7 @@ class SolverTile : public Tile
 
     SolverLine* getSolverHorizontalLine() const;
     SolverLine* getSolverVerticalLine() const;
-    SolverSubgrid* getSolverSugrid() const;
+    SolverSubgrid* getSolverSubgrid() const;
 
     std::vector<SolverRegion*> getSolverRegions() const;
 
