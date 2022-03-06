@@ -158,6 +158,8 @@ SolverTileVec SolverRegion::findLockedSetOfSuggestions(const std::unordered_set<
         return {};
     }
 
+    // retrieve all tiles with 2 <= x <= requested_size suggestions, that has at least one of the suggestions
+    // in values
     SolverTileVec candidateTiles;
     std::copy_if(getSolverTiles().begin(),
                  getSolverTiles().end(),
