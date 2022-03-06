@@ -3,6 +3,6 @@
 
 #include "Solver/Technique.hpp"
 
-NEW_TECHNIQUE(UniqueRetangles);
+NEW_TECHNIQUE(UniqueRectangles);
 
 #endif // __UNIQUERETANGLES_H__
