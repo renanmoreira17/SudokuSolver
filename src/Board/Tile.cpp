@@ -62,7 +62,7 @@ void Tile::setLine(LineOrientation orientation, Line* line)
     }
 }
 
-void Tile::setHorizontalLine(Line* const& hLine) const
+void Tile::setHorizontalLine(Line* hLine) const
 {
     m_horizontalLine = hLine;
 }
@@ -72,7 +72,7 @@ Line* Tile::getHorizontalLine() const
     return m_horizontalLine;
 }
 
-void Tile::setVerticalLine(Line* const& vLine) const
+void Tile::setVerticalLine(Line* vLine) const
 {
     m_verticalLine = vLine;
 }
@@ -82,7 +82,7 @@ Line* Tile::getVerticalLine() const
     return m_verticalLine;
 }
 
-void Tile::setSubgrid(Subgrid* const& subgrid) const
+void Tile::setSubgrid(Subgrid* subgrid) const
 {
     m_subgrid = subgrid;
 }

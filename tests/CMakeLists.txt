@@ -8,4 +8,4 @@ include(CTest)
 include(Catch)
 
 add_subdirectory(Board)
-# add_subdirectory(Solver)
+add_subdirectory(Solver)

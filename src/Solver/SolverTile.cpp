@@ -3,7 +3,11 @@
 #include "Solver.hpp"
 
 SolverTile::SolverTile(Grid* grid, TileValueType row, TileValueType col)
-    : Tile(grid, Coordinates{row, col})
+    : SolverTile(grid, Coordinates{row, col})
+{}
+
+SolverTile::SolverTile(Grid* grid, const Coordinates& coordinates, TileValueType value)
+    : Tile(grid, coordinates, value)
 {}
 
 SolverTile::SolverTile(const SolverTile& other, Grid* grid)

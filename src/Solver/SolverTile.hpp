@@ -2,8 +2,8 @@
 #define __SOLVERTILE_H__
 
 #include "Board/Tile.hpp"
-#include "Util/GlobalDefinitions.hpp"
 #include "SolverTypes.hpp"
+#include "Util/GlobalDefinitions.hpp"
 
 #include <string>
 #include <unordered_set>
@@ -23,6 +23,7 @@ class SolverTile : public Tile
 
   public:
     SolverTile(Grid* grid, TileValueType row, TileValueType col);
+    SolverTile(Grid* grid, const Coordinates& coordinates, TileValueType value = 0);
     SolverTile(const SolverTile& other, Grid* grid);
     ~SolverTile() = default;
 

@@ -37,13 +37,13 @@ class Tile
 
     void setLine(LineOrientation orientation, Line* line);
 
-    void setHorizontalLine(Line* const& hLine) const;
+    void setHorizontalLine(Line* hLine) const;
     Line* getHorizontalLine() const;
 
-    void setVerticalLine(Line* const& vLine) const;
+    void setVerticalLine(Line* vLine) const;
     Line* getVerticalLine() const;
 
-    void setSubgrid(Subgrid* const& subgrid) const;
+    void setSubgrid(Subgrid* subgrid) const;
     Subgrid* getSubgrid() const;
 
     void setGrid(Grid* grid);
