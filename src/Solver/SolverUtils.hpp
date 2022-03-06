@@ -31,7 +31,7 @@ static std::vector<Container> createCombination(const int k, Iterator begin, Ite
     auto currentEnd = std::prev(end, k - 1);
     for (auto it = begin; it != currentEnd; ++it)
     {
-        std::vector<Container> internalResult = createCombination<Container>(k - 1, it + 1, end);
+        std::vector<Container> internalResult = createCombination<Container>(k - 1, std::next(it), end);
         if (internalResult.empty())
         {
             result.emplace_back(Container{*it});
@@ -41,7 +41,8 @@ static std::vector<Container> createCombination(const int k, Iterator begin, Ite
             for (const auto& subCombs : internalResult)
             {
                 Container currentResult{*it};
-                currentResult.insert(currentResult.end(), subCombs.begin(), subCombs.end());
+                std::copy(
+                    subCombs.begin(), subCombs.end(), std::inserter(currentResult, currentResult.end()));
                 result.emplace_back(std::move(currentResult));
             }
         }

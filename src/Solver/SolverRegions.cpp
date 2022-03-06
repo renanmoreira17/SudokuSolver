@@ -142,7 +142,8 @@ SolverTileVec SolverRegion::findLockedSetOfSuggestions(const std::unordered_set<
         return {};
     }
 
-    const std::vector<SolverTileVec> combinations = createCombination(requestedSize, candidateTiles);
+    const std::vector<SolverTileVec> combinations =
+        SolverUtils::createCombination(requestedSize, candidateTiles);
 
     for (const auto& combination : combinations)
     {
@@ -188,7 +189,7 @@ std::vector<SolverTileVec> SolverRegion::findLockedSetsOfSize(const unsigned sho
 
     std::vector<SolverTileVec> result;
 
-    const auto combinations = createCombination(n, targetSuggestions);
+    const auto combinations = SolverUtils::createCombination(n, targetSuggestions);
     for (const auto& combination : combinations)
     {
         auto lockedSet =
