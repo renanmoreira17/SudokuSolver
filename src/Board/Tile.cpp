@@ -12,62 +12,22 @@ Tile::Tile(Grid* grid, Coordinates coordinates, const TileValueType value)
 
 Tile::Tile(const Tile& other)
 {
-    m_grid = other.m_grid;
+    m_grid = nullptr;
     m_coordinates = other.m_coordinates;
     m_value = other.m_value;
-    m_horizontalLine = other.m_horizontalLine;
-    m_verticalLine = other.m_verticalLine;
-    m_subgrid = other.m_subgrid;
+    m_horizontalLine = nullptr;
+    m_verticalLine = nullptr;
+    m_subgrid = nullptr;
 }
 
-Tile::Tile(Tile&& other)
+Tile::Tile(const Tile& other, Grid* grid)
 {
-    m_grid = std::move(other.m_grid);
-    m_coordinates = std::move(other.m_coordinates);
-    m_value = std::move(other.m_value);
-    m_horizontalLine = std::move(other.m_horizontalLine);
-    m_verticalLine = std::move(other.m_verticalLine);
-    m_subgrid = std::move(other.m_subgrid);
-
-    other.m_grid = nullptr;
-    other.m_horizontalLine = nullptr;
-    other.m_verticalLine = nullptr;
-    other.m_subgrid = nullptr;
-}
-
-Tile& Tile::operator=(const Tile& other)
-{
-    if (this == &other)
-        return *this;
-
-    m_grid = other.m_grid;
+    m_grid = grid;
     m_coordinates = other.m_coordinates;
     m_value = other.m_value;
-    m_horizontalLine = other.m_horizontalLine;
-    m_verticalLine = other.m_verticalLine;
-    m_subgrid = other.m_subgrid;
-
-    return *this;
-}
-
-Tile& Tile::operator=(Tile&& other)
-{
-    if (this == &other)
-        return *this;
-
-    m_grid = std::move(other.m_grid);
-    m_coordinates = std::move(other.m_coordinates);
-    m_value = std::move(other.m_value);
-    m_horizontalLine = std::move(other.m_horizontalLine);
-    m_verticalLine = std::move(other.m_verticalLine);
-    m_subgrid = std::move(other.m_subgrid);
-
-    other.m_grid = nullptr;
-    other.m_horizontalLine = nullptr;
-    other.m_verticalLine = nullptr;
-    other.m_subgrid = nullptr;
-
-    return *this;
+    m_horizontalLine = nullptr;
+    m_verticalLine = nullptr;
+    m_subgrid = nullptr;
 }
 
 const Coordinates& Tile::getCoordinates() const
@@ -102,7 +62,7 @@ void Tile::setLine(LineOrientation orientation, Line* line)
     }
 }
 
-void Tile::setHorizontalLine(Line* const& hLine) const
+void Tile::setHorizontalLine(Line* hLine) const
 {
     m_horizontalLine = hLine;
 }
@@ -112,7 +72,7 @@ Line* Tile::getHorizontalLine() const
     return m_horizontalLine;
 }
 
-void Tile::setVerticalLine(Line* const& vLine) const
+void Tile::setVerticalLine(Line* vLine) const
 {
     m_verticalLine = vLine;
 }
@@ -122,7 +82,7 @@ Line* Tile::getVerticalLine() const
     return m_verticalLine;
 }
 
-void Tile::setSubgrid(Subgrid* const& subgrid) const
+void Tile::setSubgrid(Subgrid* subgrid) const
 {
     m_subgrid = subgrid;
 }
@@ -156,4 +116,14 @@ Tile& Tile::operator=(const TileValueType value)
 {
     setValue(value);
     return *this;
+}
+
+void Tile::setGrid(Grid* grid)
+{
+    m_grid = grid;
+}
+
+Grid* Tile::getGrid() const
+{
+    return m_grid;
 }

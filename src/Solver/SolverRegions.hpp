@@ -21,11 +21,11 @@ class SolverTile;
 class SolverRegion : virtual public Region
 {
   private:
-    Grid* m_grid;
     // Suggestions m_missing{1, 2, 3, 4, 5, 6, 7, 8, 9};
-    SuggestionsQuantity m_suggestionsQuan;
-
     mutable std::unique_ptr<SolverTileVec> m_solverTiles;
+
+  protected:
+    SuggestionsQuantity m_suggestionsQuan;
 
   public:
     SolverRegion() = delete;
@@ -68,6 +68,7 @@ class SolverLine
   private:
   public:
     SolverLine(Grid* grid, LineOrientation orientation, const short index);
+    SolverLine(const SolverLine& other, Grid* grid);
     SolverLine(SolverLine&& other) = default;
     SolverLine& operator=(SolverLine&& other) = default;
     ~SolverLine() {}
@@ -80,6 +81,7 @@ class SolverSubgrid
   private:
   public:
     SolverSubgrid(Grid* grid, const short index);
+    SolverSubgrid(const SolverSubgrid& other, Grid* grid);
     SolverSubgrid(SolverSubgrid&& other) = default;
     SolverSubgrid& operator=(SolverSubgrid&& other) = default;
     ~SolverSubgrid() {}

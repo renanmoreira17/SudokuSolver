@@ -4,12 +4,7 @@
 #include "Util/GlobalDefinitions.hpp"
 
 #include <array>
-
-struct Coordinates
-{
-    TileValueType row;
-    TileValueType col;
-};
+#include <memory>
 
 class Region;
 class Grid;
@@ -24,16 +19,17 @@ class Tile
 
     TileValueType m_value;
 
-    mutable Line* m_horizontalLine;
-    mutable Line* m_verticalLine;
-    mutable Subgrid* m_subgrid;
+    mutable Line* m_horizontalLine{nullptr};
+    mutable Line* m_verticalLine{nullptr};
+    mutable Subgrid* m_subgrid{nullptr};
 
   public:
     Tile(Grid* grid, Coordinates coordinates, const TileValueType value = 0);
     Tile(const Tile& other);
-    Tile(Tile&& other);
-    Tile& operator=(const Tile& other);
-    Tile& operator=(Tile&& other);
+    Tile(const Tile& other, Grid* grid);
+    Tile(Tile&& other) = delete;
+    Tile& operator=(const Tile& other) = delete;
+    Tile& operator=(Tile&& other) = delete;
     virtual ~Tile() = default;
 
     bool operator==(const TileValueType value) const;
@@ -41,14 +37,17 @@ class Tile
 
     void setLine(LineOrientation orientation, Line* line);
 
-    void setHorizontalLine(Line* const& hLine) const;
+    void setHorizontalLine(Line* hLine) const;
     Line* getHorizontalLine() const;
 
-    void setVerticalLine(Line* const& vLine) const;
+    void setVerticalLine(Line* vLine) const;
     Line* getVerticalLine() const;
 
-    void setSubgrid(Subgrid* const& subgrid) const;
+    void setSubgrid(Subgrid* subgrid) const;
     Subgrid* getSubgrid() const;
+
+    void setGrid(Grid* grid);
+    Grid* getGrid() const;
 
     const std::tuple<Line*, Line*, Subgrid*> getRegionsTuple();
     const std::tuple<const Line*, const Line*, const Subgrid*> getRegionsTuple() const;

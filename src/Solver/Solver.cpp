@@ -16,30 +16,47 @@
 #include <sstream>
 #include <utility>
 
-std::shared_ptr<Tile> SolverComponentsContructor::createTile(Grid* grid, TileValueType row, TileValueType col)
+std::shared_ptr<Tile>
+SolverComponentsContructor::createTile(Grid* grid, TileValueType row, TileValueType col) const
 {
     return std::static_pointer_cast<Tile>(std::make_shared<SolverTile>(grid, row, col));
 }
 
 std::shared_ptr<Line>
-SolverComponentsContructor::createLine(Grid* grid, LineOrientation orientation, const short index)
+SolverComponentsContructor::createLine(Grid* grid, LineOrientation orientation, const short index) const
 {
     return std::static_pointer_cast<Line>(std::make_shared<SolverLine>(grid, orientation, index));
 }
 
-std::shared_ptr<Subgrid> SolverComponentsContructor::createSubgrid(Grid* grid, const short index)
+std::shared_ptr<Subgrid> SolverComponentsContructor::createSubgrid(Grid* grid, const short index) const
 {
     return std::static_pointer_cast<Subgrid>(std::make_shared<SolverSubgrid>(grid, index));
 }
 
+std::shared_ptr<Tile> SolverComponentsContructor::createTileCopy(Grid* grid,
+                                                                 const std::shared_ptr<Tile>& tile) const
+{
+    return std::make_shared<SolverTile>(*std::dynamic_pointer_cast<SolverTile>(tile), grid);
+}
+std::shared_ptr<Line> SolverComponentsContructor::createLineCopy(Grid* grid,
+                                                                 const std::shared_ptr<Line>& line) const
+{
+    return std::make_shared<SolverLine>(*std::dynamic_pointer_cast<SolverLine>(line), grid);
+}
+std::shared_ptr<Subgrid>
+SolverComponentsContructor::createSubgridCopy(Grid* grid, const std::shared_ptr<Subgrid>& subgrid) const
+{
+    return std::make_shared<SolverSubgrid>(*std::dynamic_pointer_cast<SolverSubgrid>(subgrid), grid);
+}
+
 Solver::Solver()
-    : Grid(std::make_unique<SolverComponentsContructor>())
+    : Grid(std::make_shared<SolverComponentsContructor>())
 {
     initialize();
 }
 
 Solver::Solver(const std::string& fromBoard)
-    : Grid(fromBoard, std::make_unique<SolverComponentsContructor>())
+    : Grid(fromBoard, std::make_shared<SolverComponentsContructor>())
 {
     initialize();
 }

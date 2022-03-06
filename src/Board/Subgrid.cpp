@@ -7,8 +7,7 @@
 #include <utility>
 
 Subgrid::Subgrid(Grid* grid, const short index)
-    : Region(index, RegionType::SUBGRID)
-    , m_grid(grid)
+    : Region(index, RegionType::SUBGRID, grid)
 {
     const auto lambda = [&](const std::shared_ptr<Tile>& tile) {
         tile->setSubgrid(this);
@@ -17,9 +16,8 @@ Subgrid::Subgrid(Grid* grid, const short index)
 }
 
 Subgrid::Subgrid(Subgrid&& other)
-    : Region(other)
+    : Region(std::move(other))
 {
-    m_grid = other.m_grid;
     m_index = other.m_index;
 
     auto* head = m_elementList->getHead();
@@ -27,7 +25,6 @@ Subgrid::Subgrid(Subgrid&& other)
         head->getElement()->setSubgrid(this);
     } while ((head = head->next()));
 
-    other.m_grid = nullptr;
     other.m_elementList = nullptr;
 }
 
@@ -38,7 +35,6 @@ Subgrid& Subgrid::operator=(Subgrid&& other)
 
     Region::operator=(std::move(other));
 
-    m_grid = other.m_grid;
     m_index = other.m_index;
 
     auto head = m_elementList->getHead();
@@ -46,11 +42,14 @@ Subgrid& Subgrid::operator=(Subgrid&& other)
         head->getElement()->setSubgrid(this);
     } while ((head = head->next()));
 
-    other.m_grid = nullptr;
     other.m_elementList = nullptr;
 
     return *this;
 }
+
+Subgrid::Subgrid(const Subgrid& other, Grid* grid)
+    : Subgrid(grid, other.getIndex())
+{}
 
 const std::shared_ptr<Tile> Subgrid::getTile(const TileValueType row, const TileValueType col) const
 {
@@ -58,8 +57,7 @@ const std::shared_ptr<Tile> Subgrid::getTile(const TileValueType row, const Tile
     return *std::next(first, row * 3 + col);
 }
 
-const std::shared_ptr<Tile> Subgrid::operator()(const TileValueType row,
-                                                const TileValueType col) const
+const std::shared_ptr<Tile> Subgrid::operator()(const TileValueType row, const TileValueType col) const
 {
     return getTile(row, col);
 }

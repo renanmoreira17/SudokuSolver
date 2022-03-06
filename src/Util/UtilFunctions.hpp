@@ -26,4 +26,9 @@ std::string joinContainer(const ContainerType& container, const std::string& sep
     return ss.str();
 }
 
+Coordinates transformRelativeSubgridToAbsoluteCoordinates(const Coordinates& relativeCoordinates,
+                                                          TileValueType subgridIndex);
+Coordinates transformSubgridIndexedToAbsoluteCoordinates(TileValueType indexedCoordinate,
+                                                         TileValueType subgridIndex);
+
 #endif // __UTILFUNCTIONS_H__

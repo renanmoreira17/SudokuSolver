@@ -13,9 +13,14 @@ class Technique;
 class SolverComponentsContructor : public ComponentsConstructor
 {
   public:
-    std::shared_ptr<Tile> createTile(Grid* grid, TileValueType row, TileValueType col) override;
-    std::shared_ptr<Line> createLine(Grid* grid, LineOrientation row, short index) override;
-    std::shared_ptr<Subgrid> createSubgrid(Grid* grid, short index) override;
+    std::shared_ptr<Tile> createTile(Grid* grid, TileValueType row, TileValueType col) const override;
+    std::shared_ptr<Line> createLine(Grid* grid, LineOrientation row, short index) const override;
+    std::shared_ptr<Subgrid> createSubgrid(Grid* grid, short index) const override;
+
+    std::shared_ptr<Tile> createTileCopy(Grid* grid, const std::shared_ptr<Tile>& tile) const override;
+    std::shared_ptr<Line> createLineCopy(Grid* grid, const std::shared_ptr<Line>& line) const override;
+    std::shared_ptr<Subgrid> createSubgridCopy(Grid* grid,
+                                               const std::shared_ptr<Subgrid>& subgrid) const override;
 };
 
 class Solver : public Grid
@@ -35,9 +40,8 @@ class Solver : public Grid
     std::shared_ptr<Reporter> m_reporter;
 
   protected:
-    std::vector<std::string>
-    requestTileDisplayStringForCoordinate(const TileValueType row,
-                                          const TileValueType col) const override;
+    std::vector<std::string> requestTileDisplayStringForCoordinate(const TileValueType row,
+                                                                   const TileValueType col) const override;
 
   public:
     const std::array<SolverRegion* const, 3> getSolverRegions(const Tile& tile);
@@ -51,9 +55,8 @@ class Solver : public Grid
     void computeAllSuggestions(const bool clear = false);
     void computeTileSuggestions(const Tile& tile, const bool clear = false);
 
-    bool canPlaceValueInTile(const Tile& tile,
-                             const TileValueType value,
-                             const bool forceCheck = false) const;
+    bool
+    canPlaceValueInTile(const Tile& tile, const TileValueType value, const bool forceCheck = false) const;
 
     friend int main();
 

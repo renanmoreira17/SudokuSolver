@@ -12,6 +12,6 @@ enum class GameDifficulty
     Expert = 4
 };
 
-std::string getGameOfDifficulty(GameDifficulty difficulty);
+const std::string& getGameOfDifficulty(GameDifficulty difficulty);
 
 #endif // __GAMES_H__

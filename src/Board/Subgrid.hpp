@@ -8,21 +8,14 @@ class Tile;
 
 class Subgrid : virtual public Region
 {
-  private:
-    Grid* m_grid;
-
   public:
     Subgrid(Grid* grid, const short index);
-    Subgrid(const Subgrid& other) = default;
     Subgrid(Subgrid&& other);
-    Subgrid& operator=(const Subgrid& other) = default;
+    Subgrid(const Subgrid& other, Grid* grid);
     Subgrid& operator=(Subgrid&& other);
     ~Subgrid() {}
 
-    RegionSpecificType getRegionSpecificType() const override
-    {
-        return RegionSpecificType::SUBGRID;
-    }
+    RegionSpecificType getRegionSpecificType() const override { return RegionSpecificType::SUBGRID; }
 
     const std::shared_ptr<Tile> getTile(const TileValueType row, const TileValueType col) const;
     const std::shared_ptr<Tile> operator()(const TileValueType row, const TileValueType col) const;

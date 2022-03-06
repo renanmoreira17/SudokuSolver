@@ -3,8 +3,18 @@
 #include "Solver.hpp"
 
 SolverTile::SolverTile(Grid* grid, TileValueType row, TileValueType col)
-    : Tile(grid, Coordinates{row, col})
+    : SolverTile(grid, Coordinates{row, col})
 {}
+
+SolverTile::SolverTile(Grid* grid, const Coordinates& coordinates, TileValueType value)
+    : Tile(grid, coordinates, value)
+{}
+
+SolverTile::SolverTile(const SolverTile& other, Grid* grid)
+    : Tile(other, grid)
+{
+    m_suggestions = other.m_suggestions;
+}
 
 void SolverTile::setValue(TileValueType value)
 {
@@ -108,8 +118,7 @@ bool SolverTile::removeSuggestion(TileValueType value)
     return erased;
 }
 
-bool SolverTile::removeAllSuggestionsExceptFrom(
-    const std::vector<TileValueType>& exceptionSuggestions)
+bool SolverTile::removeAllSuggestionsExceptFrom(const std::vector<TileValueType>& exceptionSuggestions)
 {
     bool removed = false;
     const auto suggestionsCopy = getSuggestions();

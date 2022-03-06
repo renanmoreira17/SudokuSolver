@@ -6,9 +6,8 @@
 #include <utility>
 
 Line::Line(Grid* grid, LineOrientation orientation, const short index)
-    : Region(index, RegionType::LINE)
+    : Region(index, RegionType::LINE, grid)
     , m_orientation(orientation)
-    , m_grid(grid)
 {
 
     const auto lamb = [&](const std::shared_ptr<Tile>& tile) {
@@ -19,20 +18,18 @@ Line::Line(Grid* grid, LineOrientation orientation, const short index)
 }
 
 Line::Line(Line&& other)
-    : Region(other)
-    , m_grid(other.m_grid)
+    : Region(std::move(other))
 {
     m_index = other.m_index;
     m_orientation = other.m_orientation;
 
-    auto* head = m_elementList->getHead();
-    do {
-        auto& tile = head->getElement();
+    auto* ptr = m_elementList->getHead();
+    while (ptr)
+    {
+        auto& tile = ptr->getElement();
         tile->setLine(m_orientation, this);
-    } while ((head = head->next()));
-
-    other.m_grid = nullptr;
-    other.m_elementList = nullptr;
+        ptr = ptr->next();
+    }
 }
 
 Line& Line::operator=(Line&& other)
@@ -42,18 +39,20 @@ Line& Line::operator=(Line&& other)
 
     Region::operator=(std::move(other));
 
-    m_grid = other.m_grid;
     m_index = other.m_index;
     m_orientation = other.m_orientation;
 
-    auto* head = m_elementList->getHead();
-    do {
-        auto& tile = head->getElement();
+    auto* ptr = m_elementList->getHead();
+    while (ptr)
+    {
+        auto& tile = ptr->getElement();
         tile->setLine(m_orientation, this);
-    } while ((head = head->next()));
-
-    other.m_grid = nullptr;
-    other.m_elementList = nullptr;
+        ptr = ptr->next();
+    }
 
     return *this;
 }
+
+Line::Line(const Line& other, Grid* grid)
+    : Line(grid, other.getLineOrientation(), other.getIndex())
+{}

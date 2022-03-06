@@ -12,24 +12,21 @@
 #include <utility>
 
 SolverRegion::SolverRegion(Grid* grid, const unsigned index, const RegionType type)
-    : Region(index, type)
-    , m_grid(grid)
+    : Region(index, type, grid)
 {}
 
 SolverRegion::SolverRegion(SolverRegion&& other)
-    : Region(other)
+    : Region(std::move(other))
 {
-    m_grid = other.m_grid;
     m_suggestionsQuan = std::move(other.m_suggestionsQuan);
 
-    other.m_grid = nullptr;
     other.m_elementList = nullptr;
 }
 
 Solver* SolverRegion::getSolver() const
 {
     // try casting m_grid to Solver*, and return it if it is valid, otherwise throw an exception
-    Solver* solver = dynamic_cast<Solver*>(m_grid);
+    Solver* solver = dynamic_cast<Solver*>(getGrid());
     if (solver == nullptr)
     {
         throw std::runtime_error("SolverRegion::getSolver() - m_grid is not a Solver*");
@@ -44,10 +41,8 @@ SolverRegion& SolverRegion::operator=(SolverRegion&& other)
 
     Region::operator=(std::move(other));
 
-    m_grid = other.m_grid;
     m_suggestionsQuan = std::move(other.m_suggestionsQuan);
 
-    other.m_grid = nullptr;
     other.m_elementList = nullptr;
 
     return *this;
@@ -243,13 +238,25 @@ std::vector<SolverTileVec> SolverRegion::findLockedSetsOfSize(const unsigned sho
 // SPECIFIC REGIONS
 
 SolverLine::SolverLine(Grid* grid, LineOrientation orientation, const short index)
-    : Region(index, RegionType::LINE)
+    : Region(index, RegionType::LINE, grid)
     , SolverRegion(grid, index, RegionType::LINE)
     , Line(grid, orientation, index)
 {}
 
+SolverLine::SolverLine(const SolverLine& other, Grid* grid)
+    : SolverLine(grid, other.getLineOrientation(), other.getIndex())
+{
+    m_suggestionsQuan = other.m_suggestionsQuan;
+}
+
 SolverSubgrid::SolverSubgrid(Grid* grid, const short index)
-    : Region(index, RegionType::SUBGRID)
+    : Region(index, RegionType::SUBGRID, grid)
     , SolverRegion(grid, index, RegionType::SUBGRID)
     , Subgrid(grid, index)
 {}
+
+SolverSubgrid::SolverSubgrid(const SolverSubgrid& other, Grid* grid)
+    : SolverSubgrid(grid, other.getIndex())
+{
+    m_suggestionsQuan = other.m_suggestionsQuan;
+}

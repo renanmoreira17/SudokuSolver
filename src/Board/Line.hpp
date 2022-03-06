@@ -10,13 +10,11 @@ class Line : virtual public Region
 {
   private:
     LineOrientation m_orientation;
-    Grid* m_grid;
 
   public:
     Line(Grid* grid, LineOrientation orientation, const short index);
-    Line(const Line& other) = default;
+    Line(const Line& other, Grid* grid);
     Line(Line&& other);
-    Line& operator=(const Line& other) = default;
     Line& operator=(Line&& other);
     virtual ~Line() = default;
 
