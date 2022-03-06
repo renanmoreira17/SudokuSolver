@@ -55,6 +55,8 @@ class SolverRegion : virtual public Region
 
     SolverTileVec getTilesWithSuggestion(TileValueType value) const;
 
+    SolverTileVec getTilesWithAllSuggestions(const std::vector<TileValueType>& suggestions) const;
+
     TileValueType getSuggestionsQuanFor(TileValueType value) const;
 
     SolverTileVec findLockedSetOfSuggestions(const std::unordered_set<TileValueType>& values) const;

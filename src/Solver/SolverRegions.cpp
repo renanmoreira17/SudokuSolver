@@ -103,14 +103,23 @@ bool SolverRegion::removeSuggestionsFromTiles(const std::vector<TileValueType>& 
 
 SolverTileVec SolverRegion::getTilesWithSuggestion(TileValueType value) const
 {
+    return getTilesWithAllSuggestions({value});
+}
+
+SolverTileVec SolverRegion::getTilesWithAllSuggestions(const std::vector<TileValueType>& suggestions) const
+{
     SolverTileVec tiles;
     for (const SolverTilePtr& solverTile : getSolverTiles())
     {
         if (solverTile->getSuggestions().empty())
             continue;
 
-        if (solverTile->hasSuggestion(value))
+        if (std::all_of(suggestions.begin(), suggestions.end(), [&solverTile](const TileValueType& s) {
+                return solverTile->hasSuggestion(s);
+            }))
+        {
             tiles.emplace_back(solverTile);
+        }
     }
     return tiles;
 }
