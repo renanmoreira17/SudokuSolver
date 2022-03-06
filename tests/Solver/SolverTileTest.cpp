@@ -160,17 +160,17 @@ TEST_CASE("Test SolverTile value manipulation", "[SolverTile]")
     }
 }
 
-TEST_CASE("Test SolverTile move constructor", "[SolverTile]")
-{
-    Grid grid;
+// TEST_CASE("Test SolverTile move constructor", "[SolverTile]")
+// {
+//     Grid grid;
 
-    const auto& tile = grid(1, 2);
-    SolverTile tile2(*tile);
-    REQUIRE(tile2.getCoordinates().col == tile->getCoordinates().col);
-    REQUIRE(tile2.getCoordinates().row == tile->getCoordinates().row);
-    REQUIRE(tile2.getValue() == tile->getValue());
-    REQUIRE(tile2.getGrid() == nullptr);
-    REQUIRE(tile2.getHorizontalLine() == nullptr);
-    REQUIRE(tile2.getVerticalLine() == nullptr);
-    REQUIRE(tile2.getSubgrid() == nullptr);
-}
+//     const auto& tile = grid(1, 2);
+//     SolverTile tile2(*tile);
+//     REQUIRE(tile2.getCoordinates().col == tile->getCoordinates().col);
+//     REQUIRE(tile2.getCoordinates().row == tile->getCoordinates().row);
+//     REQUIRE(tile2.getValue() == tile->getValue());
+//     REQUIRE(tile2.getGrid() == nullptr);
+//     REQUIRE(tile2.getHorizontalLine() == nullptr);
+//     REQUIRE(tile2.getVerticalLine() == nullptr);
+//     REQUIRE(tile2.getSubgrid() == nullptr);
+// }

@@ -149,14 +149,14 @@ SolverLine* SolverTile::getSolverVerticalLine() const
     return dynamic_cast<SolverLine*>(getVerticalLine());
 }
 
-SolverSubgrid* SolverTile::getSolverSugrid() const
+SolverSubgrid* SolverTile::getSolverSubgrid() const
 {
     return dynamic_cast<SolverSubgrid*>(getSubgrid());
 }
 
 std::vector<SolverRegion*> SolverTile::getSolverRegions() const
 {
-    return {getSolverHorizontalLine(), getSolverVerticalLine(), getSolverSugrid()};
+    return {getSolverHorizontalLine(), getSolverVerticalLine(), getSolverSubgrid()};
 }
 
 #ifdef DEBUG
