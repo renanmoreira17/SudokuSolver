@@ -3,18 +3,13 @@
 #include "Solver/Solver.hpp"
 #include "Solver/SolverTile.hpp"
 #include "Solver/SolverUtils.hpp"
-#include "Tools/Chain.hpp"
-#include "Tools/Traversal.hpp"
 
 #include <cassert>
-#include <map>
 #include <memory>
-#include <optional>
+#include <unordered_map>
 #include <unordered_set>
 
-#include "Util/UtilFunctions.hpp"
 #include <fmt/format.h>
-#include <iostream>
 
 namespace
 {
