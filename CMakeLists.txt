@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 project(SudokuSolver VERSION 0.1.0)
 
 set (CMAKE_CXX_STANDARD 20)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++ -Wall -Wextra -Wpedantic")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -stdlib=libc++")
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_COLOR_MAKEFILE   ON)

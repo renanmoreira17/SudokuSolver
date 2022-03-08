@@ -8,6 +8,7 @@
 #include "Techniques/SinglesChains.hpp"
 #include "Techniques/SinglesRegion.hpp"
 #include "Techniques/SinglesTile.hpp"
+#include "Techniques/UniqueRectangles.hpp"
 
 #include <algorithm>
 #include <array>
@@ -86,6 +87,7 @@ void Solver::initializeTechniques()
     INIT_TECHNIQUE(NakedPairs);
     INIT_TECHNIQUE(NakedTriples);
     INIT_TECHNIQUE(SinglesChains);
+    INIT_TECHNIQUE(UniqueRectangles);
 }
 
 void Solver::solve()

@@ -23,6 +23,8 @@ class ComponentsConstructor
     virtual std::shared_ptr<Line> createLineCopy(Grid* grid, const std::shared_ptr<Line>& line) const = 0;
     virtual std::shared_ptr<Subgrid> createSubgridCopy(Grid* grid,
                                                        const std::shared_ptr<Subgrid>& subgrid) const = 0;
+
+    virtual ~ComponentsConstructor() = default;
 };
 
 class DefaultComponentsConstructor : public ComponentsConstructor

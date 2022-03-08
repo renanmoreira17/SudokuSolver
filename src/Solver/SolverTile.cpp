@@ -118,6 +118,13 @@ bool SolverTile::removeSuggestion(TileValueType value)
     return erased;
 }
 
+bool SolverTile::removeSuggestions(const std::vector<TileValueType>& suggestions)
+{
+    bool changed = false;
+    for (const auto& suggestion : suggestions) { changed |= removeSuggestion(suggestion); }
+    return changed;
+}
+
 bool SolverTile::removeAllSuggestionsExceptFrom(const std::vector<TileValueType>& exceptionSuggestions)
 {
     bool removed = false;
