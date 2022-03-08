@@ -8,6 +8,7 @@ class Tile;
 class Region;
 class SuggestionsQuantity;
 class SolverTile;
+class SolverRegion;
 
 namespace SolverUtils
 {
@@ -17,6 +18,12 @@ bool areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2);
 bool areTilesInTheSameRegion(const Tile& tile1, const Tile& tile2);
 
 Region* getTilesCommonRegion(const Tile& tile1, const Tile& tile2);
+
+std::vector<SolverRegion*> getSolverTilesCommonSolverRegions(const SolverTilePtr& tile1,
+                                                             const SolverTilePtr& tile2);
+
+SolverTileVec getSeenTiles(const SolverTilePtr& tile);
+SolverTileVec getMutuallySeenTiles(const SolverTileVec& tiles);
 
 SuggestionsQuantity collectSuggestionInformation(const SolverTileVec& tiles);
 

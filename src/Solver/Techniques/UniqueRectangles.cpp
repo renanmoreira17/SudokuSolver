@@ -43,6 +43,10 @@ class UniqueRectanglesAnalyzer
         {
             return true;
         }
+        if (analyzeType2())
+        {
+            return true;
+        }
         return false;
     }
 
@@ -63,6 +67,76 @@ class UniqueRectanglesAnalyzer
                         roofTile,
                         fmt::join(m_targetSuggestions, ", "),
                         roofTile);
+        return true;
+    }
+
+    bool analyzeType2() const
+    {
+        // in order to be type 2, there must be two floor tiles and two roof tiles.
+        if (m_floorTiles.size() != 2 || m_roofTiles.size() != 2)
+        {
+            return false;
+        }
+
+        const auto& roofTile1 = m_roofTiles.front();
+        const auto& roofTile2 = m_roofTiles.back();
+
+        // the roof tiles must have 3 suggestions, and the suggestions must be the same
+        if (roofTile1->getSuggestionsCount() != 3 || roofTile2->getSuggestionsCount() != 3)
+        {
+            return false;
+        }
+        if (roofTile1->getSuggestions() != roofTile2->getSuggestions())
+        {
+            return false;
+        }
+
+        // we must fetch the extra suggestion now
+        auto roofSuggestionsCopy = roofTile1->getSuggestions();
+        std::erase_if(roofSuggestionsCopy, [&](const TileValueType& suggestion) {
+            return std::find(m_targetSuggestions.begin(), m_targetSuggestions.end(), suggestion) !=
+                   m_targetSuggestions.end();
+        });
+        assert(roofSuggestionsCopy.size() == 1);
+        const auto& extraSuggestion = *roofSuggestionsCopy.begin();
+
+        // now, we must check if the tiles seen by the roof tiles has the extra suggestion
+        const auto seenTiles = SolverUtils::getMutuallySeenTiles(m_roofTiles);
+        if (seenTiles.empty())
+        {
+            return false;
+        }
+
+        SolverTileVec affectedTiles;
+        for (const auto& seenTile : seenTiles)
+        {
+            if (seenTile->hasValue() || !seenTile->hasSuggestion(extraSuggestion))
+            {
+                continue;
+            }
+
+            seenTile->removeSuggestion(extraSuggestion);
+            affectedTiles.emplace_back(seenTile);
+        }
+
+        if (affectedTiles.empty())
+        {
+            return false;
+        }
+
+        m_solver.report(
+            "Unique Rectangles - Type 2:\nOs tiles {} formam um Unique Rectangle, com as sugestões {}. No "
+            "entanto, os tiles {} e {} formam um roof com uma sugestão extra além dessas: {}. Assim, "
+            "para que o Sudoku tenha uma solução única, essa sugestão extra {} deve ser removida de todos os "
+            "tiles vistos pelo roof. Assim, a sugestão {} foi removida dos tiles {}.",
+            fmt::join(m_tiles, ", "),
+            fmt::join(m_targetSuggestions, ", "),
+            roofTile1,
+            roofTile2,
+            extraSuggestion,
+            extraSuggestion,
+            extraSuggestion,
+            fmt::join(affectedTiles, ", "));
         return true;
     }
 

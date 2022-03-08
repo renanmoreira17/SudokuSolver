@@ -4,6 +4,7 @@
 #include "Board/Region.hpp"
 #include "Board/Subgrid.hpp"
 #include "Board/Tile.hpp"
+#include "Solver/SolverRegions.hpp"
 #include "SolverTile.hpp"
 #include "SuggestionsQuantity.hpp"
 
@@ -79,4 +80,58 @@ Region* SolverUtils::getTilesCommonRegion(const Tile& tile1, const Tile& tile2)
         assert(0);
         return nullptr;
     }
+}
+
+std::vector<SolverRegion*> SolverUtils::getSolverTilesCommonSolverRegions(const SolverTilePtr& tile1,
+                                                                          const SolverTilePtr& tile2)
+{
+    std::vector<SolverRegion*> result;
+    const auto tile1Regions = tile1->getSolverRegions();
+    const auto tile2Regions = tile2->getSolverRegions();
+    for (const auto& tile1Region : tile1Regions)
+    {
+        for (const auto& tile2Region : tile2Regions)
+        {
+            if (tile1Region == tile2Region)
+            {
+                result.emplace_back(tile1Region);
+            }
+        }
+    }
+    return result;
+}
+
+SolverTileVec SolverUtils::getSeenTiles(const SolverTilePtr& tile)
+{
+    std::unordered_set<SolverTilePtr> result;
+    for (const auto& region : tile->getSolverRegions())
+    {
+        for (const auto& regionTile : region->getSolverTiles())
+        {
+            if (regionTile != tile)
+            {
+                result.emplace(regionTile);
+            }
+        }
+    }
+    return {result.begin(), result.end()};
+}
+
+SolverTileVec SolverUtils::getMutuallySeenTiles(const SolverTileVec& tiles)
+{
+    if (tiles.size() < 2)
+    {
+        return {};
+    }
+    SolverTileVec result;
+    const auto& referenceTile = *tiles.begin();
+    result = getSeenTiles(referenceTile);
+    for (auto it = tiles.begin() + 1; it != tiles.end(); ++it)
+    {
+        const auto& currentTile = *it;
+        std::erase_if(result, [&](const auto& seenTile) {
+            return (seenTile == currentTile) || !areTilesInTheSameRegion(*seenTile, *currentTile);
+        });
+    }
+    return result;
 }

@@ -72,6 +72,9 @@ class Solver : public Grid
         }
     }
 
+    SolverTilePtr operator()(TileValueType row, TileValueType col) const;
+    SolverTilePtr operator()(const Coordinates& coordinates) const;
+
   public:
     Solver();
     Solver(const std::string& fromBoard);

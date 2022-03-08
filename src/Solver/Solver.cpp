@@ -221,3 +221,12 @@ std::vector<std::string> Solver::requestTileDisplayStringForCoordinate(const Til
 
     return result;
 }
+
+SolverTilePtr Solver::operator()(TileValueType row, TileValueType col) const
+{
+    return std::dynamic_pointer_cast<SolverTile>(Grid::operator()(row, col));
+}
+SolverTilePtr Solver::operator()(const Coordinates& coordinates) const
+{
+    return std::dynamic_pointer_cast<SolverTile>(Grid::operator()(coordinates));
+}
