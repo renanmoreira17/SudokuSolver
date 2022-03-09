@@ -33,6 +33,7 @@ class SolverTile : public Tile
 
     const Suggestions& getSuggestions() const { return m_suggestions; };
     bool hasSuggestion(TileValueType value) const;
+    void addSuggestion(TileValueType value);
     bool removeSuggestion(TileValueType value);
     bool removeSuggestions(const std::vector<TileValueType>& suggestions);
     bool removeAllSuggestionsExceptFrom(const std::vector<TileValueType>& exceptionSuggestions);

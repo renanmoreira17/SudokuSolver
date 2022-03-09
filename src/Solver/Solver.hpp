@@ -39,6 +39,8 @@ class Solver : public Grid
 
     std::shared_ptr<Reporter> m_reporter;
 
+    bool m_initializedWithSuggestions{false};
+
   protected:
     std::vector<std::string> requestTileDisplayStringForCoordinate(const TileValueType row,
                                                                    const TileValueType col) const override;

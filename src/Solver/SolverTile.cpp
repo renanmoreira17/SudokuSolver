@@ -66,19 +66,7 @@ void SolverTile::computeSuggestions(const bool clear)
     {
         if (vLine->hasValue(value) || hLine->hasValue(value) || sGrid->hasValue(value))
             continue;
-
-        const auto [_, inserted] = m_suggestions.insert(value);
-        // se tiver inserido, então incrementa em 1 o número de ocorrências dessa sugestão em todas
-        // as regions desse tile
-        if (inserted)
-        {
-            const auto& regions = getRegions();
-            for (auto&& region : regions)
-            {
-                auto* solverRegion = dynamic_cast<SolverRegion*>(region);
-                solverRegion->suggestionAdded(value);
-            }
-        }
+        addSuggestion(value);
     }
 }
 
@@ -99,6 +87,26 @@ bool SolverTile::canPlaceValueInTile(const TileValueType value, const bool force
 bool SolverTile::hasSuggestion(TileValueType value) const
 {
     return m_suggestions.find(value) != m_suggestions.cend();
+}
+
+void SolverTile::addSuggestion(TileValueType value)
+{
+    const auto regions = getRegions();
+    const auto isInvalid = std::any_of(
+        regions.begin(), regions.end(), [&](const Region* region) { return region->hasValue(value); });
+    if (isInvalid)
+    {
+        throw std::runtime_error(
+            fmt::format("Can't add suggestion {} to tile {} because it's already in a region", value, *this));
+    }
+    const auto insertedPair = m_suggestions.insert(value);
+    // se tiver inserido, então incrementa em 1 o número de ocorrências dessa sugestão em todas
+    // as regions desse tile
+    if (insertedPair.second)
+    {
+        const auto solverRegions = getSolverRegions();
+        for (const auto& solverRegion : solverRegions) { solverRegion->suggestionAdded(value); }
+    }
 }
 
 bool SolverTile::removeSuggestion(TileValueType value)

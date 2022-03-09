@@ -57,8 +57,59 @@ Solver::Solver()
 }
 
 Solver::Solver(const std::string& fromBoard)
-    : Grid(fromBoard, std::make_shared<SolverComponentsContructor>())
+    : Grid(std::make_shared<SolverComponentsContructor>())
 {
+    size_t currentIndex = 0;
+    size_t currentTileIndex = 0;
+    while (currentIndex < fromBoard.size())
+    {
+        const auto& currentTile = this->operator()(currentTileIndex / 9, currentTileIndex % 9);
+        ++currentTileIndex;
+        const auto& currentToken = fromBoard[currentIndex];
+        switch (currentToken)
+        {
+        case '{':
+        {
+            m_initializedWithSuggestions = true;
+            const auto endingSuggestionIndex = fromBoard.find('}', currentIndex);
+            if (endingSuggestionIndex == std::string::npos)
+            {
+                throw std::runtime_error(
+                    fmt::format("Missing closing bracket for suggestion at tile index {}", currentTileIndex));
+            }
+            const auto suggestionsString =
+                fromBoard.substr(currentIndex + 1, endingSuggestionIndex - currentIndex - 1);
+            for (const auto& suggestion : suggestionsString)
+            {
+                const auto value = static_cast<TileValueType>(suggestion - '0');
+                if (value < 1 || value > 9)
+                {
+                    throw std::runtime_error(
+                        fmt::format("Invalid suggestion value {} at tile index {}", value, currentTileIndex));
+                }
+                currentTile->addSuggestion(value);
+            }
+            currentIndex = endingSuggestionIndex + 1;
+            break;
+        }
+        default:
+        {
+            ++currentIndex;
+            if (currentToken == '.' || currentToken == '0')
+            {
+                break;
+            }
+            const auto value = static_cast<TileValueType>(currentToken - '0');
+            if (value < 0 || value > 9)
+            {
+                throw std::runtime_error(
+                    fmt::format("Invalid tile value {} at tile index {}", value, currentTileIndex));
+            }
+            currentTile->setValue(value);
+        }
+        }
+    }
+
     initialize();
 }
 
@@ -93,7 +144,10 @@ void Solver::initializeTechniques()
 void Solver::solve()
 {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    computeAllSuggestions();
+    if (!m_initializedWithSuggestions)
+    {
+        computeAllSuggestions();
+    }
     printGrid();
     // checar enquanto o board não tiver solucionado
     while (!isSolved())

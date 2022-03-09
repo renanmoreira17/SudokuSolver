@@ -63,7 +63,6 @@ Grid::Grid(std::shared_ptr<ComponentsConstructor>&& constructor)
 Grid::Grid(const std::string& boardStr, std::shared_ptr<ComponentsConstructor>&& constructor)
     : Grid(std::move(constructor))
 {
-    fmt::print("Grid::Grid(const std::string& boardStr)\n");
     for (std::string::size_type i = 0; i < boardStr.size(); i++)
     {
         if (boardStr[i] == '.' || boardStr[i] == '0')
