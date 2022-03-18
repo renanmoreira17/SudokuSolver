@@ -3,6 +3,7 @@
 #include "Solver/Solver.hpp"
 #include "Solver/SolverTile.hpp"
 #include "Solver/SolverUtils.hpp"
+#include "Tools/UniqueRectanglesCreator.hpp"
 
 #include <cassert>
 #include <memory>
@@ -339,22 +340,6 @@ bool UniqueRectangles::analyze()
     return false;
 }
 
-namespace
-{
-SolverTileVec getPossiblePairs(const SolverRegion* fromRegion,
-                               const SolverTilePtr& fromTile,
-                               const std::vector<TileValueType>& suggestions)
-{
-    auto tilesWithSuggestions = fromRegion->getTilesWithAllSuggestions(suggestions);
-    if (tilesWithSuggestions.size() < 2)
-    {
-        return {};
-    }
-    std::erase_if(tilesWithSuggestions, [&fromTile](const SolverTilePtr& t) { return t == fromTile; });
-    return tilesWithSuggestions;
-}
-} // namespace
-
 bool UniqueRectangles::perform()
 {
     for (const auto& vLine : m_solver.getAllSolverVerticalLines())
@@ -369,107 +354,31 @@ bool UniqueRectangles::perform()
         const auto combinations = SolverUtils::createCombination(2, candidateSuggestions);
         for (const auto& combination : combinations)
         {
-            const auto tiles = vLine->getTilesWithAllSuggestions(combination);
-            if (tiles.size() < 2)
+
+            // we must also check if there are at least 2 tiles with 2 suggestions to constitute the
+            // floor tiles
+            const UniqueRectanglesCreator URCreator(combination, vLine);
+            const auto possibleRectangles = URCreator.buildPossibleRectangles();
+
+            for (const auto& possibleRectangle : possibleRectangles)
             {
-                continue;
-            }
-
-            const auto tileCombs = SolverUtils::createCombination(2, tiles);
-
-            // first two tiles
-            for (const auto& tileComb : tileCombs)
-            {
-                // we must check if the tiles we got form a rectangle. for that, we must check the horizontal
-                // lines of the tiles, and check if they form a pair, and if the pairs are on the same
-                // vertical line.
-
-                std::vector<SolverTileVec> possibleRectangleTiles;
-
-                const auto& startingTile = tileComb.at(0);
-                const auto& finishingTile = tileComb.at(1);
-
-                const auto pairsForStarting =
-                    getPossiblePairs(startingTile->getSolverHorizontalLine(), startingTile, combination);
-                if (pairsForStarting.empty())
+                unsigned short quanWith2Suggestions = 0;
+                for (const auto& tile : possibleRectangle)
+                {
+                    if (tile->getSuggestionsCount() == 2)
+                    {
+                        ++quanWith2Suggestions;
+                    }
+                }
+                if (quanWith2Suggestions < 2)
                 {
                     continue;
                 }
 
-                // pair for first edge
-                for (const auto& possiblePairForStarting : pairsForStarting)
+                const UniqueRectanglesAnalyzer analyzer(possibleRectangle, combination, m_solver);
+                if (analyzer.analyzeAndPerform())
                 {
-                    const auto possibleSecondPairs =
-                        getPossiblePairs(possiblePairForStarting->getSolverVerticalLine(),
-                                         possiblePairForStarting,
-                                         combination);
-                    if (possibleSecondPairs.empty())
-                    {
-                        continue;
-                    }
-
-                    // pair for second edge
-                    for (const auto& possibleSecondPair : possibleSecondPairs)
-                    {
-                        const auto possibleThirdPairs = getPossiblePairs(
-                            possibleSecondPair->getSolverHorizontalLine(), possibleSecondPair, combination);
-                        if (possibleThirdPairs.empty())
-                        {
-                            continue;
-                        }
-
-                        // pair for third edge (hopefully the finishing tile)
-                        for (const auto& possibleThirdPair : possibleThirdPairs)
-                        {
-                            if (possibleThirdPair == finishingTile)
-                            {
-                                possibleRectangleTiles.push_back({startingTile,
-                                                                  possiblePairForStarting,
-                                                                  possibleSecondPair,
-                                                                  possibleThirdPair});
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // if it didn't find any rectangle, must continue to the next iteration
-                if (possibleRectangleTiles.empty())
-                {
-                    continue;
-                }
-
-                for (const auto& possibleRectangle : possibleRectangleTiles)
-                {
-                    // we must check if all those tiles are contained in only 2 subgrids.
-                    std::unordered_set<const SolverSubgrid*> subgrids;
-                    for (const auto& tile : possibleRectangle) { subgrids.insert(tile->getSolverSubgrid()); }
-                    if (subgrids.size() != 2)
-                    {
-                        continue;
-                    }
-
-                    // we must also check if there are at least 2 tiles with 2 suggestions to constitute the
-                    // floor tiles
-
-                    unsigned short quanWith2Suggestions = 0;
-                    for (const auto& tile : possibleRectangle)
-                    {
-                        if (tile->getSuggestionsCount() == 2)
-                        {
-                            ++quanWith2Suggestions;
-                        }
-                    }
-                    if (quanWith2Suggestions < 2)
-                    {
-                        continue;
-                    }
-
-                    const UniqueRectanglesAnalyzer analyzer(possibleRectangle, combination, m_solver);
-                    if (analyzer.analyzeAndPerform())
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
