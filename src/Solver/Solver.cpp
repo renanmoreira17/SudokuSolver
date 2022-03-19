@@ -2,6 +2,7 @@
 #include "Board/Tile.hpp"
 #include "SolverTile.hpp"
 #include "Techniques/HiddenPairs.hpp"
+#include "Techniques/HiddenUniqueRectangles.hpp"
 #include "Techniques/NakedPairs.hpp"
 #include "Techniques/NakedTriples.hpp"
 #include "Techniques/PointingPair.hpp"
@@ -139,6 +140,7 @@ void Solver::initializeTechniques()
     INIT_TECHNIQUE(NakedTriples);
     INIT_TECHNIQUE(SinglesChains);
     INIT_TECHNIQUE(UniqueRectangles);
+    INIT_TECHNIQUE(HiddenUniqueRectangles);
 }
 
 void Solver::solve()

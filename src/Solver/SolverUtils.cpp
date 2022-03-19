@@ -26,6 +26,12 @@ bool SolverUtils::areTilesInTheSameLine(const Tile& tile1, const Tile& tile2, Li
     }
 }
 
+bool SolverUtils::areTilesInAnySameLine(const Tile& tile1, const Tile& tile2)
+{
+    return areTilesInTheSameLine(tile1, tile2, LineOrientation::HORIZONTAL) ||
+           areTilesInTheSameLine(tile1, tile2, LineOrientation::VERTICAL);
+}
+
 bool SolverUtils::areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2)
 {
     const auto& tile1Coordinates = tile1.getCoordinates();
@@ -99,6 +105,22 @@ std::vector<SolverRegion*> SolverUtils::getSolverTilesCommonSolverRegions(const 
         }
     }
     return result;
+}
+
+SolverLine* SolverUtils::getCommonSolverLine(const SolverTilePtr& tile1, const SolverTilePtr& tile2)
+{
+    if (areTilesInTheSameLine(*tile1, *tile2, LineOrientation::HORIZONTAL))
+    {
+        return tile1->getSolverHorizontalLine();
+    }
+    else if (areTilesInTheSameLine(*tile1, *tile2, LineOrientation::VERTICAL))
+    {
+        return tile1->getSolverVerticalLine();
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 SolverTileVec SolverUtils::getSeenTiles(const SolverTilePtr& tile)
