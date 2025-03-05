@@ -31,4 +31,22 @@ Coordinates transformRelativeSubgridToAbsoluteCoordinates(const Coordinates& rel
 Coordinates transformSubgridIndexedToAbsoluteCoordinates(TileValueType indexedCoordinate,
                                                          TileValueType subgridIndex);
 
+template<typename Range>
+std::string join(const Range& range, const std::string& delimiter)
+{
+    std::ostringstream oss;
+    auto it = range.begin();
+    if (it != range.end())
+    {
+        oss << *it;
+        ++it;
+    }
+    while (it != range.end())
+    {
+        oss << delimiter << *it;
+        ++it;
+    }
+    return oss.str();
+}
+
 #endif // __UTILFUNCTIONS_H__

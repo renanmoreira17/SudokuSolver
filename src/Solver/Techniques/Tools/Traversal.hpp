@@ -5,6 +5,8 @@
 
 #include <memory>
 #include <unordered_set>
+#include <functional>
+#include <optional>
 
 class ChainLinkElement;
 class SolverTile;

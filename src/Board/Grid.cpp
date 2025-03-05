@@ -4,10 +4,11 @@
 #include "Subgrid.hpp"
 #include "Tile.hpp"
 
-#include <fmt/format.h>
+#include <format>
 #include <iostream>
 #include <string>
 #include <vector>
+#include <format>
 
 std::shared_ptr<Tile>
 DefaultComponentsConstructor::createTile(Grid* grid, TileValueType row, TileValueType col) const
@@ -184,9 +185,9 @@ std::vector<std::string> Grid::requestTileDisplayStringForCoordinate(const TileV
 {
     const auto& tile = m_gridTiles(row, col);
     std::vector<std::string> result;
-    result.emplace_back(fmt::format(R"(\   /)"));
-    result.emplace_back(fmt::format(R"(  {}  )", tile->hasValue() ? std::to_string(tile->getValue()) : " "));
-    result.emplace_back(fmt::format(R"(/   \)"));
+    result.emplace_back(std::format(R"(\   /)"));
+    result.emplace_back(std::format(R"(  {}  )", tile->hasValue() ? std::to_string(tile->getValue()) : " "));
+    result.emplace_back(std::format(R"(/   \)"));
 
     return result;
 }

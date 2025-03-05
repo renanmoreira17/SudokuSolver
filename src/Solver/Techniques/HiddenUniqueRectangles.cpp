@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <fmt/format.h>
+#include <format>
 
 namespace
 {
@@ -103,12 +103,12 @@ class HiddenUniqueRectanglesAnalyzer
                     "do Unique Rectangle). Dessa forma, para se evitar um deadly pattern, a outra sugestão "
                     "que não forma strong links deve ser removida desse tile oposto. Assim, a sugestão {} "
                     "foi removida do tile {}.",
-                    fmt::join(m_tiles, ", "),
-                    fmt::join(m_biValueSuggestions, ", "),
+                    join(m_tiles, ", "),
+                    join(m_biValueSuggestions, ", "),
                     *tileWithBiValue,
                     opposedTile,
                     biValueSuggestion,
-                    fmt::join(otherTiles, ", "),
+                    join(otherTiles, ", "),
                     otherSuggestion,
                     *opposedTile);
                 return true;
@@ -176,9 +176,9 @@ class HiddenUniqueRectanglesAnalyzer
                         "Assim, para se evitar um deadly pattern, devemos eliminar a outra sugestão de "
                         "bi-value do outro roof tile que não forma o strong link. Dessa forma, a sugestão {} "
                         "foi removida do tile {}.",
-                        fmt::join(m_tiles, ", "),
-                        fmt::join(m_biValueSuggestions, ", "),
-                        fmt::join(floor, ", "),
+                        join(m_tiles, ", "),
+                        join(m_biValueSuggestions, ", "),
+                        join(floor, ", "),
                         floorTile,
                         suggestion,
                         *roofTile,

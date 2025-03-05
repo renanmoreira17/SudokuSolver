@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <fmt/format.h>
+#include <format>
 
 namespace
 {
@@ -71,10 +71,10 @@ class UniqueRectanglesAnalyzer
         m_solver.report("Unique Rectangles - Type 1:\nOs tiles {} formam um Unique Rectangle, com as "
                         "sugestões {}. No entanto, o tile {} possui sugestões extras além dessas. Assim, as "
                         "sugestões {} foram removidas do Tile {} para que o Sudoku tenha uma solução única.",
-                        fmt::join(m_tiles, ", "),
-                        fmt::join(m_targetSuggestions, ", "),
+                        join(m_tiles, ", "),
+                        join(m_targetSuggestions, ", "),
                         roofTile,
-                        fmt::join(m_targetSuggestions, ", "),
+                        join(m_targetSuggestions, ", "),
                         roofTile);
         return true;
     }
@@ -138,14 +138,14 @@ class UniqueRectanglesAnalyzer
             "entanto, os tiles {} e {} formam um roof com uma sugestão extra além dessas: {}. Assim, "
             "para que o Sudoku tenha uma solução única, essa sugestão extra {} deve ser removida de todos os "
             "tiles vistos pelo roof. Assim, a sugestão {} foi removida dos tiles {}.",
-            fmt::join(m_tiles, ", "),
-            fmt::join(m_targetSuggestions, ", "),
+            join(m_tiles, ", "),
+            join(m_targetSuggestions, ", "),
             roofTile1,
             roofTile2,
             extraSuggestion,
             extraSuggestion,
             extraSuggestion,
-            fmt::join(affectedTiles, ", "));
+            join(affectedTiles, ", "));
         return true;
     }
 
@@ -248,18 +248,18 @@ class UniqueRectanglesAnalyzer
             "Sudoku tenha uma solução única, essas duas sugestões extras {} e {} devem ser removidas de "
             "todos os tiles vistos pelo roof e os tiles que formam LockedSet. Assim, as "
             "sugestões {} e {} foram removidas dos tiles {}.",
-            fmt::join(m_tiles, ", "),
-            fmt::join(m_targetSuggestions, ", "),
+            join(m_tiles, ", "),
+            join(m_targetSuggestions, ", "),
             roofTile1,
             roofTile2,
             extraSuggestion1,
             extraSuggestion2,
-            fmt::join(lockedSetPossibilities, ", "),
+            join(lockedSetPossibilities, ", "),
             extraSuggestion1,
             extraSuggestion2,
             extraSuggestion1,
             extraSuggestion2,
-            fmt::join(affectedTiles, ", "));
+            join(affectedTiles, ", "));
         return true;
     }
 
@@ -303,13 +303,13 @@ class UniqueRectanglesAnalyzer
                     "justamente os tiles de roof, {}. Dessa forma, para não se criar um deadly pattern, a "
                     "outra sugestão de target do Unique Rectangle deve ser removida de todos os tiles de "
                     "roof. Assim, a sugestão {} foi removida dos tiles {}.",
-                    fmt::join(m_tiles, ", "),
-                    fmt::join(m_targetSuggestions, ", "),
+                    join(m_tiles, ", "),
+                    join(m_targetSuggestions, ", "),
                     *region,
                     suggestion,
-                    fmt::join(m_roofTiles, ", "),
+                    join(m_roofTiles, ", "),
                     otherSuggestion,
-                    fmt::join(m_roofTiles, ", "));
+                    join(m_roofTiles, ", "));
 
                 return true;
             }

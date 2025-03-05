@@ -2,7 +2,7 @@
 #include "Solver/Solver.hpp"
 #include "Util/UtilFunctions.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 bool HiddenPairs::analyze()
 {

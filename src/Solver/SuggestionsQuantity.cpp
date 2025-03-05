@@ -1,4 +1,5 @@
 #include "SuggestionsQuantity.hpp"
+#include <stdexcept>
 
 SuggestionsQuantity::SuggestionsQuantity()
 {

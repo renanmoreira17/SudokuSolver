@@ -17,6 +17,7 @@
 #include <iostream>
 #include <sstream>
 #include <utility>
+#include <format>
 
 std::shared_ptr<Tile>
 SolverComponentsContructor::createTile(Grid* grid, TileValueType row, TileValueType col) const
@@ -76,7 +77,7 @@ Solver::Solver(const std::string& fromBoard)
             if (endingSuggestionIndex == std::string::npos)
             {
                 throw std::runtime_error(
-                    fmt::format("Missing closing bracket for suggestion at tile index {}", currentTileIndex));
+                    std::format("Missing closing bracket for suggestion at tile index {}", currentTileIndex));
             }
             const auto suggestionsString =
                 fromBoard.substr(currentIndex + 1, endingSuggestionIndex - currentIndex - 1);
@@ -86,7 +87,7 @@ Solver::Solver(const std::string& fromBoard)
                 if (value < 1 || value > 9)
                 {
                     throw std::runtime_error(
-                        fmt::format("Invalid suggestion value {} at tile index {}", value, currentTileIndex));
+                        std::format("Invalid suggestion value {} at tile index {}", value, currentTileIndex));
                 }
                 currentTile->addSuggestion(value);
             }
@@ -104,7 +105,7 @@ Solver::Solver(const std::string& fromBoard)
             if (value < 0 || value > 9)
             {
                 throw std::runtime_error(
-                    fmt::format("Invalid tile value {} at tile index {}", value, currentTileIndex));
+                    std::format("Invalid tile value {} at tile index {}", value, currentTileIndex));
             }
             currentTile->setValue(value);
         }
@@ -175,10 +176,10 @@ void Solver::solve()
               << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count()
               << " milisegundos." << std::endl;
 
-    fmt::print("\nTechniques report:\n");
+    std::cout << "\nTechniques report:\n";
     for (const auto& technique : m_techniques)
     {
-        fmt::print("  {:<20}: {}\n", technique->getTechniqueName(), technique->getRanCount());
+        std::cout << std::format("  {:<20}: {}\n", technique->getTechniqueName(), technique->getRanCount());
     }
 }
 

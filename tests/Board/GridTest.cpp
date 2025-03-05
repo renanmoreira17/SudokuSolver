@@ -9,7 +9,7 @@
 #include "GamesManager/Games.hpp"
 #include "Util/UtilFunctions.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 TEST_CASE("Test Grid creation", "[Grid]")
 {

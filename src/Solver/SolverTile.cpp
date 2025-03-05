@@ -97,7 +97,7 @@ void SolverTile::addSuggestion(TileValueType value)
     if (isInvalid)
     {
         throw std::runtime_error(
-            fmt::format("Can't add suggestion {} to tile {} because it's already in a region", value, *this));
+            std::format("Can't add suggestion {} to tile {} because it's already in a region", value, *this));
     }
     const auto insertedPair = m_suggestions.insert(value);
     // se tiver inserido, então incrementa em 1 o número de ocorrências dessa sugestão em todas
@@ -176,13 +176,13 @@ std::vector<SolverRegion*> SolverTile::getSolverRegions() const
 
 #ifdef DEBUG
 #include "Util/UtilFunctions.hpp"
-#include <fmt/format.h>
+#include <format>
 
 std::string SolverTile::toString() const
 {
     std::stringstream ss;
     const auto& coordinates = getCoordinates();
-    ss << fmt::format("Tile {}{}: ", convertRowToLetter(coordinates.row), coordinates.col + 1);
+    ss << std::format("Tile {}{}: ", convertRowToLetter(coordinates.row), coordinates.col + 1);
     if (hasValue())
     {
         ss << "Value: " << getValue() << " ";

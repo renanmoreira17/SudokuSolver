@@ -39,7 +39,7 @@ bool NakedPairs::perform()
         if (region->isCompleted())
             continue;
 
-        std::list<const SolverTilePtr> solverTilesWith2Suggestions;
+        std::list<SolverTilePtr> solverTilesWith2Suggestions;
 
         // filtra todos tiles que tem a quantidade de sugestões == 2
         for (const auto& tile : *region)

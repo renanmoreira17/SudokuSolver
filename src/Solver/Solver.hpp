@@ -64,12 +64,12 @@ class Solver : public Grid
 
     void setReporter(const std::shared_ptr<Reporter>& reporter) { m_reporter = reporter; }
 
-    template<typename FormatString, typename... Args>
-    void report(FormatString formatString, Args&&... args) const
+    template<typename... Args>
+    void report(const std::format_string<Args...>& fmt, Args&&... args) const
     {
         if (m_reporter)
         {
-            m_reporter->report(formatString, std::forward<Args>(args)...);
+            m_reporter->report(fmt, std::forward<Args>(args)...);
             printGrid();
         }
     }

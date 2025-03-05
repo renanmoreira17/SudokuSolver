@@ -12,7 +12,7 @@
 #include <unordered_set>
 
 #include "Util/UtilFunctions.hpp"
-#include <fmt/format.h>
+#include <format>
 #include <iostream>
 
 #ifdef DEBUG
@@ -183,7 +183,7 @@ class SinglesChain : public Chain
                const std::shared_ptr<SinglesChainLinkElement>& linkedTo) {
                 const auto& sourceTileCoord = source->getSourceTile()->getCoordinates();
                 const auto& targetTileCoord = linkedTo->getSourceTile()->getCoordinates();
-                return fmt::format("{}{}({}) -> {}{}({})",
+                return std::format("{}{}({}) -> {}{}({})",
                                    convertRowToLetter(sourceTileCoord.row),
                                    sourceTileCoord.col + 1,
                                    convertElementLinkStateToString(source->getLinkState()),
@@ -237,7 +237,7 @@ class SinglesChain : public Chain
     {
         for (const auto& rootElement : getRootElements())
         {
-            fmt::print("Chain: {}\n", m_targetChainValue);
+            std::format::print("Chain: {}\n", m_targetChainValue);
             const auto& rootElementCoord = rootElement->getSourceTile()->getCoordinates();
             fmt::print("Root: {}{}\n", convertRowToLetter(rootElementCoord.row), rootElementCoord.col + 1);
             fmt::print("Links:\n");
@@ -247,7 +247,7 @@ class SinglesChain : public Chain
                    const std::shared_ptr<SinglesChainLinkElement>& linkedTo) {
                     const auto& sourceTileCoord = source->getSourceTile()->getCoordinates();
                     const auto& targetTileCoord = linkedTo->getSourceTile()->getCoordinates();
-                    return fmt::format("{}{}({}) -> {}{}({}) (Linked through: {})",
+                    return std::format("{}{}({}) -> {}{}({}) (Linked through: {})",
                                        convertRowToLetter(sourceTileCoord.row),
                                        sourceTileCoord.col + 1,
                                        convertElementLinkStateToString(source->getLinkState()),
@@ -349,7 +349,7 @@ class SinglesChainsAnalyzer
                             const auto& elementSolverTile = singlesElement->getSourceTile();
                             const bool res = elementSolverTile->removeSuggestion(referenceSuggestion);
                             assert(res);
-                            suggestionRemovedTiles.push_back(fmt::format("{}", *elementSolverTile));
+                            suggestionRemovedTiles.push_back(std::format("{}", *elementSolverTile));
                         }
                         return false;
                     });
@@ -441,7 +441,7 @@ class SinglesChainsAnalyzer
                 std::vector<std::string> seeingElementsStrings;
                 for (const auto& element : seeingElements)
                 {
-                    seeingElementsStrings.push_back(fmt::format("{}", *element->getSourceTile()));
+                    seeingElementsStrings.push_back(std::format("{}", *element->getSourceTile()));
                 }
 
                 solverTile->removeSuggestion(chainedValue);
