@@ -3,13 +3,38 @@
 
 #include "GlobalDefinitions.hpp"
 
+#include <format>
 #include <iterator>
+#include <memory>
 #include <sstream>
 #include <string>
+#include <ostream>
 
 char convertRowToLetter(TileValueType row);
 
 std::string convertRegionSpecificTypeToString(RegionSpecificType regionSpecificType);
+
+namespace detail
+{
+template<typename T>
+void appendToStream(std::ostream& os, const T& value)
+{
+    os << std::format("{}", value);
+}
+
+template<typename T>
+void appendToStream(std::ostream& os, const std::shared_ptr<T>& value)
+{
+    if (value)
+    {
+        os << std::format("{}", *value);
+    }
+    else
+    {
+        os << "<null>";
+    }
+}
+} // namespace detail
 
 template<typename ContainerType>
 std::string joinContainer(const ContainerType& container, const std::string& separator = ", ")
@@ -17,7 +42,7 @@ std::string joinContainer(const ContainerType& container, const std::string& sep
     std::stringstream ss;
     for (auto it = container.cbegin(); it != container.cend(); ++it)
     {
-        ss << *it;
+        detail::appendToStream(ss, *it);
         if (std::next(it) != container.cend())
         {
             ss << separator;
@@ -38,12 +63,13 @@ std::string join(const Range& range, const std::string& delimiter)
     auto it = range.begin();
     if (it != range.end())
     {
-        oss << *it;
+        detail::appendToStream(oss, *it);
         ++it;
     }
     while (it != range.end())
     {
-        oss << delimiter << *it;
+        oss << delimiter;
+        detail::appendToStream(oss, *it);
         ++it;
     }
     return oss.str();

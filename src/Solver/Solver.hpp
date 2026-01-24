@@ -60,7 +60,7 @@ class Solver : public Grid
     bool
     canPlaceValueInTile(const Tile& tile, const TileValueType value, const bool forceCheck = false) const;
 
-    friend int main();
+    friend int main(int argc, char** argv);
 
     void setReporter(const std::shared_ptr<Reporter>& reporter) { m_reporter = reporter; }
 

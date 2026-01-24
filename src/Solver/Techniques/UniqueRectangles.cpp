@@ -73,9 +73,9 @@ class UniqueRectanglesAnalyzer
                         "sugestões {} foram removidas do Tile {} para que o Sudoku tenha uma solução única.",
                         join(m_tiles, ", "),
                         join(m_targetSuggestions, ", "),
-                        roofTile,
+                        *roofTile,
                         join(m_targetSuggestions, ", "),
-                        roofTile);
+                        *roofTile);
         return true;
     }
 
@@ -140,8 +140,8 @@ class UniqueRectanglesAnalyzer
             "tiles vistos pelo roof. Assim, a sugestão {} foi removida dos tiles {}.",
             join(m_tiles, ", "),
             join(m_targetSuggestions, ", "),
-            roofTile1,
-            roofTile2,
+            *roofTile1,
+            *roofTile2,
             extraSuggestion,
             extraSuggestion,
             extraSuggestion,
@@ -250,8 +250,8 @@ class UniqueRectanglesAnalyzer
             "sugestões {} e {} foram removidas dos tiles {}.",
             join(m_tiles, ", "),
             join(m_targetSuggestions, ", "),
-            roofTile1,
-            roofTile2,
+            *roofTile1,
+            *roofTile2,
             extraSuggestion1,
             extraSuggestion2,
             join(lockedSetPossibilities, ", "),

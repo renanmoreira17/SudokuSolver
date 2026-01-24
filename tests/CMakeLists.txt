@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(catch2_SOURCE_DIR ${CMAKE_SOURCE_DIR}/libs/Catch2)
-
-list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
-
-
 include(FetchContent)
 
 FetchContent_Declare(
@@ -14,6 +9,8 @@ FetchContent_Declare(
     )
     
 FetchContent_MakeAvailable(Catch2)
+
+list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
     
 include(CTest)
 include(Catch)

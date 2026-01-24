@@ -4,58 +4,135 @@
 #include "Solver/Solver.hpp"
 #include "Board/Tile.hpp"
 
+#include <cctype>
 #include <iostream>
+#include <optional>
 #include <string>
+#include <string_view>
 
 void printAction(const std::string& action)
 {
     std::cout << action << std::endl;
 }
 
-int main()
+namespace
 {
-    // https://www.7sudoku.com/play-online
-    // std::string game("5...8..49...5...3..673....115..........2.8..........187....415..3...2...49..5...3");
+std::string toLower(std::string_view value)
+{
+    std::string result(value);
+    for (auto& ch : result)
+    {
+        ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+    }
+    return result;
+}
 
-    // const auto game = getGameOfDifficulty(GameDifficulty::Expert);
+std::optional<GameDifficulty> parseDifficulty(std::string_view value)
+{
+    const auto lowerValue = toLower(value);
+    if (lowerValue == "any")
+        return GameDifficulty::Any;
+    if (lowerValue == "simple")
+        return GameDifficulty::Simple;
+    if (lowerValue == "easy")
+        return GameDifficulty::Easy;
+    if (lowerValue == "intermediate")
+        return GameDifficulty::Intermediate;
+    if (lowerValue == "expert")
+        return GameDifficulty::Expert;
+    return std::nullopt;
+}
 
-    // std::string game("...612..7...3.91.2.....7.4.7....6..1..3.9.....2....4591.....7.3.....1..5.9..3....");
-    // const std::string game(
-    //     "000000070000090810500203004800020000045000720000000003400308006072010000030000000");
+void printUsage(const char* exe)
+{
+    std::cout << "Usage:\n"
+              << "  " << exe << " [--game <puzzle>] [--difficulty <level>] [--report]\n\n"
+              << "Options:\n"
+              << "  --game <puzzle>       81-char puzzle string with digits, '.' or '0'\n"
+              << "  --difficulty <level> any|simple|easy|intermediate|expert (default: any)\n"
+              << "  --report              print technique explanations as they run\n"
+              << "  -h, --help            show this help\n";
+}
+} // namespace
 
-    // goal game
-    // std::string game("..9.....43..6..2......53.........81.16.4.5..223..8...9...21....94..36.........6..");
-    // simplified goal game
-    std::string game("6.9.2...43..6..2......53..6.9.362815168495..2235.8.469..621...394..36.....3...6..");
+int main(int argc, char** argv)
+{
+    std::optional<std::string> gameArg;
+    std::optional<GameDifficulty> difficultyArg;
+    bool report = false;
+    bool hasDifficulty = false;
 
-    // unique rectangles - type 1
-    // const auto game("12...794396..1.87247.9..1563.71.9.256.9..5731512.7..987.1...2.48.6...3172347.15.9");
-    // unique rectangles - type 2
-    // const auto game("...8.6...2...1..74..97...1...6...2.13.....6...2........3...5.....2....8.81...2953");
-    // unique rectangles - type 2b without 3d medusa
-    // const auto game(".4186539..9..4..6..3.7924.1.28...94.519624..3.7.9.821.15..8.629.6..19.3.98.2.61..");
-    // unique rectangles - type 3
-    // const auto game(
-    // "{69}{69}{128}5{12}347{18}5{73}{12}8{127}4{139}6{39}4{73}{18}{17}96{138}52857{123}{13}96{12}43246{18}"
-    // "759{18}{19}{19}6{42}{48}5{28}37285{73}61{379}4{39}{167}{16}9{347}{347}8{1237}{12}5{17}43952{17}86");
-    // unique rectangles - type 3b
-    // const auto game("419.2...6.6.1.9....3.465921.9.2.1.8...1.5.29..7.9.4.1...65.2.79.5.398.6292......8");
-    // unique rectangles - type 4
-    // const std::string game(
-    // "31.2..645..5.4.1...4..5.9...32....98.5.....36.9..3..51421863579.63.27814...4..362");
-    // hidden unique rectangle - type 1 and 2
-    // const std::string game(
-    //     "1.957.3...7.39..1...3.1.597.8.743...492.5.78373.289.4.317.2.4..26..3..7.95..67231");
+    for (int i = 1; i < argc; ++i)
+    {
+        const std::string_view arg(argv[i]);
+        if (arg == "-h" || arg == "--help")
+        {
+            printUsage(argv[0]);
+            return 0;
+        }
+        if (arg == "--game")
+        {
+            if (i + 1 >= argc)
+            {
+                std::cerr << "Missing value for --game\n";
+                return 1;
+            }
+            gameArg = std::string(argv[++i]);
+            continue;
+        }
+        if (arg == "--difficulty")
+        {
+            if (i + 1 >= argc)
+            {
+                std::cerr << "Missing value for --difficulty\n";
+                return 1;
+            }
+            hasDifficulty = true;
+            const auto parsed = parseDifficulty(argv[++i]);
+            if (!parsed.has_value())
+            {
+                std::cerr << "Invalid difficulty value\n";
+                return 1;
+            }
+            difficultyArg = parsed;
+            continue;
+        }
+        if (arg == "--report")
+        {
+            report = true;
+            continue;
+        }
+        if (!arg.empty() && arg[0] == '-')
+        {
+            std::cerr << "Unknown option: " << arg << "\n";
+            return 1;
+        }
+        if (!gameArg.has_value())
+        {
+            gameArg = std::string(arg);
+        }
+        else
+        {
+            std::cerr << "Unexpected argument: " << arg << "\n";
+            return 1;
+        }
+    }
 
-    // const std::string
-    // game("..7.836...397.68..82641975364.19.387.8.367....73.48.6.39.87..267649..1382.863.97."); //simple
-    // coloring
+    if (gameArg.has_value() && hasDifficulty)
+    {
+        std::cerr << "Warning: --game provided, ignoring --difficulty\n";
+    }
 
+    const std::string game = gameArg.value_or(getGameOfDifficulty(
+        difficultyArg.value_or(GameDifficulty::Any)));
     std::cout << "Game: \n" << game << std::endl << std::endl;
 
     Solver solver = Solver(game);
-    std::shared_ptr<Reporter> reporter = std::make_shared<Reporter>(printAction);
-    solver.setReporter(reporter);
+    if (report)
+    {
+        std::shared_ptr<Reporter> reporter = std::make_shared<Reporter>(printAction);
+        solver.setReporter(reporter);
+    }
     solver.solve();
     return 0;
 }

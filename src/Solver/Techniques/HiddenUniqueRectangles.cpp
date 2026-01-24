@@ -105,8 +105,8 @@ class HiddenUniqueRectanglesAnalyzer
                     "foi removida do tile {}.",
                     join(m_tiles, ", "),
                     join(m_biValueSuggestions, ", "),
-                    *tileWithBiValue,
-                    opposedTile,
+                    **tileWithBiValue,
+                    *opposedTile,
                     biValueSuggestion,
                     join(otherTiles, ", "),
                     otherSuggestion,
@@ -179,12 +179,12 @@ class HiddenUniqueRectanglesAnalyzer
                         join(m_tiles, ", "),
                         join(m_biValueSuggestions, ", "),
                         join(floor, ", "),
-                        floorTile,
+                        *floorTile,
                         suggestion,
-                        *roofTile,
+                        **roofTile,
                         *commonLine,
                         otherSuggestion,
-                        otherRoof);
+                        *otherRoof);
                     return true;
                 }
             }

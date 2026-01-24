@@ -71,16 +71,6 @@ struct std::formatter<SolverTile> : std::formatter<std::string_view>
 };
 
 template<>
-struct std::formatter<std::shared_ptr<SolverTile>> : std::formatter<std::string_view>
-{
-    template<typename FormatContext>
-    auto format(const std::shared_ptr<SolverTile>& solverTile, FormatContext& ctx) const
-    {
-        return std::format_to(ctx.out(), "{}", *solverTile);
-    }
-};
-
-template<>
 struct std::formatter<Line> : std::formatter<std::string_view>
 {
     template<typename FormatContext>
@@ -108,16 +98,6 @@ struct std::formatter<SolverLine> : std::formatter<std::string_view>
 };
 
 template<>
-struct std::formatter<std::shared_ptr<SolverLine>> : std::formatter<std::string_view>
-{
-    template<typename FormatContext>
-    auto format(const std::shared_ptr<SolverLine>& solverLine, FormatContext& ctx) const
-    {
-        return std::format_to(ctx.out(), "{}", *solverLine);
-    }
-};
-
-template<>
 struct std::formatter<Subgrid> : std::formatter<std::string_view>
 {
     template<typename FormatContext>
@@ -137,16 +117,6 @@ struct std::formatter<SolverSubgrid> : std::formatter<std::string_view>
     auto format(const SolverSubgrid& solverSubgrid, FormatContext& ctx) const
     {
         return std::format_to(ctx.out(), "{}", static_cast<const Subgrid&>(solverSubgrid));
-    }
-};
-
-template<>
-struct std::formatter<std::shared_ptr<SolverSubgrid>> : std::formatter<std::string_view>
-{
-    template<typename FormatContext>
-    auto format(const std::shared_ptr<SolverSubgrid>& solverSubgrid, FormatContext& ctx) const
-    {
-        return std::format_to(ctx.out(), "{}", *solverSubgrid);
     }
 };
 
@@ -173,16 +143,6 @@ struct std::formatter<SolverRegion> : std::formatter<std::string_view>
     auto format(const SolverRegion& solverRegion, FormatContext& ctx) const
     {
         return std::format_to(ctx.out(), "{}", static_cast<const Region&>(solverRegion));
-    }
-};
-
-template<>
-struct std::formatter<std::shared_ptr<SolverRegion>> : std::formatter<std::string_view>
-{
-    template<typename FormatContext>
-    auto format(const std::shared_ptr<SolverRegion>& solverRegion, FormatContext& ctx) const
-    {
-        return std::format_to(ctx.out(), "{}", *solverRegion);
     }
 };
 

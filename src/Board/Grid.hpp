@@ -52,7 +52,7 @@ class Grid
 
     friend class Solver;
     friend class GridPrinter;
-    friend int main();
+    friend int main(int argc, char** argv);
 
   public:
     void print() const;

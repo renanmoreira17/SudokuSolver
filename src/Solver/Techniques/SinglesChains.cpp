@@ -206,7 +206,7 @@ class SinglesChain : public Chain
                 const auto& links = element->getLinksTo();
                 // if (!links.empty())
                 // {
-                //     fmt::print("Entering depth {}\n", depth);
+                //     std::cout << std::format("Entering depth {}\n", depth);
                 // }
                 for (const auto& linkedTo : links)
                 {
@@ -221,7 +221,7 @@ class SinglesChain : public Chain
                 }
                 // if (!links.empty())
                 // {
-                //     fmt::print("Exiting depth {}\n", depth);
+                //     std::cout << std::format("Exiting depth {}\n", depth);
                 // }
             };
         generateLinksFor(std::dynamic_pointer_cast<SinglesChainLinkElement>(rootElement), 0);
@@ -237,10 +237,11 @@ class SinglesChain : public Chain
     {
         for (const auto& rootElement : getRootElements())
         {
-            std::format::print("Chain: {}\n", m_targetChainValue);
+            std::cout << std::format("Chain: {}\n", m_targetChainValue);
             const auto& rootElementCoord = rootElement->getSourceTile()->getCoordinates();
-            fmt::print("Root: {}{}\n", convertRowToLetter(rootElementCoord.row), rootElementCoord.col + 1);
-            fmt::print("Links:\n");
+            std::cout << std::format(
+                "Root: {}{}\n", convertRowToLetter(rootElementCoord.row), rootElementCoord.col + 1);
+            std::cout << "Links:\n";
             const auto chainStr = genericBuildChainString(
                 rootElement,
                 [](const std::shared_ptr<SinglesChainLinkElement>& source,
@@ -256,7 +257,7 @@ class SinglesChain : public Chain
                                        convertElementLinkStateToString(linkedTo->getLinkState()),
                                        convertRegionSpecificTypeToString(linkedTo->getLinkType()));
                 });
-            fmt::print("{}\n", chainStr);
+            std::cout << std::format("{}\n", chainStr);
         }
     }
 #endif // DEBUG
