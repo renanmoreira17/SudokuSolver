@@ -18,7 +18,7 @@ bool NakedPairs::analyze()
             // cast tile to SolverTilePtr, check if the number of suggestions is
             // greater than 2, if so, increments suggestionQuan, and if suggestionQuan is greater
             // than 2, then return true
-            if (std::dynamic_pointer_cast<SolverTile>(tile)->getSuggestions().size() >= 2)
+            if (tile->getSuggestions().size() >= 2)
             {
                 ++suggestionQuan;
                 if (suggestionQuan == 2)
@@ -44,7 +44,7 @@ bool NakedPairs::perform()
         // filtra todos tiles que tem a quantidade de sugestões == 2
         for (const auto& tile : *region)
         {
-            const auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
+            const auto& solverTile = tile;
             if (solverTile->getSuggestions().size() == 2)
             {
                 solverTilesWith2Suggestions.push_back(solverTile);

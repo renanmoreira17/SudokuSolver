@@ -1,48 +1,42 @@
 #ifndef __SOLVERREGIONS_H__
 #define __SOLVERREGIONS_H__
 
-#include "Board/ElementsContainer.hpp"
-#include "Board/Grid.hpp"
-#include "Board/Line.hpp"
-#include "Board/Region.hpp"
-#include "Board/Subgrid.hpp"
 #include "SolverTypes.hpp"
 #include "SuggestionsQuantity.hpp"
+#include "Util/GlobalDefinitions.hpp"
 
-#include <map>
 #include <optional>
 #include <unordered_set>
+#include <vector>
 
-class Solver;
-class Line;
-class Subgrid;
 class SolverTile;
 
-class SolverRegion : virtual public Region
+enum class SolverRegionType
 {
-  private:
-    // Suggestions m_missing{1, 2, 3, 4, 5, 6, 7, 8, 9};
-    mutable std::unique_ptr<SolverTileVec> m_solverTiles;
+    LINE,
+    SUBGRID
+};
 
-  protected:
-    SuggestionsQuantity m_suggestionsQuan;
-
+class SolverRegion
+{
   public:
     SolverRegion() = delete;
-    SolverRegion(Grid* grid, const unsigned index, RegionType type);
-    SolverRegion(SolverRegion&& other);
-    SolverRegion& operator=(SolverRegion&& other);
+    SolverRegion(SolverRegionType type,
+                 RegionSpecificType specificType,
+                 short index,
+                 SolverTileVec tiles);
     virtual ~SolverRegion() = default;
 
-    Solver* getSolver() const;
+    short getIndex() const { return m_index; }
+    SolverRegionType getType() const { return m_type; }
+    RegionSpecificType getRegionSpecificType() const { return m_specificType; }
 
-    const SolverTileVec& getSolverTiles() const;
+    const SolverTileVec& getSolverTiles() const { return m_tiles; }
 
-    // Returns a map telling how many times each value is missing in this region
     const SuggestionsQuantity& getSuggestionsQuan() const { return m_suggestionsQuan; }
 
-    void suggestionAdded(const unsigned value);
-    void suggestionRemoved(const unsigned value);
+    void suggestionAdded(unsigned value);
+    void suggestionRemoved(unsigned value);
 
     bool removeSuggestionsFromTiles(const std::vector<TileValueType>& values,
                                     const std::optional<SolverTileVec>& exceptFromTiles = std::nullopt);
@@ -54,39 +48,48 @@ class SolverRegion : virtual public Region
     }
 
     SolverTileVec getTilesWithSuggestion(TileValueType value) const;
-
     SolverTileVec getTilesWithAllSuggestions(const std::vector<TileValueType>& suggestions) const;
 
     TileValueType getSuggestionsQuanFor(TileValueType value) const;
 
     SolverTileVec findLockedSetOfSuggestions(const std::unordered_set<TileValueType>& values) const;
     std::vector<SolverTileVec> findLockedSetsOfSize(unsigned short n) const;
+
+    bool hasValue(TileValueType value) const;
+    bool isCompleted() const;
+
+    SolverTileVec::iterator begin() { return m_tiles.begin(); }
+    SolverTileVec::iterator end() { return m_tiles.end(); }
+    SolverTileVec::const_iterator begin() const { return m_tiles.begin(); }
+    SolverTileVec::const_iterator end() const { return m_tiles.end(); }
+    SolverTileVec::const_iterator cbegin() const { return m_tiles.cbegin(); }
+    SolverTileVec::const_iterator cend() const { return m_tiles.cend(); }
+
+  protected:
+    SolverTileVec m_tiles;
+    SuggestionsQuantity m_suggestionsQuan;
+
+  private:
+    SolverRegionType m_type;
+    RegionSpecificType m_specificType;
+    short m_index;
 };
 
-class SolverLine
-    : public SolverRegion
-    , public Line
+class SolverLine : public SolverRegion
 {
-  private:
   public:
-    SolverLine(Grid* grid, LineOrientation orientation, const short index);
-    SolverLine(const SolverLine& other, Grid* grid);
-    SolverLine(SolverLine&& other) = default;
-    SolverLine& operator=(SolverLine&& other) = default;
-    ~SolverLine() {}
+    SolverLine(LineOrientation orientation, short index, SolverTileVec tiles);
+
+    LineOrientation getLineOrientation() const { return m_orientation; }
+
+  private:
+    LineOrientation m_orientation;
 };
 
-class SolverSubgrid
-    : public SolverRegion
-    , public Subgrid
+class SolverSubgrid : public SolverRegion
 {
-  private:
   public:
-    SolverSubgrid(Grid* grid, const short index);
-    SolverSubgrid(const SolverSubgrid& other, Grid* grid);
-    SolverSubgrid(SolverSubgrid&& other) = default;
-    SolverSubgrid& operator=(SolverSubgrid&& other) = default;
-    ~SolverSubgrid() {}
+    SolverSubgrid(short index, SolverTileVec tiles);
 };
 
 #endif // __SOLVERREGIONS_H__

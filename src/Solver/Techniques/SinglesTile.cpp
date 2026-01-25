@@ -21,8 +21,7 @@ bool SinglesTile::perform()
             continue;
         }
 
-        const auto& solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
-
+        const auto& solverTile = tile;
         const auto& tileSuggestions = solverTile->getSuggestions();
         if (tileSuggestions.size() == 1)
         {

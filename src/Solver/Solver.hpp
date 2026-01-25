@@ -1,66 +1,66 @@
 #ifndef __SOLVER_H__
 #define __SOLVER_H__
 
-#include "Board/Grid.hpp"
 #include "Reporter.hpp"
+#include "SolverRegions.hpp"
+#include "SolverTile.hpp"
+#include "SolverTypes.hpp"
 
-#include <array>
+#include <format>
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 class Technique;
 
-class SolverComponentsContructor : public ComponentsConstructor
-{
-  public:
-    std::shared_ptr<Tile> createTile(Grid* grid, TileValueType row, TileValueType col) const override;
-    std::shared_ptr<Line> createLine(Grid* grid, LineOrientation row, short index) const override;
-    std::shared_ptr<Subgrid> createSubgrid(Grid* grid, short index) const override;
-
-    std::shared_ptr<Tile> createTileCopy(Grid* grid, const std::shared_ptr<Tile>& tile) const override;
-    std::shared_ptr<Line> createLineCopy(Grid* grid, const std::shared_ptr<Line>& line) const override;
-    std::shared_ptr<Subgrid> createSubgridCopy(Grid* grid,
-                                               const std::shared_ptr<Subgrid>& subgrid) const override;
-};
-
-class Solver : public Grid
+class Solver
 {
   private:
-    mutable std::vector<std::shared_ptr<SolverRegion>> m_allSolverRegions;
-
-    mutable std::vector<std::shared_ptr<SolverSubgrid>> m_allSolverSubgrids;
-    mutable std::vector<std::shared_ptr<SolverLine>> m_allSolverHorizontalLines;
-    mutable std::vector<std::shared_ptr<SolverLine>> m_allSolverVerticalLines;
+    SolverTileVec m_tiles;
+    std::vector<std::shared_ptr<SolverSubgrid>> m_subgrids;
+    std::vector<std::shared_ptr<SolverLine>> m_horizontalLines;
+    std::vector<std::shared_ptr<SolverLine>> m_verticalLines;
+    std::vector<std::shared_ptr<SolverRegion>> m_allRegions;
 
     std::vector<std::unique_ptr<Technique>> m_techniques;
-
-    void initialize();
-    void initializeTechniques();
-
     std::shared_ptr<Reporter> m_reporter;
 
     bool m_initializedWithSuggestions{false};
 
-  protected:
-    std::vector<std::string> requestTileDisplayStringForCoordinate(const TileValueType row,
-                                                                   const TileValueType col) const override;
+    void initializeLayout();
+    void initializeTechniques();
+    void initializeFromBoard(const std::string& fromBoard);
+
+    SolverTilePtr getTileAt(TileValueType row, TileValueType col) const;
+    std::vector<std::string> requestTileDisplayStringForCoordinate(TileValueType row,
+                                                                   TileValueType col) const;
 
   public:
-    const std::array<SolverRegion* const, 3> getSolverRegions(const Tile& tile);
-    const std::array<const SolverRegion* const, 3> getSolverRegions(const Tile& tile) const;
+    Solver();
+    explicit Solver(const std::string& fromBoard);
+    ~Solver();
+
+    SolverTileVec& getGridTiles() { return m_tiles; }
+    const SolverTileVec& getGridTiles() const { return m_tiles; }
+
+    SolverTilePtr operator()(TileValueType row, TileValueType col) const;
+    SolverTilePtr operator()(const Coordinates& coordinates) const;
 
     const std::vector<std::shared_ptr<SolverRegion>>& getAllRegions() const;
     const std::vector<std::shared_ptr<SolverSubgrid>>& getAllSolverSubgrids() const;
     const std::vector<std::shared_ptr<SolverLine>>& getAllSolverHorizontalLines() const;
     const std::vector<std::shared_ptr<SolverLine>>& getAllSolverVerticalLines() const;
 
-    void computeAllSuggestions(const bool clear = false);
-    void computeTileSuggestions(const Tile& tile, const bool clear = false);
+    void computeAllSuggestions(bool clear = false);
+    void computeTileSuggestions(const SolverTilePtr& tile, bool clear = false);
 
-    bool
-    canPlaceValueInTile(const Tile& tile, const TileValueType value, const bool forceCheck = false) const;
+    bool canPlaceValueInTile(const SolverTile& tile, TileValueType value, bool forceCheck = false) const;
 
-    friend int main(int argc, char** argv);
+    bool isSolved() const;
+
+    std::string getBoardString() const;
+    void printGrid() const;
 
     void setReporter(const std::shared_ptr<Reporter>& reporter) { m_reporter = reporter; }
 
@@ -73,14 +73,6 @@ class Solver : public Grid
             printGrid();
         }
     }
-
-    SolverTilePtr operator()(TileValueType row, TileValueType col) const;
-    SolverTilePtr operator()(const Coordinates& coordinates) const;
-
-  public:
-    Solver();
-    Solver(const std::string& fromBoard);
-    ~Solver();
 
     void solve();
 };

@@ -1,7 +1,6 @@
 #ifndef __SOLVERTILE_H__
 #define __SOLVERTILE_H__
 
-#include "Board/Tile.hpp"
 #include "SolverTypes.hpp"
 #include "Util/GlobalDefinitions.hpp"
 
@@ -9,25 +8,26 @@
 #include <unordered_set>
 #include <vector>
 
-class Solver;
 class SolverLine;
 class SolverSubgrid;
 class SolverRegion;
 
 using Suggestions = std::unordered_set<TileValueType>;
 
-class SolverTile : public Tile
+class SolverTile
 {
-  private:
-    Suggestions m_suggestions;
-
   public:
-    SolverTile(Grid* grid, TileValueType row, TileValueType col);
-    SolverTile(Grid* grid, const Coordinates& coordinates, TileValueType value = 0);
-    SolverTile(const SolverTile& other, Grid* grid);
+    SolverTile(TileValueType row, TileValueType col);
+    SolverTile(const Coordinates& coordinates, TileValueType value = 0);
+    SolverTile(const SolverTile& other) = default;
+    SolverTile& operator=(const SolverTile& other) = default;
     ~SolverTile() = default;
 
-    void setValue(TileValueType value) override;
+    void setValue(TileValueType value);
+    TileValueType getValue() const;
+    bool hasValue() const;
+
+    const Coordinates& getCoordinates() const;
 
     void computeSuggestions(bool clear = false);
 
@@ -39,9 +39,13 @@ class SolverTile : public Tile
     bool removeAllSuggestionsExceptFrom(const std::vector<TileValueType>& exceptionSuggestions);
     unsigned short getSuggestionsCount() const;
 
-    SolverLine* getSolverHorizontalLine() const;
-    SolverLine* getSolverVerticalLine() const;
-    SolverSubgrid* getSolverSubgrid() const;
+    void setHorizontalLine(SolverLine* line);
+    void setVerticalLine(SolverLine* line);
+    void setSubgrid(SolverSubgrid* subgrid);
+
+    SolverLine* getSolverHorizontalLine() const { return m_horizontalLine; }
+    SolverLine* getSolverVerticalLine() const { return m_verticalLine; }
+    SolverSubgrid* getSolverSubgrid() const { return m_subgrid; }
 
     std::vector<SolverRegion*> getSolverRegions() const;
 
@@ -50,6 +54,15 @@ class SolverTile : public Tile
 #ifdef DEBUG
     std::string toString() const;
 #endif
+
+  private:
+    Coordinates m_coordinates;
+    TileValueType m_value{0};
+    Suggestions m_suggestions;
+
+    SolverLine* m_horizontalLine{nullptr};
+    SolverLine* m_verticalLine{nullptr};
+    SolverSubgrid* m_subgrid{nullptr};
 };
 
 #endif // __SOLVERTILE_H__

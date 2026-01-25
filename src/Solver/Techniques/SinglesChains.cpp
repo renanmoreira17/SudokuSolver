@@ -391,7 +391,7 @@ class SinglesChainsAnalyzer
                 Traversal::getExtremityElementFrom(rootElement);
             for (const auto& tile : m_solver.getGridTiles())
             {
-                const auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
+                const auto& solverTile = tile;
                 if (!solverTile->hasSuggestion(chainedValue))
                     continue;
 

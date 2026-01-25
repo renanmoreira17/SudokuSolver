@@ -1,38 +1,35 @@
 #include "SolverUtils.hpp"
 
-#include "Board/Line.hpp"
-#include "Board/Region.hpp"
-#include "Board/Subgrid.hpp"
-#include "Board/Tile.hpp"
-#include "Solver/SolverRegions.hpp"
+#include "SolverRegions.hpp"
 #include "SolverTile.hpp"
 #include "SuggestionsQuantity.hpp"
 
+#include <algorithm>
 #include <cassert>
+#include <unordered_set>
 
-bool SolverUtils::areTilesInTheSameLine(const Tile& tile1, const Tile& tile2, LineOrientation lineOrientation)
+bool SolverUtils::areTilesInTheSameLine(const SolverTile& tile1,
+                                        const SolverTile& tile2,
+                                        LineOrientation lineOrientation)
 {
     if (tile1.getCoordinates().row == tile2.getCoordinates().row)
     {
         return lineOrientation == LineOrientation::HORIZONTAL;
     }
-    else if (tile1.getCoordinates().col == tile2.getCoordinates().col)
+    if (tile1.getCoordinates().col == tile2.getCoordinates().col)
     {
         return lineOrientation == LineOrientation::VERTICAL;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
-bool SolverUtils::areTilesInAnySameLine(const Tile& tile1, const Tile& tile2)
+bool SolverUtils::areTilesInAnySameLine(const SolverTile& tile1, const SolverTile& tile2)
 {
     return areTilesInTheSameLine(tile1, tile2, LineOrientation::HORIZONTAL) ||
            areTilesInTheSameLine(tile1, tile2, LineOrientation::VERTICAL);
 }
 
-bool SolverUtils::areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2)
+bool SolverUtils::areTilesInTheSameSubgrid(const SolverTile& tile1, const SolverTile& tile2)
 {
     const auto& tile1Coordinates = tile1.getCoordinates();
     const auto& tile2Coordinates = tile2.getCoordinates();
@@ -45,7 +42,7 @@ bool SolverUtils::areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2)
     return tile1SubgridRow == tile2SubgridRow && tile1SubgridCol == tile2SubgridCol;
 }
 
-bool SolverUtils::areTilesInTheSameRegion(const Tile& tile1, const Tile& tile2)
+bool SolverUtils::areTilesInTheSameRegion(const SolverTile& tile1, const SolverTile& tile2)
 {
     return areTilesInTheSameLine(tile1, tile2, LineOrientation::HORIZONTAL) ||
            areTilesInTheSameLine(tile1, tile2, LineOrientation::VERTICAL) ||
@@ -63,29 +60,27 @@ SuggestionsQuantity SolverUtils::collectSuggestionInformation(const SolverTileVe
     return suggestionsQuan;
 }
 
-Region* SolverUtils::getTilesCommonRegion(const Tile& tile1, const Tile& tile2)
+SolverRegion* SolverUtils::getTilesCommonRegion(const SolverTile& tile1, const SolverTile& tile2)
 {
     if (!areTilesInTheSameRegion(tile1, tile2))
     {
         return nullptr;
     }
-    else if (areTilesInTheSameSubgrid(tile1, tile2))
+    if (areTilesInTheSameSubgrid(tile1, tile2))
     {
-        return tile1.getSubgrid();
+        return tile1.getSolverSubgrid();
     }
-    else if (areTilesInTheSameLine(tile1, tile2, LineOrientation::HORIZONTAL))
+    if (areTilesInTheSameLine(tile1, tile2, LineOrientation::HORIZONTAL))
     {
-        return tile1.getHorizontalLine();
+        return tile1.getSolverHorizontalLine();
     }
-    else if (areTilesInTheSameLine(tile1, tile2, LineOrientation::VERTICAL))
+    if (areTilesInTheSameLine(tile1, tile2, LineOrientation::VERTICAL))
     {
-        return tile1.getVerticalLine();
+        return tile1.getSolverVerticalLine();
     }
-    else
-    {
-        assert(0);
-        return nullptr;
-    }
+
+    assert(false);
+    return nullptr;
 }
 
 std::vector<SolverRegion*> SolverUtils::getSolverTilesCommonSolverRegions(const SolverTilePtr& tile1,
@@ -113,14 +108,12 @@ SolverLine* SolverUtils::getCommonSolverLine(const SolverTilePtr& tile1, const S
     {
         return tile1->getSolverHorizontalLine();
     }
-    else if (areTilesInTheSameLine(*tile1, *tile2, LineOrientation::VERTICAL))
+    if (areTilesInTheSameLine(*tile1, *tile2, LineOrientation::VERTICAL))
     {
         return tile1->getSolverVerticalLine();
     }
-    else
-    {
-        return nullptr;
-    }
+
+    return nullptr;
 }
 
 SolverTileVec SolverUtils::getSeenTiles(const SolverTilePtr& tile)
@@ -128,6 +121,10 @@ SolverTileVec SolverUtils::getSeenTiles(const SolverTilePtr& tile)
     std::unordered_set<SolverTilePtr> result;
     for (const auto& region : tile->getSolverRegions())
     {
+        if (!region)
+        {
+            continue;
+        }
         for (const auto& regionTile : region->getSolverTiles())
         {
             if (regionTile != tile)

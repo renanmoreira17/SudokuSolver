@@ -5,6 +5,9 @@
 #include "Solver/SolverTile.hpp"
 #include "Solver/SolverUtils.hpp"
 
+#include <algorithm>
+#include <unordered_set>
+
 TEST_CASE("Test getMutuallySeenTiles", "[SolverUtils]")
 {
     Solver solver;

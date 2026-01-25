@@ -1,71 +1,88 @@
 #include "SolverTile.hpp"
 
-#include "Solver.hpp"
+#include "SolverRegions.hpp"
 
-SolverTile::SolverTile(Grid* grid, TileValueType row, TileValueType col)
-    : SolverTile(grid, Coordinates{row, col})
+#include <algorithm>
+#include <format>
+#include <stdexcept>
+
+SolverTile::SolverTile(TileValueType row, TileValueType col)
+    : SolverTile(Coordinates{row, col})
 {}
 
-SolverTile::SolverTile(Grid* grid, const Coordinates& coordinates, TileValueType value)
-    : Tile(grid, coordinates, value)
+SolverTile::SolverTile(const Coordinates& coordinates, TileValueType value)
+    : m_coordinates(coordinates)
+    , m_value(value)
 {}
-
-SolverTile::SolverTile(const SolverTile& other, Grid* grid)
-    : Tile(other, grid)
-{
-    m_suggestions = other.m_suggestions;
-}
 
 void SolverTile::setValue(TileValueType value)
 {
-    Tile::setValue(value);
-    // removera todas as sugestoes desse tile. Com isso, também é necessario decrementar
-    // o número de sugestoes para cada valor contido nas sugestoes em cada region, depois
-    // limpando as sugestoes
-    const auto& regions = getRegions();
+    m_value = value;
+
+    const auto regions = getSolverRegions();
     for (const auto& suggestion : m_suggestions)
     {
-        // iterate over all regions and cast each region to a SolverRegion
-        for (const auto& region : regions)
+        for (auto* region : regions)
         {
-            auto solverRegion = dynamic_cast<SolverRegion*>(region);
-            solverRegion->suggestionRemoved(suggestion);
+            if (region)
+            {
+                region->suggestionRemoved(suggestion);
+            }
         }
     }
-    // remove todas as sugestões
     m_suggestions.clear();
 
-    // TODO: talvez não passar novamente por tiles já visitados
-    // para cada region do tile a ter o valor inserido, remove todas as ocorrência de suggestion
-    // desse valor (já que agora ele existe no tile atual)
-    for (auto region : regions)
+    for (auto* region : regions)
     {
-        // para cada tile da region a ser iterada
-        // não passara pelo tile que está sendo setado porque agora ele contem um valor.
-        for (const auto& tile : *region)
+        if (!region)
         {
-            // cast tile to SolverTilePtr
-            auto solverTile = std::dynamic_pointer_cast<SolverTile>(tile);
-            if (solverTile->hasValue())
+            continue;
+        }
+        for (const auto& tile : region->getSolverTiles())
+        {
+            if (tile.get() == this || tile->hasValue())
+            {
                 continue;
-
-            solverTile->removeSuggestion(value);
+            }
+            tile->removeSuggestion(value);
         }
     }
+}
+
+TileValueType SolverTile::getValue() const
+{
+    return m_value;
+}
+
+bool SolverTile::hasValue() const
+{
+    return m_value != 0;
+}
+
+const Coordinates& SolverTile::getCoordinates() const
+{
+    return m_coordinates;
 }
 
 void SolverTile::computeSuggestions(const bool clear)
 {
-    auto& [hLine, vLine, sGrid] = getRegionsTuple();
     if (clear)
     {
-        m_suggestions.clear();
+        const auto suggestionsCopy = m_suggestions;
+        for (const auto& suggestion : suggestionsCopy)
+        {
+            removeSuggestion(suggestion);
+        }
     }
 
     for (TileValueType value = 1; value <= 9; ++value)
     {
-        if (vLine->hasValue(value) || hLine->hasValue(value) || sGrid->hasValue(value))
+        if ((m_verticalLine && m_verticalLine->hasValue(value)) ||
+            (m_horizontalLine && m_horizontalLine->hasValue(value)) ||
+            (m_subgrid && m_subgrid->hasValue(value)))
+        {
             continue;
+        }
         addSuggestion(value);
     }
 }
@@ -74,14 +91,14 @@ bool SolverTile::canPlaceValueInTile(const TileValueType value, const bool force
 {
     if (forceCheck)
     {
-        const auto& regions = getRegions();
+        const auto regions = getSolverRegions();
         return std::none_of(
-            regions.begin(), regions.end(), [=](auto&& region) { return region->hasValue(value); });
+            regions.begin(),
+            regions.end(),
+            [=](auto* region) { return region != nullptr && region->hasValue(value); });
     }
-    else
-    {
-        return m_suggestions.find(value) == m_suggestions.cend();
-    }
+
+    return m_suggestions.find(value) != m_suggestions.cend();
 }
 
 bool SolverTile::hasSuggestion(TileValueType value) const
@@ -91,36 +108,45 @@ bool SolverTile::hasSuggestion(TileValueType value) const
 
 void SolverTile::addSuggestion(TileValueType value)
 {
-    const auto regions = getRegions();
-    const auto isInvalid = std::any_of(
-        regions.begin(), regions.end(), [&](const Region* region) { return region->hasValue(value); });
+    const auto regions = getSolverRegions();
+    const auto isInvalid =
+        std::any_of(regions.begin(), regions.end(), [&](const SolverRegion* region) {
+            return region != nullptr && region->hasValue(value);
+        });
     if (isInvalid)
     {
-        throw std::runtime_error(
-            std::format("Can't add suggestion {} to tile {} because it's already in a region", value, *this));
+        throw std::runtime_error(std::format(
+            "Can't add suggestion {} to tile ({}, {}) because it's already in a region",
+            value,
+            m_coordinates.row,
+            m_coordinates.col));
     }
     const auto insertedPair = m_suggestions.insert(value);
-    // se tiver inserido, então incrementa em 1 o número de ocorrências dessa sugestão em todas
-    // as regions desse tile
     if (insertedPair.second)
     {
         const auto solverRegions = getSolverRegions();
-        for (const auto& solverRegion : solverRegions) { solverRegion->suggestionAdded(value); }
+        for (const auto& solverRegion : solverRegions)
+        {
+            if (solverRegion)
+            {
+                solverRegion->suggestionAdded(value);
+            }
+        }
     }
 }
 
 bool SolverTile::removeSuggestion(TileValueType value)
 {
     const auto erased = m_suggestions.erase(value);
-    // se tiver apagado (o tile tinha suggestion desse value), diminui o numero de
-    // suggestions das SolverRegions desse valor
     if (erased)
     {
-        const auto& regions = getRegions();
-        for (auto& region : regions)
+        const auto regions = getSolverRegions();
+        for (auto* solverRegion : regions)
         {
-            auto* solverRegion = dynamic_cast<SolverRegion*>(region);
-            solverRegion->suggestionRemoved(value);
+            if (solverRegion)
+            {
+                solverRegion->suggestionRemoved(value);
+            }
         }
     }
     return erased;
@@ -129,7 +155,10 @@ bool SolverTile::removeSuggestion(TileValueType value)
 bool SolverTile::removeSuggestions(const std::vector<TileValueType>& suggestions)
 {
     bool changed = false;
-    for (const auto& suggestion : suggestions) { changed |= removeSuggestion(suggestion); }
+    for (const auto& suggestion : suggestions)
+    {
+        changed |= removeSuggestion(suggestion);
+    }
     return changed;
 }
 
@@ -154,29 +183,28 @@ unsigned short SolverTile::getSuggestionsCount() const
     return static_cast<unsigned short>(m_suggestions.size());
 }
 
-SolverLine* SolverTile::getSolverHorizontalLine() const
+void SolverTile::setHorizontalLine(SolverLine* line)
 {
-    return dynamic_cast<SolverLine*>(getHorizontalLine());
+    m_horizontalLine = line;
 }
 
-SolverLine* SolverTile::getSolverVerticalLine() const
+void SolverTile::setVerticalLine(SolverLine* line)
 {
-    return dynamic_cast<SolverLine*>(getVerticalLine());
+    m_verticalLine = line;
 }
 
-SolverSubgrid* SolverTile::getSolverSubgrid() const
+void SolverTile::setSubgrid(SolverSubgrid* subgrid)
 {
-    return dynamic_cast<SolverSubgrid*>(getSubgrid());
+    m_subgrid = subgrid;
 }
 
 std::vector<SolverRegion*> SolverTile::getSolverRegions() const
 {
-    return {getSolverHorizontalLine(), getSolverVerticalLine(), getSolverSubgrid()};
+    return {m_horizontalLine, m_verticalLine, m_subgrid};
 }
 
 #ifdef DEBUG
 #include "Util/UtilFunctions.hpp"
-#include <format>
 
 std::string SolverTile::toString() const
 {

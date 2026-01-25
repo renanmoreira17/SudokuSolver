@@ -4,8 +4,6 @@
 #include "SolverTypes.hpp"
 #include "Util/GlobalDefinitions.hpp"
 
-class Tile;
-class Region;
 class SuggestionsQuantity;
 class SolverTile;
 class SolverRegion;
@@ -13,13 +11,15 @@ class SolverLine;
 
 namespace SolverUtils
 {
-bool areTilesInTheSameLine(const Tile& tile1, const Tile& tile2, LineOrientation lineOrientation);
-bool areTilesInAnySameLine(const Tile& tile1, const Tile& tile2);
-bool areTilesInTheSameSubgrid(const Tile& tile1, const Tile& tile2);
+bool areTilesInTheSameLine(const SolverTile& tile1,
+                           const SolverTile& tile2,
+                           LineOrientation lineOrientation);
+bool areTilesInAnySameLine(const SolverTile& tile1, const SolverTile& tile2);
+bool areTilesInTheSameSubgrid(const SolverTile& tile1, const SolverTile& tile2);
 
-bool areTilesInTheSameRegion(const Tile& tile1, const Tile& tile2);
+bool areTilesInTheSameRegion(const SolverTile& tile1, const SolverTile& tile2);
 
-Region* getTilesCommonRegion(const Tile& tile1, const Tile& tile2);
+SolverRegion* getTilesCommonRegion(const SolverTile& tile1, const SolverTile& tile2);
 
 std::vector<SolverRegion*> getSolverTilesCommonSolverRegions(const SolverTilePtr& tile1,
                                                              const SolverTilePtr& tile2);

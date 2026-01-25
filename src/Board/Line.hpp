@@ -27,6 +27,7 @@ class Line : virtual public Region
         case LineOrientation::HORIZONTAL: return RegionSpecificType::HORIZONTAL_LINE;
         case LineOrientation::VERTICAL: return RegionSpecificType::VERTICAL_LINE;
         }
+        return RegionSpecificType::UNKNOWN;
     }
 };
 

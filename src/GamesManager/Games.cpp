@@ -69,4 +69,6 @@ const std::string& getGameOfDifficulty(GameDifficulty difficulty)
         }
         return getGameOfDifficulty(randomDifficulty);
     }
+
+    return simpleGames.front();
 }

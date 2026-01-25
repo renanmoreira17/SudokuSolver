@@ -29,11 +29,11 @@ bool SinglesRegion::perform()
             // a key desse iterator será o valor que tem apenas 1 sugestão
             const TileValueType value = found->first;
             // sempre vai achar
-            auto foundTile = std::find_if(region->cbegin(), region->cend(), [&](auto& in) -> bool {
-                return std::dynamic_pointer_cast<SolverTile>(in)->hasSuggestion(value);
+            auto foundTile = std::find_if(region->cbegin(), region->cend(), [&](const auto& in) -> bool {
+                return in->hasSuggestion(value);
             });
             assert(foundTile != region->cend());
-            auto solverTile = std::dynamic_pointer_cast<SolverTile>(*foundTile);
+            auto solverTile = *foundTile;
             solverTile->setValue(value);
             performed = true;
 
@@ -41,7 +41,7 @@ bool SinglesRegion::perform()
                             "valor {}, no Tile {}. Dessa forma, esse Tile foi definido com esse valor.",
                             *region,
                             value,
-                            **foundTile);
+                            *solverTile);
         }
     }
     return performed;
