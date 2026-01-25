@@ -56,6 +56,10 @@ class MultilineElement
 
     MultilineElement operator+(const MultilineElement& other) const
     {
+        if (m_lines.size() != other.m_lines.size())
+        {
+            throw std::runtime_error("MultilineElement size mismatch while composing board.");
+        }
         MultilineElement result;
         for (size_t i = 0; i < m_lines.size(); ++i)
         {
@@ -156,6 +160,38 @@ class DisplayMultilineElementBuilder
 size_t toIndex(TileValueType row, TileValueType col)
 {
     return static_cast<size_t>(row) * kGridSize + col;
+}
+
+MultilineElement buildRowLabels(const unsigned short tileLineCount)
+{
+    std::vector<std::string> lines;
+    lines.reserve(1 + (kSubgridSize * (1 + kSubgridSize * (tileLineCount + 1))));
+    lines.emplace_back("  ");
+
+    TileValueType rowIndex = 0;
+    for (TileValueType subgridRow = 0; subgridRow < kSubgridSize; ++subgridRow)
+    {
+        lines.emplace_back("  ");
+        for (TileValueType rowInSubgrid = 0; rowInSubgrid < kSubgridSize; ++rowInSubgrid)
+        {
+            for (unsigned short lineIndex = 0; lineIndex < tileLineCount; ++lineIndex)
+            {
+                if (lineIndex == tileLineCount / 2)
+                {
+                    const char label = static_cast<char>('A' + rowIndex);
+                    lines.emplace_back(std::string{label, ' '});
+                }
+                else
+                {
+                    lines.emplace_back("  ");
+                }
+            }
+            lines.emplace_back("  ");
+            ++rowIndex;
+        }
+    }
+
+    return MultilineElement(std::move(lines));
 }
 } // namespace
 
@@ -445,6 +481,7 @@ std::vector<std::string> Solver::requestTileDisplayStringForCoordinate(const Til
 
 std::string Solver::getBoardString() const
 {
+    unsigned short tileLineCount = 0;
     std::vector<MultilineElement> subgridDisplayElements;
     for (TileValueType subgridIndex = 0; subgridIndex < kGridSize; ++subgridIndex)
     {
@@ -460,6 +497,11 @@ std::string Solver::getBoardString() const
                 currentSubgridDisplayElements.emplace_back(
                     requestTileDisplayStringForCoordinate(absoluteRow, absoluteCol));
             }
+        }
+        if (tileLineCount == 0)
+        {
+            tileLineCount =
+                static_cast<unsigned short>(currentSubgridDisplayElements.front().getLines().size());
         }
         const DisplayMultilineElementBuilder displayMultilineElementBuilder(
             std::move(currentSubgridDisplayElements),
@@ -479,48 +521,12 @@ std::string Solver::getBoardString() const
 
     boardWithColumns.addFromMultilineElement(boardElementsBuilder.build());
 
-    const static MultilineElement linesLabelString({
-        "  ",
-        "  ",
-        "  ",
-        "A ",
-        "  ",
-        "  ",
-        "  ",
-        "B ",
-        "  ",
-        "  ",
-        "  ",
-        "C ",
-        "  ",
-        "  ",
-        "  ",
-        "  ",
-        "  ",
-        "D ",
-        "  ",
-        "  ",
-        "  ",
-        "E ",
-        "  ",
-        "  ",
-        "  ",
-        "F ",
-        "  ",
-        "  ",
-        "  ",
-        "  ",
-        "  ",
-        "G ",
-        "  ",
-        "  ",
-        "  ",
-        "H ",
-        "  ",
-        "  ",
-        "  ",
-        "I ",
-    });
+    if (tileLineCount == 0)
+    {
+        throw std::runtime_error("Invalid tile line count while building board.");
+    }
+
+    const auto linesLabelString = buildRowLabels(tileLineCount);
 
     const MultilineElement finalBoardDisplay = linesLabelString + boardWithColumns;
 
